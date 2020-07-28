@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>车辆登记系统</title>
+    <script src="res/unpkg/vue.min.js"></script>
+    <script src="res/unpkg/axios.min.js"></script>
+    <script src="res/unpkg/vue-multiselect.min.js"></script>
+    <link rel="stylesheet" href="res/unpkg/vue-multiselect.min.css">
+    <script src="res/rowColor.js"></script>
+    <script src="res/qs.min.js"></script>
+    <style>
+        .tabs { /* tab选项卡外围 */
+            width: 95%;
+            height: 20px;
+            padding: 0;
+        }
+
+        .li-tab { /* tab的每个选项卡 */
+            width: 120px;
+            height: 20px;
+            display: inline-block;
+            text-align: center;
+            float: left;
+            border: 1px solid white;
+            background-color: gray;
+            cursor: pointer;
+        }
+
+        .active { /* tab活动选项卡 */
+            background-color: #99ffff !important;
+        }
+
+        .divTab { /* tab内容 */
+            width: 95%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="divApp">
+    <ul class="tabs">
+        <li :class="{active:0==tab.tabIndex}" class="li-tab" @click="toggleTabs(0)">查看</li>
+        <li :class="{active:1==tab.tabIndex}" class="li-tab" @click="toggleTabs(1)">xxx</li>
+    </ul>
+    <div class="tab-content">
+        <!-- tab 1 -->
+        <div v-show="tab.tabIndex===0" class="divTab">
+            <div>
+                <div style="float: left;">
+                    <div>
+                        <span style="display: inline-block;width:80px;">车牌：</span>
+                        <div style="width: 450px; display: inline-block;">
+                            <input type="text" v-model="condition.carNumber">
+                        </div>
+                    </div>
+                    <div>
+                        <button @click="doSearch">查找</button>
+
+                        <button @click="addCar">添加车辆</button>
+                    </div>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+            <hr>
+            <table border="1" style=" border: 1px solid black;">
+                <tr>
+                    <th></th>
+                    <th>序号</th>
+                    <th>车牌</th>
+                    <th>住址</th>
+                    <th>电话</th>
+                    <th>户主</th>
+                    <th>备注</th>
+                    <th>众筹</th>
+                </tr>
+                <tr v-for="(item, idx) in cars">
+                    <td>{{idx + 1}}</td>
+                    <td>{{item.sn}}</td>
+                    <td>{{item.carNumber}}</td>
+                    <td>{{item.address}}</td>
+                    <td>{{item.phone}}</td>
+                    <td>{{item.owner}}</td>
+                    <td>{{item.remark}}</td>
+                    <td>{{item.money}}</td>
+                </tr>
+            </table>
+        </div>
+        <!-- tab 2 -->
+        <div v-show="tab.tabIndex===1" class="divTab">
+            我是第二个TAB
+        </div>
+    </div>
+
+
+    <!--  弹窗浮层
+        <button type="button" @click="showModal">打开弹出层</button>-->
+    <div style="display: none;background: lightblue;border:1px solid green; width:610px;height:400px; overflow-y: auto;"
+         id="divToast">
+        <a href="javascript:;" @click="closeModal">【关闭弹窗】</a>
+        <!-- 弹窗内容  -->
+        <div>
+            <span style="font-size: 30px; font-weight: bold;">添加车辆</span>
+            <table border="1" style="width:600px; border: 1px solid black;">
+                <tbody>
+                <tr>
+                    <th>序号</th>
+                    <td><input type="text" v-model="editCar.sn"></td>
+                </tr>
+                <tr>
+                    <th>车牌</th>
+                    <td><input type="text" v-model="editCar.carNumber"></td>
+                </tr>
+                <tr>
+                    <th>住址</th>
+                    <td><input type="text" v-model="editCar.address"></td>
+                </tr>
+                <tr>
+                    <th>电话</th>
+                    <td><input type="text" v-model="editCar.phone"></td>
+                </tr>
+                <tr>
+                    <th>户主</th>
+                    <td><input type="checkbox" v-model="editCar.owner"></td>
+                </tr>
+                <tr>
+                    <th>备注</th>
+                    <td><input type="text" v-model="editCar.remark"></td>
+                </tr>
+                <tr>
+                    <th>众筹</th>
+                    <td><input type="text" v-model="editCar.money"></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button>保存</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vueApp = new Vue({
+        el: '#divApp',
+        components: {
+            Multiselect: window.VueMultiselect.default
+        },
+        data: {
+            tab: {
+                tabIndex: 0,
+                title: '',
+            },
+            condition: {
+                carNumber: '',
+            },
+            cars: [],
+            editCar: {},
+        },
+        created: function () {
+            this.loadCars();
+        },
+        methods: {
+            toggleTabs: function (idx) {
+                this.tab.tabIndex = idx;
+            },
+            loadCars: function () {
+                let _vue = this;
+                let url = '/v1/cars';
+                axios.get(url).then(function (response) {
+                    if (!response.data || response.data.length <= 0) {
+                        alert('未找到数据');
+                        return;
+                    }
+                    _vue.cars = response.data;
+                }).catch(function (error) {
+                    _vue.ajaxError(error);
+                });
+            },
+            doSearch: function () {
+            },
+            addCar: function () {
+                this.showModal();
+            },
+            showModal: function () {
+                let toast = document.getElementById('divToast');
+                toast.style.display = 'block';
+                toast.style.position = 'fixed';
+                let winWidth = window.innerWidth;
+                let winHeight = window.innerHeight;
+                let targetWidth = toast.offsetWidth;
+                let targetHeight = toast.offsetHeight;
+                toast.style.top = (winHeight - targetHeight) / 2 + 'px';
+                toast.style.left = (winWidth - targetWidth) / 2 + 'px';
+            },
+            closeModal: function () {
+                document.getElementById('divToast').style.display = 'none';
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    let msg = error.response.data['Msg'];
+                    if (msg === 'Unauthorized') {
+                        location.href = '/login?r=%2Fadmin%23%2FserverStatus.html';
+                        return;
+                    }
+                    console.log(JSON.stringify(error.response.data));
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>

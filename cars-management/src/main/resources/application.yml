@@ -1,0 +1,29 @@
+server:
+  port: 9999
+
+spring:
+  application:
+    name: "scangitcode"         # 程序name，建议配置，方便统一的服务管理
+
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:/sqlitedb.db
+    username:
+    password:
+  ### sqlite需要自己配置连接方式
+  jpa:
+    database-platform: com.beinet.carsmanagement.utils.SQLiteDialect #自己配置的方言
+    hibernate:
+      ddl-auto: update  #自动更新表结构
+    show-sql: true
+
+  jackson:
+    default-property-inclusion: always  #为空也序列化
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    mapper:
+      accept_case_insensitive_properties: true
+
+logging:
+  level:
+    com.mike.scannewcode.gitScan.OpsFeign: debug
