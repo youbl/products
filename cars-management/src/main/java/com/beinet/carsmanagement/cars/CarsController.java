@@ -1,8 +1,10 @@
 package com.beinet.carsmanagement.cars;
 
+import com.beinet.carsmanagement.SecurityConfig;
 import com.beinet.carsmanagement.cars.model.Cars;
 import com.beinet.carsmanagement.cars.services.CarsService;
 import com.beinet.carsmanagement.utils.IpHelper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,8 +21,13 @@ public class CarsController {
         this.carsService = carsService;
     }
 
+    @GetMapping("user")
+    public String getLoginUser() {
+        return SecurityConfig.getLoginUser();
+    }
+
     @GetMapping("cars")
-    public List<Cars> getCars(@RequestParam String carNumber) {
+    public List<Cars> getCars(@RequestParam(required = false) String carNumber) {
         return carsService.getCars(carNumber);
     }
 

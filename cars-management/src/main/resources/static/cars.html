@@ -146,7 +146,8 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <input type="button" value="保存" @click="saveCar">
+                        <input v-show="loginUser" type="button" value="保存" @click="saveCar">
+                        <span v-show="!loginUser">未登录，不能编辑</span>
                     </td>
                 </tr>
                 </tbody>
@@ -189,6 +190,7 @@
                 carNumber: '',
                 phone: '',
             },
+            loginUser: '',
             cars: [],
             editCar: {
                 id: 0,
@@ -203,11 +205,20 @@
             },
         },
         created: function () {
+            this.loadLoginUser();
             this.loadCars();
         },
         methods: {
             toggleTabs: function (idx) {
                 this.tab.tabIndex = idx;
+            },
+            loadLoginUser: function () {
+                let url = '/v1/user';
+                axios.get(url).then(response => {
+                    this.loginUser = response.data;
+                }).catch(error => {
+                    this.ajaxError(error);
+                });
             },
             initCar: function () {
                 let empty = {

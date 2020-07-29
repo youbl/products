@@ -3,7 +3,11 @@ server:
 
 spring:
   application:
-    name: "scangitcode"         # 程序name，建议配置，方便统一的服务管理
+    name: "car-manager"         # 程序name，建议配置，方便统一的服务管理
+  security:
+    user:
+      name: ybl
+      password: 1234321
 
   datasource:
     driver-class-name: org.sqlite.JDBC
