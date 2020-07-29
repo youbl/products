@@ -2,14 +2,16 @@ package com.beinet.carsmanagement.cars;
 
 import com.beinet.carsmanagement.cars.model.Cars;
 import com.beinet.carsmanagement.cars.services.CarsService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.beinet.carsmanagement.utils.IpHelper;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/v1")
+@RequestMapping(value = "/v1")//, produces = {"application/json;charset=UTF-8"})
 public class CarsController {
     private final CarsService carsService;
 
@@ -18,7 +20,19 @@ public class CarsController {
     }
 
     @GetMapping("cars")
-    public List<Cars> getCars() {
-        return carsService.getCars();
+    public List<Cars> getCars(@RequestParam String carNumber) {
+        return carsService.getCars(carNumber);
+    }
+
+    @GetMapping("cars/{id}")
+    public Cars getCars(@PathVariable int id, @RequestParam String phone) {
+        return carsService.getCarBySearcherPhone(id, phone);
+    }
+
+    @PostMapping("cars")
+    public Cars addCars(HttpServletRequest request, @RequestBody Cars car) {
+        car.setIp(IpHelper.getIpAddr(request));
+        car.setAddTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        return carsService.saveCars(car);
     }
 }

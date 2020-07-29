@@ -12,13 +12,11 @@
     <style>
         .tabs { /* tab选项卡外围 */
             width: 95%;
-            height: 20px;
             padding: 0;
         }
 
         .li-tab { /* tab的每个选项卡 */
-            width: 120px;
-            height: 20px;
+            width: 30vw;
             display: inline-block;
             text-align: center;
             float: left;
@@ -34,14 +32,37 @@
         .divTab { /* tab内容 */
             width: 95%;
         }
+
+        input[type=text], input[type=button] {
+            font-size: 50px;
+            line-height: 90%;
+            -webkit-appearance: none;
+            width: 95%;
+            margin: 5px 5px 5px 5px;
+        }
+
+        input[type=checkbox] {
+            /* Double-sized Checkboxes */
+            -ms-transform: scale(4); /* IE */
+            -moz-transform: scale(4); /* FF */
+            -webkit-transform: scale(4); /* Safari and Chrome */
+            -o-transform: scale(4); /* Opera */
+            transform: scale(4);
+            padding: 10px;
+        }
+
+        td {
+            text-align: center;
+            vertical-align: center;
+        }
     </style>
 </head>
 <body>
 
-<div id="divApp">
+<div id="divApp" style="font-size: 50px; text-align: center;">
     <ul class="tabs">
         <li :class="{active:0==tab.tabIndex}" class="li-tab" @click="toggleTabs(0)">查看</li>
-        <li :class="{active:1==tab.tabIndex}" class="li-tab" @click="toggleTabs(1)">xxx</li>
+        <li :class="{active:1==tab.tabIndex}" class="li-tab" @click="toggleTabs(1)">编辑车辆</li>
     </ul>
     <div class="tab-content">
         <!-- tab 1 -->
@@ -49,63 +70,45 @@
             <div>
                 <div style="float: left;">
                     <div>
-                        <span style="display: inline-block;width:80px;">车牌：</span>
-                        <div style="width: 450px; display: inline-block;">
+                        <span style="display: inline-block;width:20vw;">车牌：</span>
+                        <div style="width: 70vw; display: inline-block;">
                             <input type="text" v-model="condition.carNumber">
                         </div>
                     </div>
                     <div>
-                        <button @click="doSearch">查找</button>
-
-                        <button @click="addCar">添加车辆</button>
+                        <div style="width: 30vw; display: inline-block;">
+                            <input type="button" value="查找" @click="doSearch">
+                        </div>
+                        <div style="width: 30vw; display: inline-block;">
+                            <input type="button" value="添加车辆" @click="addCar">
+                        </div>
                     </div>
                 </div>
                 <div style="clear: both;"></div>
             </div>
             <hr>
-            <table border="1" style=" border: 1px solid black;">
+            <table border="1" style="width: 95%; border: 1px solid black;">
                 <tr>
                     <th></th>
                     <th>序号</th>
                     <th>车牌</th>
                     <th>住址</th>
-                    <th>电话</th>
-                    <th>户主</th>
-                    <th>备注</th>
-                    <th>众筹</th>
                 </tr>
-                <tr v-for="(item, idx) in cars">
+                <tr v-for="(item, idx) in cars" @click="editItem(item)">
                     <td>{{idx + 1}}</td>
                     <td>{{item.sn}}</td>
                     <td>{{item.carNumber}}</td>
                     <td>{{item.address}}</td>
-                    <td>{{item.phone}}</td>
-                    <td>{{item.owner}}</td>
-                    <td>{{item.remark}}</td>
-                    <td>{{item.money}}</td>
                 </tr>
             </table>
         </div>
         <!-- tab 2 -->
         <div v-show="tab.tabIndex===1" class="divTab">
-            我是第二个TAB
-        </div>
-    </div>
-
-
-    <!--  弹窗浮层
-        <button type="button" @click="showModal">打开弹出层</button>-->
-    <div style="display: none;background: lightblue;border:1px solid green; width:610px;height:400px; overflow-y: auto;"
-         id="divToast">
-        <a href="javascript:;" @click="closeModal">【关闭弹窗】</a>
-        <!-- 弹窗内容  -->
-        <div>
-            <span style="font-size: 30px; font-weight: bold;">添加车辆</span>
-            <table border="1" style="width:600px; border: 1px solid black;">
+            <table border="1" style="width:95%; border: 1px solid black;">
                 <tbody>
                 <tr>
-                    <th>序号</th>
-                    <td><input type="text" v-model="editCar.sn"></td>
+                    <th style="width: 20vw;">序号</th>
+                    <td style="width:80vw;"><input type="text" v-model="editCar.sn"></td>
                 </tr>
                 <tr>
                     <th>车牌</th>
@@ -116,12 +119,18 @@
                     <td><input type="text" v-model="editCar.address"></td>
                 </tr>
                 <tr>
-                    <th>电话</th>
-                    <td><input type="text" v-model="editCar.phone"></td>
+                    <th>手机</th>
+                    <td style="text-align: left;">
+                        <input type="text" v-model="editCar.phone" style="width:35vw;">
+                        <input type="button" value="完整手机号" v-if="editCar.id" @click="showPhone" style="width:30vw;">
+                    </td>
                 </tr>
                 <tr>
                     <th>户主</th>
-                    <td><input type="checkbox" v-model="editCar.owner"></td>
+                    <td>
+                        <label><input type="checkbox" v-model="editCar.owner">&nbsp;是
+                        </label>
+                    </td>
                 </tr>
                 <tr>
                     <th>备注</th>
@@ -132,12 +141,35 @@
                     <td><input type="text" v-model="editCar.money"></td>
                 </tr>
                 <tr>
+                    <th>IP</th>
+                    <td>{{editCar.ip}}</td>
+                </tr>
+                <tr>
                     <td colspan="2">
-                        <button>保存</button>
+                        <input type="button" value="保存" @click="saveCar">
                     </td>
                 </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+
+    <!--  弹窗浮层
+        <button type="button" @click="showModal">打开弹出层</button>-->
+    <div style="display: none;background: lightblue;border:1px solid green; width:95%;height:400px; overflow-y: auto; text-align: left;"
+         id="divToast">
+        <a href="javascript:;" @click="closeModal">【关闭弹窗】</a>
+        <!-- 弹窗内容  -->
+        <div>
+            <div>只有列表中人员可查看</div>
+            <div>
+                请输入您的完整手机号：
+                <input type="text" v-model="condition.phone" style="width:35vw;">
+            </div>
+            <div>
+                <input type="button" value="查看" @click="checkAndShowPhone">
+            </div>
         </div>
     </div>
 </div>
@@ -155,9 +187,19 @@
             },
             condition: {
                 carNumber: '',
+                phone: '',
             },
             cars: [],
-            editCar: {},
+            editCar: {
+                id: 0,
+                sn: '',
+                address: '',
+                owner: false,
+                addTime: '',
+                carNumber: '',
+                money: 0,
+                remark: '',
+            },
         },
         created: function () {
             this.loadCars();
@@ -166,23 +208,118 @@
             toggleTabs: function (idx) {
                 this.tab.tabIndex = idx;
             },
+            initCar: function () {
+                this.editCar.id = 0;
+                this.editCar.sn = '';
+                this.editCar.address = '';
+                this.editCar.owner = false;
+                this.editCar.addTime = '';
+                this.editCar.carNumber = '';
+                this.editCar.money = 0;
+                this.editCar.remark = '';
+                this.editCar.phone = '';
+            },
             loadCars: function () {
-                let _vue = this;
-                let url = '/v1/cars';
-                axios.get(url).then(function (response) {
+                this.toggleTabs(0);
+                this.initCar();
+                let url = '/v1/cars?carNumber=' + encodeURIComponent(this.condition.carNumber);
+                // 箭头函数，可以直接在响应在使用 this（就是vueApp)
+                axios.get(url).then(response => {
                     if (!response.data || response.data.length <= 0) {
-                        alert('未找到数据');
+                        // alert('未找到数据');
                         return;
                     }
-                    _vue.cars = response.data;
-                }).catch(function (error) {
-                    _vue.ajaxError(error);
+                    for (let i = 0, j = response.data.length; i < j; i++) {
+                        let item = response.data[i];
+                        item.money = this.intToMoney(item.money);
+                    }
+                    this.cars = response.data;
+                }).catch(error => {
+                    this.ajaxError(error);
                 });
             },
             doSearch: function () {
+                this.loadCars();
+            },
+            showPhone: function () {
+                this.showModal();
+            },
+            checkAndShowPhone: function () {
+                if (!this.isPhone(this.condition.phone)) {
+                    alert('手机号格式不符');
+                    return;
+                }
+                let url = '/v1/cars/' + this.editCar.id + '?phone=' + this.condition.phone;
+                axios.get(url).then(response => {
+                    if (!response.data) {
+                        alert('系统中未找到您的手机号，查看失败');
+                        return;
+                    }
+                    Vue.set(this, "editCar", response.data);
+                    this.closeModal();
+                }).catch(error => {
+                    this.ajaxError(error);
+                });
             },
             addCar: function () {
-                this.showModal();
+                this.initCar();
+                this.toggleTabs(1);
+            },
+            editItem: function (item) {
+                Vue.set(this, "editCar", item);
+                this.toggleTabs(1);
+            },
+            saveCar: function () {
+                if (!this.checkCondition())
+                    return;
+                let url = '/v1/cars';
+                //this.editCar.Sn = "abc";
+                axios.post(url, this.editCar).then(response => {
+                    if (!response.data) {
+                        alert('保存失败');
+                        return;
+                    }
+                    this.loadCars();
+                }).catch(error => {
+                    this.ajaxError(error);
+                });
+            },
+            checkCondition: function () {
+                let reg = /^\d+$/;
+                if (!reg.test(this.editCar.sn)) {
+                    alert('sn只能是数字');
+                    return false;
+                }
+                if (!this.isPhone(this.editCar.phone)) {
+                    alert('手机号格式不符');
+                    return false;
+                }
+                if (this.editCar.carNumber.length <= 0) {
+                    alert('车牌必填');
+                    return false;
+                }
+                if (this.editCar.address.length <= 0) {
+                    alert('地址必填');
+                    return false;
+                }
+                if (this.editCar.money.length <= 0) {
+                    this.editCar.money = '0';
+                } else if (!(/^\d+(\.\d+)?$/).test(this.editCar.money)) {
+                    alert('金额只能是数字');
+                    return false;
+                }
+                this.editCar.money = this.moneyToInt(this.editCar.money);
+                return true;
+            },
+            isPhone: function (phone) {
+                let reg = /^1\d{10}$/;
+                return (reg.test(phone));
+            },
+            moneyToInt: function (money) {
+                return Math.floor(money * 100);
+            },
+            intToMoney: function (num) {
+                return num / 100;
             },
             showModal: function () {
                 let toast = document.getElementById('divToast');
@@ -192,7 +329,7 @@
                 let winHeight = window.innerHeight;
                 let targetWidth = toast.offsetWidth;
                 let targetHeight = toast.offsetHeight;
-                toast.style.top = (winHeight - targetHeight) / 2 + 'px';
+                toast.style.top = '50px';//(winHeight - targetHeight) / 2 + 'px';
                 toast.style.left = (winWidth - targetWidth) / 2 + 'px';
             },
             closeModal: function () {
@@ -200,7 +337,7 @@
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {
-                    let msg = error.response.data['Msg'];
+                    let msg = error.response.data['message'];
                     if (msg === 'Unauthorized') {
                         location.href = '/login?r=%2Fadmin%23%2FserverStatus.html';
                         return;
