@@ -26,7 +26,7 @@ public class CarsService {
         if (StringUtils.isEmpty(carNumber)) {
             ret = carsRepository.findAll();
         } else {
-            ret = carsRepository.findByCarNumberLike("%" + carNumber + "%");
+            ret = carsRepository.findByCarNumberLikeOrderByAddress("%" + carNumber + "%");
         }
         for (Cars item : ret) {
             item.setPhone(hidePhone(item.getPhone()));

@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CarsRepository extends JpaRepository<Cars, Integer> {
-    List<Cars> findByCarNumberLike(String carNumber);
+    List<Cars> findByCarNumberLikeOrderByAddress(String carNumber);
 
     Cars findByCarNumberOrSn(String carNumber, int sn);
 
