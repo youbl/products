@@ -16,9 +16,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/res/**").permitAll()         // 允许res目录下的所有访问
                 .antMatchers("/**/*.html").permitAll()      // 允许所有html访问
                 .antMatchers(HttpMethod.GET).permitAll()                 // 允许所有get请求
+                .antMatchers(HttpMethod.POST, "/v1/owner**").permitAll()   // 允许所有POST+owner请求
                 .anyRequest()
                 .authenticated().and().formLogin();
-        //.antMatchers(HttpMethod.GET, "/v1/**").permitAll()                 // 允许所有get和v1请求
     }
 
     /**
@@ -33,5 +33,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             return ((UserDetails) principal).getUsername();
         }
         return "";
+    }
+
+    /**
+     * 是否登录
+     *
+     * @return true false
+     */
+    public static boolean isLogin() {
+        return getLoginUser().length() > 0;
     }
 }

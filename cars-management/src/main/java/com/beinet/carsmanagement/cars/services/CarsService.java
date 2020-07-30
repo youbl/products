@@ -1,5 +1,6 @@
 package com.beinet.carsmanagement.cars.services;
 
+import com.beinet.carsmanagement.SecurityConfig;
 import com.beinet.carsmanagement.cars.model.Cars;
 import com.beinet.carsmanagement.cars.repository.CarsRepository;
 import org.springframework.stereotype.Service;
@@ -28,8 +29,11 @@ public class CarsService {
         } else {
             ret = carsRepository.findByCarNumberLikeOrderByAddress("%" + carNumber + "%");
         }
-        for (Cars item : ret) {
-            item.setPhone(hidePhone(item.getPhone()));
+        if (!SecurityConfig.isLogin()) {
+            // 未登录时，隐藏部分手机号
+            for (Cars item : ret) {
+                item.setPhone(hidePhone(item.getPhone()));
+            }
         }
         return ret;
     }

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>业主登记系统</title>
+    <script src="res/unpkg/vue.min.js"></script>
+    <script src="res/unpkg/axios.min.js"></script>
+    <script src="res/unpkg/vue-multiselect.min.js"></script>
+    <link rel="stylesheet" href="res/unpkg/vue-multiselect.min.css">
+    <script src="res/rowColor.js"></script>
+    <script src="res/qs.min.js"></script>
+    <style>
+        input[type=text], input[type=button] {
+            font-size: 50px;
+            line-height: 90%;
+            -webkit-appearance: none;
+            width: 95%;
+            margin: 5px 5px 5px 5px;
+        }
+
+        input[type=checkbox] {
+            /* Double-sized Checkboxes */
+            -ms-transform: scale(4); /* IE */
+            -moz-transform: scale(4); /* FF */
+            -webkit-transform: scale(4); /* Safari and Chrome */
+            -o-transform: scale(4); /* Opera */
+            transform: scale(4);
+            padding: 10px;
+        }
+
+        td {
+            text-align: center;
+            vertical-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="divApp" style="font-size: 50px; text-align: center;">
+    <div>
+        <div style="float: left;">
+            <div>
+                <span style="display: inline-block;width:20vw;">房号：</span>
+                <div style="width: 70vw; display: inline-block;">
+                    <input type="text" v-model="condition.address">
+                </div>
+            </div>
+            <div>
+                <div style="width: 25vw; display: inline-block;">
+                    <input type="button" value="查找" @click="doSearch">
+                </div>
+                <div style="width: 32vw; display: inline-block;">
+                    <input type="button" value="新业主登记" @click="addOwner">
+                </div>
+                &nbsp;
+                <span style="color: blue;">共{{owners.length}}位业主</span>
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+    <hr>
+    <table border="1" style="width: 95%; border: 1px solid black;">
+        <tr style="height: 12vw;">
+            <th><a href="javascript:void(0)" @click="sortData('address')">房号</a></th>
+            <th>
+                <a href="javascript:void(0)" @click="sortData('name')">姓名</a></th>
+            <th>
+                <a href="javascript:void(0)" @click="sortData('phone')">手机</a></th>
+        </tr>
+        <tr v-for="(item, idx) in owners" style="height: 12vw;">
+            <td>{{item.address}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.phone}}</td>
+        </tr>
+    </table>
+
+
+    <!--  弹窗浮层
+        <button type="button" @click="showModal">打开弹出层</button>-->
+    <div style="display: none;background: lightblue;border:1px solid green; width:95%;height:600px; overflow-y: auto; text-align: left;"
+         id="divToast">
+        <a href="javascript:;" @click="closeModal">【关闭弹窗】</a>
+        <!-- 弹窗内容  -->
+        <div>
+            <table border="1" style="width:95%; border: 1px solid black;">
+                <tbody>
+                <tr>
+                    <th style="width: 20vw;">房号</th>
+                    <td style="width:80vw;"><input type="text" v-model="editOwner.address"></td>
+                </tr>
+                <tr>
+                    <th>姓名</th>
+                    <td><input type="text" v-model="editOwner.name"></td>
+                </tr>
+                <tr>
+                    <th>手机</th>
+                    <td><input type="text" v-model="editOwner.phone"></td>
+                </tr>
+                <tr>
+                    <th>备注</th>
+                    <td><input type="text" v-model="editOwner.remark"></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="button" value="保存" @click="saveOwner" style="width: 25vw;">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vueApp = new Vue({
+        el: '#divApp',
+        components: {
+            Multiselect: window.VueMultiselect.default
+        },
+        data: {
+            condition: {
+                address: '',
+                phone: '',
+            },
+            owners: [],
+            editOwner: {},
+        },
+        created: function () {
+            this.loadOwners();
+        },
+        methods: {
+            initOwner: function () {
+                let empty = {
+                    id: 0,
+                    address: '',
+                    addTime: '',
+                    phone: '',
+                    name: '',
+                    remark: '',
+                    ip: '',
+                };
+                Vue.set(this, "editOwner", empty);
+            },
+            sortData: function (field) {
+                this.owners.sort((a, b) => {
+                    if (a[field] > b[field])
+                        return 1;
+                    else if (a[field] < b[field])
+                        return -1;
+                    return 0;
+                });
+            },
+            loadOwners: function () {
+                this.initOwner();
+                let url = '/v1/owner?address=' + encodeURIComponent(this.condition.address);
+                // 箭头函数，可以直接在响应在使用 this（就是vueApp)
+                axios.get(url).then(response => {
+                    if (!response.data || response.data.length <= 0) {
+                        // alert('未找到数据');
+                        return;
+                    }
+                    this.owners = response.data;
+                }).catch(error => {
+                    this.ajaxError(error);
+                });
+            },
+            doSearch: function () {
+                this.loadOwners();
+            },
+            addOwner: function () {
+                this.showModal();
+            },
+            saveOwner: function () {
+                if (!this.checkCondition())
+                    return;
+                let url = '/v1/owner';
+                axios.post(url, this.editOwner).then(response => {
+                    if (!response.data) {
+                        alert('保存失败');
+                        return;
+                    }
+                    this.loadOwners();
+                    this.closeModal();
+                }).catch(error => {
+                    this.ajaxError(error);
+                });
+            },
+            checkCondition: function () {
+                if (!this.isPhone(this.editOwner.phone)) {
+                    alert('手机号格式不符');
+                    return false;
+                }
+                if (this.editOwner.name.length <= 0) {
+                    alert('姓名必填');
+                    return false;
+                }
+                if (this.editOwner.address.length <= 0) {
+                    alert('地址必填');
+                    return false;
+                }
+                return true;
+            },
+            isPhone: function (phone) {
+                let reg = /^1\d{10}$/;
+                return (reg.test(phone));
+            },
+            showModal: function () {
+                let toast = document.getElementById('divToast');
+                toast.style.display = 'block';
+                toast.style.position = 'fixed';
+                let winWidth = window.innerWidth;
+                let winHeight = window.innerHeight;
+                let targetWidth = toast.offsetWidth;
+                let targetHeight = toast.offsetHeight;
+                toast.style.top = '50px';//(winHeight - targetHeight) / 2 + 'px';
+                toast.style.left = (winWidth - targetWidth) / 2 + 'px';
+            },
+            closeModal: function () {
+                document.getElementById('divToast').style.display = 'none';
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    let msg = error.response.data['message'];
+                    if (msg === 'Unauthorized') {
+                        location.href = '/login?r=%2Fadmin%23%2FserverStatus.html';
+                        return;
+                    }
+                    console.log(JSON.stringify(error.response.data));
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>
