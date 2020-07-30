@@ -46,14 +46,16 @@
                 </div>
             </div>
             <div>
-                <div style="width: 25vw; display: inline-block;">
+                <div style="width: 20vw; display: inline-block;">
                     <input type="button" value="查找" @click="doSearch">
-                </div>
+                </div>&nbsp;
                 <div style="width: 32vw; display: inline-block;">
                     <input type="button" value="新业主登记" @click="addOwner">
                 </div>
-                &nbsp;
-                <span style="color: blue;">共{{owners.length}}位业主</span>
+                <span style="color: blue;">{{owners.length}}位业主</span>
+                <div style="width: 15vw; display: inline-block;">
+                    <input type="button" value="后台" @click="goLogin">
+                </div>
             </div>
         </div>
         <div style="clear: both;"></div>
@@ -61,16 +63,21 @@
     <hr>
     <table border="1" style="width: 95%; border: 1px solid black;">
         <tr style="height: 12vw;">
+            <th></th>
             <th><a href="javascript:void(0)" @click="sortData('address')">房号</a></th>
             <th>
                 <a href="javascript:void(0)" @click="sortData('name')">姓名</a></th>
             <th>
                 <a href="javascript:void(0)" @click="sortData('phone')">手机</a></th>
+            <th>
+                <a href="javascript:void(0)" @click="sortData('remark')">备注</a></th>
         </tr>
         <tr v-for="(item, idx) in owners" style="height: 12vw;">
+            <td>{{idx+1}}</td>
             <td>{{item.address}}</td>
             <td>{{item.name}}</td>
             <td>{{item.phone}}</td>
+            <td>{{item.remark}}</td>
         </tr>
     </table>
 
@@ -163,6 +170,9 @@
                 }).catch(error => {
                     this.ajaxError(error);
                 });
+            },
+            goLogin: function () {
+                location.href = '/login'
             },
             doSearch: function () {
                 this.loadOwners();
