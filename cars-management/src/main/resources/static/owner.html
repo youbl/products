@@ -74,7 +74,12 @@
         </tr>
         <tr v-for="(item, idx) in owners" style="height: 12vw;">
             <td>{{idx+1}}</td>
-            <td>{{item.address}}</td>
+            <td>
+                <span v-show="!loginUser">{{item.address}}</span>
+                <span v-show="loginUser">
+                    <a href="javascript:void(0)" @click="editItem(item)">{{item.address}}</a>
+                </span>
+            </td>
             <td>{{item.name}}</td>
             <td>{{item.phone}}</td>
             <td>{{item.remark}}</td>
@@ -129,10 +134,12 @@
                 address: '',
                 phone: '',
             },
+            loginUser: '',
             owners: [],
             editOwner: {},
         },
         created: function () {
+            this.loadLoginUser();
             this.loadOwners();
         },
         methods: {
@@ -147,6 +154,14 @@
                     ip: '',
                 };
                 Vue.set(this, "editOwner", empty);
+            },
+            loadLoginUser: function () {
+                let url = '/v1/user';
+                axios.get(url).then(response => {
+                    this.loginUser = response.data;
+                }).catch(error => {
+                    this.ajaxError(error);
+                });
             },
             sortData: function (field) {
                 this.owners.sort((a, b) => {
@@ -178,6 +193,11 @@
                 this.loadOwners();
             },
             addOwner: function () {
+                this.initOwner();
+                this.showModal();
+            },
+            editItem: function (item) {
+                Vue.set(this, "editOwner", item);
                 this.showModal();
             },
             saveOwner: function () {
