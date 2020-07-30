@@ -76,12 +76,14 @@
                         </div>
                     </div>
                     <div>
-                        <div style="width: 30vw; display: inline-block;">
+                        <div style="width: 25vw; display: inline-block;">
                             <input type="button" value="查找" @click="doSearch">
                         </div>
-                        <div style="width: 30vw; display: inline-block;">
+                        <div style="width: 25vw; display: inline-block;">
                             <input type="button" value="添加车辆" @click="addCar">
                         </div>
+                        &nbsp;
+                        <span style="color: blue;">共{{cars.length}}辆车</span>
                     </div>
                 </div>
                 <div style="clear: both;"></div>
@@ -89,15 +91,15 @@
             <hr>
             <table border="1" style="width: 95%; border: 1px solid black;">
                 <tr style="height: 12vw;">
-                    <th></th>
-                    <th>停车证</th>
-                    <th @click="sortData('carNumber')">车牌</th>
-                    <th @click="sortData('address')">住址</th>
+                    <th><a href="javascript:void(0)" @click="sortData('sn')">停车证</a></th>
+                    <th>
+                        <a href="javascript:void(0)" @click="sortData('carNumber')">车牌</a></th>
+                    <th>
+                        <a href="javascript:void(0)" @click="sortData('address')">住址</a></th>
                 </tr>
                 <tr v-for="(item, idx) in cars" @click="editItem(item)" style="height: 12vw;">
-                    <td>{{idx + 1}}</td>
                     <td>{{item.sn}}</td>
-                    <td>{{item.carNumber}}</td>
+                    <td><a href="javascript:void(0)">{{item.carNumber}}</a></td>
                     <td>{{item.address}}</td>
                 </tr>
             </table>
@@ -146,8 +148,9 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <input v-show="loginUser" type="button" value="保存" @click="saveCar">
+                        <input v-show="loginUser" type="button" value="保存" @click="saveCar" style="width: 25vw;">
                         <span v-show="!loginUser">未登录，不能编辑</span>
+                        <input type="button" value="返回" @click="toggleTabs(0)" style="width: 25vw;">
                     </td>
                 </tr>
                 </tbody>
@@ -158,7 +161,7 @@
 
     <!--  弹窗浮层
         <button type="button" @click="showModal">打开弹出层</button>-->
-    <div style="display: none;background: lightblue;border:1px solid green; width:95%;height:400px; overflow-y: auto; text-align: left;"
+    <div style="display: none;background: lightblue;border:1px solid green; width:95%;height:600px; overflow-y: auto; text-align: left;"
          id="divToast">
         <a href="javascript:;" @click="closeModal">【关闭弹窗】</a>
         <!-- 弹窗内容  -->
@@ -279,6 +282,7 @@
                         alert('系统中未找到您的手机号，查看失败');
                         return;
                     }
+                    response.data.money = this.intToMoney(response.data.money);
                     Vue.set(this, "editCar", response.data);
                     this.closeModal();
                 }).catch(error => {

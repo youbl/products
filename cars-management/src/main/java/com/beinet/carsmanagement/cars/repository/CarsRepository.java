@@ -8,6 +8,8 @@ import java.util.List;
 public interface CarsRepository extends JpaRepository<Cars, Integer> {
     List<Cars> findByCarNumberLikeOrderByAddress(String carNumber);
 
+    List<Cars> findByOrderByAddress();
+
     Cars findByCarNumberOrSn(String carNumber, int sn);
 
     Cars findByPhone(String phone);

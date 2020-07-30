@@ -24,7 +24,7 @@ public class CarsService {
     public List<Cars> getCars(String carNumber) {
         List<Cars> ret;
         if (StringUtils.isEmpty(carNumber)) {
-            ret = carsRepository.findAll();
+            ret = carsRepository.findByOrderByAddress();
         } else {
             ret = carsRepository.findByCarNumberLikeOrderByAddress("%" + carNumber + "%");
         }

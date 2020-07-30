@@ -6,12 +6,12 @@ spring:
     name: "car-manager"         # 程序name，建议配置，方便统一的服务管理
   security:
     user:
-      name: ybl
+      name: yx
       password: 1234321
 
   datasource:
     driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite:/sqlitedb.db
+    url: jdbc:sqlite:/cars
     username:
     password:
   ### sqlite需要自己配置连接方式
