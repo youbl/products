@@ -246,6 +246,7 @@
                 });
             },
             loadCars: function () {
+                this.cars = [];
                 this.toggleTabs(0);
                 this.initCar();
                 let url = '/v1/cars?carNumber=' + encodeURIComponent(this.condition.carNumber);

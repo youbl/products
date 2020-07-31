@@ -27,7 +27,7 @@ public class OwnerService {
         if (StringUtils.isEmpty(address)) {
             ret = ownerRepository.findByOrderByAddress();
         } else {
-            ret = ownerRepository.findByAddressOrderByAddress("%" + address + "%");
+            ret = ownerRepository.findByAddressLikeOrderByAddress("%" + address + "%");
         }
         if (!SecurityConfig.isLogin()) {
             // 未登录时，隐藏部分手机号
@@ -61,11 +61,11 @@ public class OwnerService {
     public Owner saveOwner(Owner owner) {
         Owner oldData = ownerRepository.findByPhone(owner.getPhone());
         if (oldData != null && oldData.getId() != owner.getId()) {
-            throw new IllegalArgumentException("该手机号已被登记");
+            throw new IllegalArgumentException("该手机号已被登记:" + owner.getPhone());
         }
         oldData = ownerRepository.findByAddress(owner.getAddress());
         if (oldData != null && oldData.getId() != owner.getId()) {
-            throw new IllegalArgumentException("该地址已登记过");
+            throw new IllegalArgumentException("该地址已登记过:" + owner.getAddress());
         }
         return ownerRepository.save(owner);
     }
