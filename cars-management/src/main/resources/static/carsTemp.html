@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>临时车辆登记系统</title>
+    <script src="res/unpkg/vue.min.js"></script>
+    <script src="res/unpkg/axios.min.js"></script>
+    <script src="res/rowColor.js"></script>
+    <script src="res/qs.min.js"></script>
+    <style>
+        input[type=text], input[type=button], select {
+            font-size: 50px;
+            line-height: 90%;
+            -webkit-appearance: none;
+            width: 95%;
+            margin: 5px 5px 5px 5px;
+        }
+
+        input[type=checkbox] {
+            /* Double-sized Checkboxes */
+            -ms-transform: scale(4); /* IE */
+            -moz-transform: scale(4); /* FF */
+            -webkit-transform: scale(4); /* Safari and Chrome */
+            -o-transform: scale(4); /* Opera */
+            transform: scale(4);
+            padding: 10px;
+        }
+
+        td {
+            text-align: center;
+            vertical-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="divApp" style="font-size: 50px; text-align: center;">
+    <!-- tab 1 -->
+    <div>
+        <div>
+            <div style="float: left;">
+                <div>
+                    <span style="display: inline-block;width:20vw;">车牌：</span>
+                    <div style="width: 70vw; display: inline-block;">
+                        <input type="text" v-model="condition.carNumber">
+                    </div>
+                </div>
+                <div>
+                    <div style="width: 25vw; display: inline-block;">
+                        <input type="button" value="查找" @click="doSearch">
+                    </div>
+                    <div style="width: 32vw; display: inline-block;">
+                        <input type="button" value="临时车登记" @click="addCar">
+                    </div>
+                    &nbsp;
+                    <span style="color: blue;">共{{cars.length}}辆</span>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <hr>
+        <table border="1" style="width: 95%; border: 1px solid black;">
+            <tr style="height: 12vw;">
+                <th>
+                    <a href="javascript:void(0)" @click="sortData('carNumber')">车牌</a></th>
+                <th>
+                    <a href="javascript:void(0)" @click="sortData('address')">住址</a></th>
+                <th><a href="javascript:void(0)" @click="sortData('phone')">电话</a></th>
+                <th><a href="javascript:void(0)" @click="sortData('minute')">已停留</a></th>
+            </tr>
+            <tr v-for="(item, idx) in cars" @click="editItem(item)" style="height: 12vw; font-size:35px;"
+                v-show="item.minute <= item.hour * 60">
+                <td>{{item.carNumber}}</td>
+                <td>{{item.address}}</td>
+                <td>{{item.phone}}</td>
+                <td>{{item.minute}}分钟</td>
+            </tr>
+        </table>
+    </div>
+
+    <!--  弹窗浮层
+        <button type="button" @click="showModal">打开弹出层</button>-->
+    <div style="display: none;background: lightblue;border:1px solid green; width:95%;height:600px; overflow-y: auto; text-align: left;"
+         id="divToast">
+        <a href="javascript:;" @click="closeModal">【关闭弹窗】</a>
+        <!-- 弹窗内容  -->
+        <div>
+
+            <table border="1" style="width:95%; border: 1px solid black;">
+                <tbody>
+                <tr>
+                    <th style="width:20%;">车牌</th>
+                    <td style="width:80%;"><input type="text" v-model="editCar.carNumber"></td>
+                </tr>
+                <tr>
+                    <th>住址</th>
+                    <td><input type="text" v-model="editCar.address"></td>
+                </tr>
+                <tr>
+                    <th>手机</th>
+                    <td>
+                        <input type="text" v-model="editCar.phone">
+                    </td>
+                </tr>
+                <tr>
+                    <th>停留</th>
+                    <td>
+                        <select v-model="editCar.hour">
+                            <option value="1">1小时</option>
+                            <option value="2">2小时</option>
+                            <option value="4">4小时</option>
+                            <option value="8">8小时</option>
+                            <option value="24">1天</option>
+                        </select><br>
+                        <span>超时后，将视为未登记车辆</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="button" value="保存" @click="saveCar" style="width: 25vw;">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vueApp = new Vue({
+        el: '#divApp',
+        data: {
+            condition: {
+                carNumber: '',
+            },
+            cars: [],
+            editCar: {},
+        },
+        created: function () {
+            this.loadCars();
+        },
+        methods: {
+            initCar: function () {
+                let empty = {
+                    id: 0,
+                    address: '',
+                    carNumber: '',
+                    hour: 1,
+                    phone: '',
+                };
+                Vue.set(this, "editCar", empty);
+            },
+            sortData: function (field) {
+                this.cars.sort((a, b) => {
+                    if (a[field] > b[field])
+                        return 1;
+                    else if (a[field] < b[field])
+                        return -1;
+                    return 0;
+                });
+            },
+            loadCars: function () {
+                this.cars = [];
+                this.initCar();
+                let url = '/v1/carstemp?carNumber=' + encodeURIComponent(this.condition.carNumber);
+                // 箭头函数，可以直接在响应在使用 this（就是vueApp)
+                axios.get(url).then(response => {
+                    if (!response.data || response.data.length <= 0) {
+                        // alert('未找到数据');
+                        return;
+                    }
+                    for (let i = 0, j = response.data.length; i < j; i++) {
+                        let item = response.data[i];
+                        item.minute = this.countTime(item.addTime);
+                    }
+                    this.cars = response.data;
+                }).catch(error => {
+                    this.ajaxError(error);
+                });
+            },
+            doSearch: function () {
+                this.loadCars();
+            },
+            addCar: function () {
+                this.initCar();
+                this.showModal();
+            },
+            editItem: function (item) {
+                Vue.set(this, "editCar", item);
+            },
+            saveCar: function () {
+                if (!this.checkCondition())
+                    return;
+                let url = '/v1/carstemp';
+                axios.post(url, this.editCar).then(response => {
+                    if (!response.data) {
+                        alert('保存失败');
+                        return;
+                    }
+                    this.closeModal();
+                    this.loadCars();
+                }).catch(error => {
+                    this.ajaxError(error);
+                });
+            },
+            checkCondition: function () {
+                if (!this.isPhone(this.editCar.phone)) {
+                    alert('手机号格式不符');
+                    return false;
+                }
+                if (this.editCar.carNumber.length <= 0) {
+                    alert('车牌必填');
+                    return false;
+                }
+                this.editCar.carNumber = this.editCar.carNumber.toUpperCase();
+                if (this.editCar.address.length <= 0) {
+                    alert('地址必填');
+                    return false;
+                }
+                return true;
+            },
+            isPhone: function (phone) {
+                let reg = /^1\d{10}$/;
+                return (reg.test(phone));
+            },
+            showModal: function () {
+                let toast = document.getElementById('divToast');
+                toast.style.display = 'block';
+                toast.style.position = 'fixed';
+                let winWidth = window.innerWidth;
+                let winHeight = window.innerHeight;
+                let targetWidth = toast.offsetWidth;
+                let targetHeight = toast.offsetHeight;
+                toast.style.top = '50px';//(winHeight - targetHeight) / 2 + 'px';
+                toast.style.left = (winWidth - targetWidth) / 2 + 'px';
+            },
+            closeModal: function () {
+                document.getElementById('divToast').style.display = 'none';
+            },
+            countTime: function (addTime) {
+                let microSecond = new Date() - new Date(addTime);
+                let minute = Math.floor(microSecond / 60 / 1000);
+                return minute;
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    let msg = error.response.data['message'];
+                    if (msg === 'Unauthorized') {
+                        location.href = '/login?r=%2Fadmin%23%2FserverStatus.html';
+                        return;
+                    }
+                    console.log(JSON.stringify(error.response.data));
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>

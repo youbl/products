@@ -80,7 +80,7 @@
                             <input type="button" value="查找" @click="doSearch">
                         </div>
                         <div style="width: 25vw; display: inline-block;">
-                            <input type="button" value="添加车辆" @click="addCar">
+                            <input v-show="loginUser" type="button" value="添加车辆" @click="addCar">
                         </div>
                         &nbsp;
                         <span style="color: blue;">共{{cars.length}}辆车</span>
