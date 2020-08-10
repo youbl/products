@@ -71,13 +71,16 @@
                 <div style="float: left;">
                     <div>
                         <span style="display: inline-block;width:20vw;">车牌：</span>
-                        <div style="width: 70vw; display: inline-block;">
+                        <div style="width: 45vw; display: inline-block;">
                             <input type="text" v-model="condition.carNumber">
+                        </div>
+                        <div style="width: 25vw; display: inline-block;">
+                            <input type="button" value="查找" @click="doSearch">
                         </div>
                     </div>
                     <div>
-                        <div style="width: 25vw; display: inline-block;">
-                            <input type="button" value="查找" @click="doSearch">
+                        <div style="width: 32vw; display: inline-block;">
+                            <input type="button" value="临时车登记" @click="goCarsTemp">
                         </div>
                         <div style="width: 25vw; display: inline-block;">
                             <input v-show="loginUser" type="button" value="添加车辆" @click="addCar">
@@ -349,6 +352,9 @@
             },
             intToMoney: function (num) {
                 return num / 100;
+            },
+            goCarsTemp: function () {
+                location.href = 'carsTemp.html';
             },
             showModal: function () {
                 let toast = document.getElementById('divToast');

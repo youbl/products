@@ -41,19 +41,23 @@
             <div style="float: left;">
                 <div>
                     <span style="display: inline-block;width:20vw;">车牌：</span>
-                    <div style="width: 70vw; display: inline-block;">
+                    <div style="width: 40vw; display: inline-block;">
                         <input type="text" v-model="condition.carNumber">
+                    </div>
+                    <div style="width: 20vw; display: inline-block;">
+                        <input type="button" value="查找" @click="doSearch">
                     </div>
                 </div>
                 <div>
-                    <div style="width: 25vw; display: inline-block;">
-                        <input type="button" value="查找" @click="doSearch">
-                    </div>
                     <div style="width: 32vw; display: inline-block;">
                         <input type="button" value="临时车登记" @click="addCar">
                     </div>
                     &nbsp;
                     <span style="color: blue;">共{{cars.length}}辆</span>
+                    &nbsp;
+                    <div style="width: 32vw; display: inline-block;">
+                        <input type="button" value="业主车清单" @click="goCars">
+                    </div>
                 </div>
             </div>
             <div style="clear: both;"></div>
@@ -68,12 +72,14 @@
                 <th><a href="javascript:void(0)" @click="sortData('phone')">电话</a></th>
                 <th><a href="javascript:void(0)" @click="sortData('minute')">已停留</a></th>
             </tr>
-            <tr v-for="(item, idx) in cars" @click="editItem(item)" style="height: 12vw; font-size:35px;"
-                v-show="item.minute <= item.hour * 60">
+            <tr v-for="(item, idx) in cars" @click="editItem(item)" style="height: 12vw; font-size:35px;">
                 <td>{{item.carNumber}}</td>
                 <td>{{item.address}}</td>
                 <td>{{item.phone}}</td>
-                <td>{{item.minute}}分钟</td>
+                <td>
+                    <span v-show="item.minute <= item.hour * 60">{{item.minute}}分钟</span>
+                    <span v-show="item.minute > item.hour * 60" style="font-weight: bold; color:red;">已过期</span>
+                </td>
             </tr>
         </table>
     </div>
@@ -94,7 +100,14 @@
                 </tr>
                 <tr>
                     <th>住址</th>
-                    <td><input type="text" v-model="editCar.address"></td>
+                    <td>
+                        <select v-model="condition.building" style="width: 25%;">
+                            <option value="72">72栋</option>
+                            <option value="73">73栋</option>
+                            <option value="64">64栋</option>
+                            <option value="93">93栋</option>
+                        </select>房号：
+                        <input type="text" v-model="condition.room" style="width: 40%"></td>
                 </tr>
                 <tr>
                     <th>手机</th>
@@ -132,6 +145,8 @@
         data: {
             condition: {
                 carNumber: '',
+                building: 72,
+                room: 666
             },
             cars: [],
             editCar: {},
@@ -213,10 +228,13 @@
                     return false;
                 }
                 this.editCar.carNumber = this.editCar.carNumber.toUpperCase();
-                if (this.editCar.address.length <= 0) {
+
+                this.condition.room = this.condition.room.toString().trim();
+                if (this.condition.room.length <= 0) {
                     alert('地址必填');
                     return false;
                 }
+                this.editCar.address = this.condition.building + '-' + this.condition.room;
                 return true;
             },
             isPhone: function (phone) {
@@ -241,6 +259,9 @@
                 let microSecond = new Date() - new Date(addTime);
                 let minute = Math.floor(microSecond / 60 / 1000);
                 return minute;
+            },
+            goCars: function () {
+                location.href = 'cars.html';
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {
