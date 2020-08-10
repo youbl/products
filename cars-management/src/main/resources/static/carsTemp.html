@@ -77,7 +77,9 @@
                 <td>{{item.address}}</td>
                 <td>{{item.phone}}</td>
                 <td>
-                    <span v-show="item.minute <= item.hour * 60">{{item.minute}}分钟</span>
+                    <span v-show="item.minute <= item.hour * 60">
+                        已停放{{item.minute}}分钟<br>还要停{{item.hour * 60 - item.minute}}分钟
+                    </span>
                     <span v-show="item.minute > item.hour * 60" style="font-weight: bold; color:red;">已过期</span>
                 </td>
             </tr>
@@ -258,7 +260,7 @@
             countTime: function (addTime) {
                 let microSecond = new Date() - new Date(addTime);
                 let minute = Math.floor(microSecond / 60 / 1000);
-                return minute;
+                return minute < 0 ? 0 : minute;
             },
             goCars: function () {
                 location.href = 'cars.html';

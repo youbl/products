@@ -99,11 +99,14 @@
                         <a href="javascript:void(0)" @click="sortData('carNumber')">车牌</a></th>
                     <th>
                         <a href="javascript:void(0)" @click="sortData('address')">住址</a></th>
+                    <th>
+                        <a href="javascript:void(0)" @click="sortData('phone')">手机</a></th>
                 </tr>
-                <tr v-for="(item, idx) in cars" @click="editItem(item)" style="height: 12vw;">
+                <tr v-for="(item, idx) in cars" @click="editItem(item)" style="height: 12vw; font-size:35px;">
                     <td>{{item.sn}}</td>
                     <td><a href="javascript:void(0)">{{item.carNumber}}</a></td>
                     <td>{{item.address}}</td>
+                    <td>{{item.phone}}</td>
                 </tr>
             </table>
         </div>
