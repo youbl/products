@@ -161,9 +161,9 @@
                 let empty = {
                     id: 0,
                     address: '',
-                    carNumber: '',
+                    carNumber: this.getStorage('carNumber'),
+                    phone: this.getStorage('phone'),
                     hour: 1,
-                    phone: '',
                 };
                 Vue.set(this, "editCar", empty);
             },
@@ -214,6 +214,9 @@
                         alert('保存失败');
                         return;
                     }
+
+                    this.setStorage('carNumber', this.editCar.carNumber);
+                    this.setStorage('phone', this.editCar.phone);
                     this.closeModal();
                     this.loadCars();
                 }).catch(error => {
@@ -274,10 +277,23 @@
                     }
                     console.log(JSON.stringify(error.response.data));
                     alert(msg);
+                } else if (error.message) {
+                    alert(error.message);
                 } else {
                     console.log(JSON.stringify(error));
                     alert('未知错误');
                 }
+            },
+            getStorage: function (key) {
+                if (!key)
+                    return '';
+                let item = localStorage.getItem(key);
+                return item ? item : '';
+            },
+            setStorage: function (key, val) {
+                if (!key)
+                    return;
+                localStorage.setItem(key, val ? val : '');
             },
         },
     });

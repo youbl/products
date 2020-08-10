@@ -200,17 +200,7 @@
             },
             loginUser: '',
             cars: [],
-            editCar: {
-                id: 0,
-                sn: '',
-                address: '',
-                owner: false,
-                addTime: '',
-                carNumber: '',
-                money: 0,
-                remark: '',
-                ip: '',
-            },
+            editCar: {},
         },
         created: function () {
             this.loadLoginUser();
@@ -235,7 +225,8 @@
                     address: '',
                     owner: false,
                     addTime: '',
-                    carNumber: '',
+                    carNumber: this.getStorage('carNumber'),
+                    phone: this.getStorage('phone'),
                     money: 0,
                     remark: '',
                     ip: '',
@@ -313,6 +304,8 @@
                         alert('保存失败');
                         return;
                     }
+                    this.setStorage('carNumber', this.editCar.carNumber);
+                    this.setStorage('phone', this.editCar.phone);
                     this.loadCars();
                 }).catch(error => {
                     this.ajaxError(error);
@@ -382,10 +375,23 @@
                     }
                     console.log(JSON.stringify(error.response.data));
                     alert(msg);
+                } else if (error.message) {
+                    alert(error.message);
                 } else {
                     console.log(JSON.stringify(error));
                     alert('未知错误');
                 }
+            },
+            getStorage: function (key) {
+                if (!key)
+                    return '';
+                let item = localStorage.getItem(key);
+                return item ? item : '';
+            },
+            setStorage: function (key, val) {
+                if (!key)
+                    return;
+                localStorage.setItem(key, val ? val : '');
             },
         },
     });

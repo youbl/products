@@ -258,6 +258,8 @@
                     }
                     console.log(JSON.stringify(error.response.data));
                     alert(msg);
+                } else if (error.message) {
+                    alert(error.message);
                 } else {
                     console.log(JSON.stringify(error));
                     alert('未知错误');
