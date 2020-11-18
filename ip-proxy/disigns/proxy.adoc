@@ -1,0 +1,190 @@
+= 代理API服务
+:sectnums:
+:toc:
+
+== 需求
+
+=== 相关文档
+
+* 原型：link:http://www.beinet.cn/[]
+* 相关文档：link:http://www.beinet.cn/[]
+
+=== 系统上下文图
+
+==== 代理API系统
+[plantuml, .images/pay_context, png]
+--
+@startuml
+
+[代理API] as api
+[数据库] as db
+[用户系统] as users
+[路由服务] as router
+
+router --> api: ip/端口信息入库
+api --> db: 读写ip数据
+api --> users: 读取用户信息
+
+@enduml
+--
+
+* 说明：
+** 1、如果需要用户信息，去用户系统拉取；
+** 2、用户获取到代理ip信息后，直接跟路由服务通讯，不再经过代理API系统
+
+=== 用例图
+[plantuml, .images/pay_context, png]
+--
+@startuml
+title 代理API系统
+left to right direction
+usecase 代理API系统 as api
+usecase 路由服务 as router
+actor 用户 as user
+
+router --> api: 注册IP/端口信息、过期信息
+user --> api: 获取IP/端口信息
+api --> api: IP信息过期删除
+
+@enduml
+--
+
+=== 时序图
+[plantuml]
+--
+@startuml
+title 代理API服务流程
+autonumber
+
+actor 用户 as user
+collections 路由服务 as router
+collections 代理API系统 as api
+collections 用户系统 as users
+database Mongo as db
+
+participant user order 10
+participant router order 20
+participant api order 30
+participant users order 40
+participant db order 50
+
+group IP注册
+router -> api: 注册IP信息、ttl
+api -> db: 带ttl入库
+db --> api
+api --> router
+end
+
+group 用户访问
+user -> api: 拉取ip
+api -> users: 认证和鉴权
+users --> api
+api -> db: 读取数据
+db --> api
+api --> user
+end
+
+@enduml
+--
+
+
+=== 关键流程
+
+[plantuml]
+--
+@startuml
+title 用户获取IP的流程
+start
+:参数签名校验;
+note right
+  根据ak，读取用户系统的sk，拼接参数计算md5，
+  再与用户提交的md5比对
+end note
+:根据用户条件组装SQL;
+:查询数据返回;
+note right
+  数据过期由mongo完成
+  注意：mongo可能延迟1分钟才会过期
+end note
+stop
+@enduml
+--
+
+=== 其他需求
+
+_【编写说明】来自产品负责人和高级设计人员的非功能性需求_
+
+== 概要设计
+
+=== 关键架构决策
+
+_【编写说明】描述影响设计的关键架构决策的依据及结论（如选型、边界等）_
+
+* 由于××原因，因此××
+
+=== 领域模型
+
+[plantuml]
+--
+@startuml
+
+@enduml
+--
+* 说明：
+
+== 详细设计
+
+=== 接口
+* 提供2个接口：路由注册接口、用户查询接口
+** 1、路由注册接口
+[source,java]
+    输入: 
+    public class RouterDto
+    {
+        String ip;
+        int port;
+        String area;
+        DateTime expireTime;
+    }
+    输出: int 注册成功条数
+** 2、用户查询接口
+[source,java]
+    输入: 
+    public class RouterDto
+    {
+        // like查询
+        String ip;
+        int port;
+        String area;
+        // 要求过期时间大于此参数
+        DateTime expireTime;
+    }
+    输出: List<RouterDto>
+
+
+=== 事件
+
+_【编写说明】描述对外公开的事件的详细信息_
+
+[source,js]
+{
+    "eventType":"",
+    ...
+    "data":{
+    }
+}
+
+=== 可复用组件（UI）清单
+
+_【编写说明】按端描述对外公开的可复用界面或组件的清单信息_
+
+== 专项设计
+
+_【编写说明】针对重要或负责的业务进行更细粒度的设计，一般采用状态图、时序图、活动图、数据流图等体现较为复杂的业务场景_
+* 考虑数据需要过期，DB选型MongoDB，支持数据过滤的同时，通过创建ttl索引，可以让数据自动过期。
+
+== 技术债务
+
+_【编写说明】由于时间、排期等因素，每个版本的设计或开发都会包含若干含有减法的架构决策，因此需要对该类的决策中未解决的业务及技术问题进行记录，便于下一步进行技术债务的解决_
+
+* 【未解决】支付相关接入暂不实现。
