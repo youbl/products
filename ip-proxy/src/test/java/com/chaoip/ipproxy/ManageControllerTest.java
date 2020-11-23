@@ -1,8 +1,10 @@
 package com.chaoip.ipproxy;
 
 import com.chaoip.ipproxy.controller.dto.RouteDto;
+import com.chaoip.ipproxy.repository.RouteRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +21,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
 
+import static org.hamcrest.Matchers.hasSize;
+
 @SpringBootTest
 @ActiveProfiles("unittest")
 class ManageControllerTest extends BaseTest {
@@ -28,16 +32,30 @@ class ManageControllerTest extends BaseTest {
     @Autowired
     ObjectMapper mapper;
 
+    @Autowired
+    RouteRepository routeRepository;
+
     @Test
     void contextLoads() throws Exception {
+        // 数据清理
+        routeRepository.deleteAll();
+        Assert.assertTrue(routeRepository.findAll().size() == 0);
+
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        getAllTest(mockMvc);
-
         addTest(mockMvc);
+        getAllTest(mockMvc);
     }
 
     void getAllTest(MockMvc mockMvc) throws Exception {
+        callAll(mockMvc, 4);
+        Thread.sleep(60000);
+        callAll(mockMvc, 2);
+        Thread.sleep(60000);
+        callAll(mockMvc, 1);
+    }
+
+    void callAll(MockMvc mockMvc, int num) throws Exception {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/manage/routes");
 
@@ -45,8 +63,9 @@ class ManageControllerTest extends BaseTest {
         result.andReturn().getResponse().setCharacterEncoding("UTF-8"); // 避免print乱码
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
-                //.andExpect(MockMvcResultMatchers.content().string("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(num)))
                 .andDo(MockMvcResultHandlers.print());
+
     }
 
     void addTest(MockMvc mockMvc) throws Exception {
@@ -55,22 +74,34 @@ class ManageControllerTest extends BaseTest {
                 .port(8901)
                 .protocal("https")
                 .area("福州")
-                .expireTime(LocalDateTime.now().minusDays(-10))
+                .expireTime(LocalDateTime.now().minusDays(10))
                 .build();
+        callAdd(dto, mockMvc); // 失效数据
+
+        dto.setExpireTime(LocalDateTime.now());
+        callAdd(dto, mockMvc); // 失效数据
+
+        dto.setExpireTime(LocalDateTime.now().minusSeconds(-61));
+        callAdd(dto, mockMvc); // 一分钟后失效
+
+        dto.setExpireTime(LocalDateTime.now().minusDays(-1));
+        callAdd(dto, mockMvc); // 明天失效
+    }
+
+    void callAdd(RouteDto dto, MockMvc mockMvc) throws Exception {
+
         String content = mapper.writeValueAsString(dto);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/manage/route")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(content)
-                .header("a1", "b1")
-                .param("a", "b");
+                .content(content);
 
         ResultActions result = mockMvc.perform(requestBuilder);
         result.andReturn().getResponse().setCharacterEncoding("UTF-8"); // 避免print乱码
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("1"))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.content().string("1"));
+        //.andDo(MockMvcResultHandlers.print());
     }
 }

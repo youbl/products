@@ -26,6 +26,8 @@ public class RouteDto {
 
     }
 
+    private int id;
+
     /**
      * 代理服务IP
      */
@@ -55,6 +57,7 @@ public class RouteDto {
 
     public Route mapTo() {
         return Route.builder()
+                .id(getId())
                 .ip(getIp())
                 .port(getPort())
                 .protocal(getProtocal())
