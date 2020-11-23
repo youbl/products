@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
-import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
+import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -33,15 +33,19 @@ public class AutoIncListener extends AbstractMongoEventListener {
         this.mongoTemplate = mongoTemplate;
     }
 
-
     @Override
-    public void onBeforeSave(BeforeSaveEvent event) {
+    public void onBeforeConvert(BeforeConvertEvent event) {   // 不要用错为 onBeforeSave
         // super.onBeforeSave(event);
 
-        Object source = event.getSource();
-        if (source != null) {
-            ReflectionUtils.doWithFields(source.getClass(), field -> setIdInc(field, source));
-        }
+        Object entity = event.getSource();
+        ReflectionUtils.doWithFields(entity.getClass(), field -> setIdInc(field, entity));
+//        org.bson.Document document = BeforeSaveEvent.getDocument();
+//        if (document != null) {
+//            String id = String.valueOf(document.get("_id"));
+//            if (id == null || id.equals("0")) {
+//                document.put("_id", getNextId(entity.getClass().getSimpleName()));
+//            }
+//        }
     }
 
     private void setIdInc(Field field, Object source) throws IllegalAccessException {
@@ -56,7 +60,7 @@ public class AutoIncListener extends AbstractMongoEventListener {
         }
     }
 
-    private Integer getNextId(String collectionName) {
+    private int getNextId(String collectionName) {
         FindAndModifyOptions options = new FindAndModifyOptions();
         options.upsert(true);
         options.returnNew(true);

@@ -41,6 +41,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- 增加swagger支持 http://localhost:8801/swagger-ui/index.html -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

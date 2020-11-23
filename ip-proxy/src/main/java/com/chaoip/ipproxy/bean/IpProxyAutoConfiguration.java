@@ -115,13 +115,13 @@ public class IpProxyAutoConfiguration {
             String day;
 
             String otherStr = ymd.substring(dayIdx + 1);
-            if (otherStr.length() <= 1) {
+            if (otherStr.length() <= 2) { // 只有2位，说明没有时间
                 day = otherStr;
                 otherStr = "";
-            } else if ('1' <= otherStr.charAt(1) && otherStr.charAt(1) <= '9') {
+            } else if ('0' <= otherStr.charAt(1) && otherStr.charAt(1) <= '9') { // 第二个字符是数字，表示是2位的日期
                 day = otherStr.substring(0, 2);
                 otherStr = otherStr.substring(2);
-            } else {
+            } else { // 第二个字符不是数字，表示1位日期
                 day = otherStr.substring(0, 1);
                 otherStr = otherStr.substring(1);
             }
