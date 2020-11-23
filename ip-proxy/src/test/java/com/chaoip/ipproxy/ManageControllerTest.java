@@ -32,6 +32,24 @@ class ManageControllerTest extends BaseTest {
     void contextLoads() throws Exception {
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
+        getAllTest(mockMvc);
+
+        addTest(mockMvc);
+    }
+
+    void getAllTest(MockMvc mockMvc) throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/manage/routes");
+
+        ResultActions result = mockMvc.perform(requestBuilder);
+        result.andReturn().getResponse().setCharacterEncoding("UTF-8"); // 避免print乱码
+
+        result.andExpect(MockMvcResultMatchers.status().isOk())
+                //.andExpect(MockMvcResultMatchers.content().string("1"))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    void addTest(MockMvc mockMvc) throws Exception {
         RouteDto dto = RouteDto.builder()
                 .ip("12.34.33.22")
                 .port(8901)
@@ -55,5 +73,4 @@ class ManageControllerTest extends BaseTest {
                 .andExpect(MockMvcResultMatchers.content().string("1"))
                 .andDo(MockMvcResultHandlers.print());
     }
-
 }

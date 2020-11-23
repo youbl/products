@@ -2,6 +2,7 @@ package com.chaoip.ipproxy.service;
 
 import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.repository.RouteRepository;
+import com.chaoip.ipproxy.repository.entity.Route;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,4 +29,7 @@ public class RouteService {
         return dtos.size();
     }
 
+    public List<Route> getAll() {
+        return routeRepository.findAll();
+    }
 }

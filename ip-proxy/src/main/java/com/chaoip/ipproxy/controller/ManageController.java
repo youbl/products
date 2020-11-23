@@ -1,11 +1,9 @@
 package com.chaoip.ipproxy.controller;
 
 import com.chaoip.ipproxy.controller.dto.RouteDto;
+import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.service.RouteService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -25,6 +23,11 @@ public class ManageController {
 
     public ManageController(RouteService routeService) {
         this.routeService = routeService;
+    }
+
+    @GetMapping("routes")
+    public List<Route> getAll() {
+        return routeService.getAll();
     }
 
     /**
@@ -50,4 +53,5 @@ public class ManageController {
     public int addRoute(@RequestBody @Valid List<RouteDto> dtos) {
         return routeService.saveMultiRoute(dtos);
     }
+
 }

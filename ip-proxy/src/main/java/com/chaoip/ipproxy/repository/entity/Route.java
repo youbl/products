@@ -2,7 +2,10 @@ package com.chaoip.ipproxy.repository.entity;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -41,7 +44,24 @@ public class Route {
      */
     private String area;
     /**
-     * 过期的绝对时间
+     * 运营商
      */
+    private String operators;
+    /**
+     * 过期的绝对时间，并添加索引，
+     * Mongo里，会每分钟扫描并自动删除数据，因此不是马上过期
+     */
+    @Indexed(expireAfterSeconds = 0)
     private LocalDateTime expireTime;
+
+    /**
+     * 入库时间
+     */
+    @CreatedDate
+    private LocalDateTime addTime;
+    /**
+     * 更新时间
+     */
+    @LastModifiedDate
+    private LocalDateTime modifyTime;
 }
