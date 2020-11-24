@@ -11,6 +11,16 @@ spring:
     mongodb:
       auto-index-creation: true # 是否允许自动创建索引
 
+# 如果要在访问静态资源时，强制添加 static前缀
+#  mvc:
+#    static-path-pattern: /static/**
+#    resources:
+#      chain:
+#        strategy:
+#          content:
+#            enabled: true
+#            paths: /**
+
 ---  # 2个三横杠之间表示一个环境配置
 spring:
   profiles: unittest # 单元测试，通过注解 ActiveProfiles 使用这一段

@@ -50,6 +50,11 @@ public class RouteDto {
     @NotNull(message = "地域不能为空")
     private String area;
     /**
+     * 服务运营商
+     */
+    @NotNull(message = "运营商不能为空")
+    private String operators;
+    /**
      * 过期的绝对时间
      */
     @NotNull(message = "过期时间不能为空")
@@ -62,6 +67,7 @@ public class RouteDto {
                 .port(getPort())
                 .protocal(getProtocal())
                 .area(getArea())
+                .operators(getOperators())
                 .expireTime(getExpireTime())
                 .build();
     }
