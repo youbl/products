@@ -1,9 +1,12 @@
 package com.chaoip.ipproxy.controller;
 
+import com.chaoip.ipproxy.controller.dto.UserDto;
+import com.chaoip.ipproxy.repository.entity.BeinetUser;
+import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * UserController
@@ -21,8 +24,24 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("user")
-    public int xx() {
-        return 0;
+    @GetMapping("")
+    public String userName(AuthDetails details) {
+        if (details == null)
+            return "未登录";
+        return details.getUserName();
+    }
+
+    /**
+     * 新增用户
+     *
+     * @param dto 新用户所需字段
+     * @return 入库记录
+     */
+    @PostMapping("")
+    public BeinetUser addUser(@Valid @RequestBody UserDto dto) {
+        if (!dto.getPassword().equals(dto.getPasswordConfirm())) {
+            throw new IllegalArgumentException("两次密码输入不一致");
+        }
+        return userService.addUser(dto);
     }
 }

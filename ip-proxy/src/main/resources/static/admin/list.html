@@ -16,8 +16,16 @@
     <h1 style="text-align: center">
         IP列表页
     </h1>
-
-    <el-button type="primary" icon="el-icon-edit" @click="showAddDialog">添加记录</el-button>
+    <div>
+        <div style="float: left;">
+            <el-button type="primary" icon="el-icon-edit" @click="showAddDialog">添加记录</el-button>
+        </div>
+        <div style="float: right">
+            <el-link type="warning" href="/logout">退出登录</el-link>
+        </div>
+        <div style="float: right; width:200px;">&nbsp;</div>
+    </div>
+    <div style="clear: both"></div>
     <div class="tab-content">
         <template>
             <el-table

@@ -8,44 +8,111 @@
     <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
     <script src="/res/unpkg/elemeIndex.js"></script>
     <script src="/res/qs.min.js"></script>
-
     <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
 </head>
 
 <body>
-<div id="divApp">
-    <h1 style="text-align: center">
-        登录
-    </h1>
-    <el-form>
+<div id="divApp" style="text-align: center;">
+    <el-form style="width:500px">
+        <h1 style="text-align: center">
+            登录
+        </h1>
         <el-form-item label="用户名" label-width="200px">
-            <el-input v-model="beinetUser" placeholder="请输入"></el-input>
+            <el-input v-model="login.beinetUser" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="密码" label-width="200px">
-            <el-input v-model="beinetPwd" placeholder="请输入" show-password></el-input>
+            <el-input v-model="login.beinetPwd" placeholder="请输入" show-password></el-input>
         </el-form-item>
+        <div>
+            <el-button icon="el-icon-success" type="primary" @click="doLogin">登 录</el-button>
+            <el-button @click="openRegister">注 册</el-button>
+        </div>
     </el-form>
-    <div slot="footer" class="dialog-footer">
-        <el-button icon="el-icon-success" type="primary" @click="doLogin">登 录</el-button>
-        <el-button @click="openRegister">注 册</el-button>
-    </div>
+
+    <el-dialog title="注册账号" :visible.sync="openRegisterOption" width="40%">
+        <el-form :model="register" :rules="rulesRegister" ref="registerForm">
+            <el-form-item label="用户名" label-width="200px" prop="name">
+                <el-input v-model="register.name" placeholder="请输入" maxlength="30"></el-input>
+            </el-form-item>
+            <el-form-item label="登录密码" label-width="200px" prop="password">
+                <el-input v-model="register.password" placeholder="请输入" maxlength="30" show-password></el-input>
+            </el-form-item>
+            <el-form-item label="密码确认" label-width="200px" prop="passwordConfirm">
+                <el-input v-model="register.passwordConfirm" placeholder="请再次输入" maxlength="30"
+                          show-password></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="doRegister('registerForm')">注 册</el-button>
+            <el-button @click="cancelRegister">取 消</el-button>
+        </div>
+    </el-dialog>
 </div>
 <script>
     var vueApp = new Vue({
         el: '#divApp',
-        data: {
-            beinetUser: '',
-            beinetPwd: '',
+        data: function () {
+            let validatePass = (rule, value, callback) => {
+                if (this.register.password != this.register.passwordConfirm)
+                    return callback(new Error('两次密码输入不一致.'));
+                return callback();
+            };
+            return {
+                openRegisterOption: false,
+                login: {
+                    beinetUser: '',
+                    beinetPwd: '',
+                },
+                register: {
+                    name: '',
+                    password: '',
+                    passwordConfirm: '',
+                },
+                rulesRegister: {
+                    name: [
+                        {required: true, message: '用户名必填', trigger: 'blur'},
+                        {min: 3, max: 30, message: '用户名长度为3~30个字符', trigger: 'blur'},
+                    ],
+                    password: [
+                        {required: true, message: '密码必填', trigger: 'blur'},
+                        {min: 6, max: 30, message: '密码长度为6~30个字符', trigger: 'blur'},
+                    ],
+                    passwordConfirm: [
+                        {required: true, message: '密码必填', trigger: 'blur'},
+                        {min: 6, max: 30, message: '密码长度为6~30个字符', trigger: 'blur'},
+                        {validator: validatePass, trigger: 'blur'},
+                    ],
+                },
+            }
         },
         created: function () {
         },
         computed: {},
         methods: {
             openRegister: function () {
+                this.openRegisterOption = true;
+            },
+            cancelRegister: function () {
+                this.openRegisterOption = false;
+            },
+            doRegister: function (form) {
+                this.$refs[form].validate(valid => {
+                    if (!valid)
+                        return false;
+                    let url = '/user';
+                    axios.post(url, this.register).then(response => {
+                        if (!response || !response.data || !response.data.id) {
+                            return alert('保存失败');
+                        }
+                        alert('保存成功');
+                        this.cancelRegister();
+                    }).catch(error => this.ajaxError(error));
+                });
             },
             doLogin: function () {
                 let url = '/login';
-                axios.post(url, Qs.stringify(this.$data)).then(response => {
+                // 默认登录使用的是form形式，因此要用Qs转换一下
+                axios.post(url, Qs.stringify(this.login)).then(response => {
                     // 能到这里，表示登录成功
                     let goUrl = getQueryString('returnUrl');
                     if (!goUrl)
@@ -56,9 +123,11 @@
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {
-                    let msg = error.response.data['msg'];
                     console.log(JSON.stringify(error.response.data));
-                    alert('出错了');
+                    let msg = error.response.data['msg'];
+                    if (!msg)
+                        msg = '出错了';
+                    alert(msg);
                 } else {
                     console.log(JSON.stringify(error));
                     alert('未知错误');

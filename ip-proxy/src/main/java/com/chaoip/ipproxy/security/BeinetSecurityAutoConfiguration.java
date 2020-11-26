@@ -2,11 +2,9 @@ package com.chaoip.ipproxy.security;
 
 import com.chaoip.ipproxy.repository.BeinetUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -34,12 +32,6 @@ import java.util.Map;
 public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     static final String LOGIN_PAGE = "/login/index.html";
 
-    @Value("${beinet.security.user:sdk}")
-    private String sdkUser;
-
-    @Value("${beinet.security.password:beinet.123}")
-    private String sdkPassword;
-
     @Bean
     public PasswordEncoder createPasswordEncoder() {
         return new BeinetPasswordEncoder();
@@ -48,15 +40,6 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
     @Bean
     public BeinetUserService createUserDetailService(PasswordEncoder encoder, BeinetUserRepository userRepository) {
         return new BeinetUserService(encoder, userRepository);
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // 支持basic认证，用于admin请求 在 org.springframework.security.web.authentication.www.BasicAuthenticationFilter 里实现的
-        // 在header里添加  Authorization: Basic base64(用户名:密码) 访问
-        auth.inMemoryAuthentication()
-                .passwordEncoder(createPasswordEncoder())
-                .withUser(sdkUser).password(sdkPassword).authorities("ROLE_ADMIN", "ROLE_USER");// 用 authorities 必须显式添加ROLE_前缀
     }
 
     @Override
@@ -93,10 +76,10 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 .accessDeniedHandler(new BeinetHandleAccessDenied())            // 指定登录用户访问无权限url的异常处理器
                 .and()
                 .authorizeRequests()                // 开始指定请求授权
-                .antMatchers(LOGIN_PAGE + "/**").permitAll() // 上面的loginPage("/myLogin.html").permitAll() 居然不支持带参数: myLogin.html?xxx
-                .antMatchers("/res/**").permitAll()     // res根路径及子目录请求，不限制访问
+                .antMatchers("/res/**", "/error/**").permitAll()     // res根路径及子目录请求，不限制访问
                 .antMatchers("/favicon.ico").permitAll()     // ico不限制访问
                 .antMatchers("/user/**").permitAll()    // user控制器请求，不限制访问
+                .antMatchers("/login/**").permitAll()   // login相关页面请求，不限制访问
                 .antMatchers("/admin/**").hasRole("ADMIN")// news根路径及子目录请求，要求ADMIN角色才能访问
                 //.antMatchers("/**").permitAll()
                 //.antMatchers("/role/**").permitAll()    // 忽略配置里的权限，改用 EnableGlobalMethodSecurity 和 PreAuthorize 注解
@@ -110,6 +93,11 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
 
     @Configuration
     static class WebMvcConfig implements WebMvcConfigurer {
+        /**
+         * 为Controller增加一个参数解析器
+         *
+         * @param resolvers
+         */
         @Override
         public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
             resolvers.add(new AuthDetailArgumentResolver());

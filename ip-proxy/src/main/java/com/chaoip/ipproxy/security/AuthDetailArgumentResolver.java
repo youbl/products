@@ -38,6 +38,7 @@ public class AuthDetailArgumentResolver implements HandlerMethodArgumentResolver
 
         // 调用者的信息
         ret.setUserAgent(webRequest.getHeader("user-agent"));
+        ret.setUserName("匿名");
 
         Principal principal = webRequest.getUserPrincipal();
         if (principal != null) {

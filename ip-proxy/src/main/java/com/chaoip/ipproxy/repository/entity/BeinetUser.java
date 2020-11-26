@@ -8,8 +8,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +36,20 @@ public class BeinetUser implements UserDetails {
     private String identity;
     private String bankNo;
     private String security;
-    private String roles;
+    private String roles = "USER";
+    private LocalDateTime creationTime = LocalDateTime.now();
+
+    /**
+     * 给用户计算一个密钥，后续作为api使用
+     * @param name
+     * @param password
+     * @param time
+     * @return
+     */
+    public static String countSecurity(String name, String password, LocalDateTime time) {
+        String sign = String.format("%s-%s-%s", name, password, time);
+        return DigestUtils.md5DigestAsHex(sign.getBytes());
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
