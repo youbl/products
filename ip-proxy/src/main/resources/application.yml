@@ -37,3 +37,14 @@ spring:
       password: beinet123
       database: firstdemo
 ---
+
+spring:
+  profiles: prod # 生产使用这一段
+  data:
+    mongodb:
+      host: 127.0.0.1
+      port: 27017
+      username: beinet
+      password: beinet123
+      database: ipproxy
+---

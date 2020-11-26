@@ -74,6 +74,7 @@ class ManageControllerTest extends BaseTest {
                 .port(8901)
                 .protocal("https")
                 .area("福州")
+                .operators("中国电信")
                 .expireTime(LocalDateTime.now().minusDays(10))
                 .build();
         callAdd(dto, mockMvc); // 失效数据
