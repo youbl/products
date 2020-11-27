@@ -4,6 +4,7 @@ import com.chaoip.ipproxy.repository.entity.Route;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import util.CityHelper;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -42,7 +43,7 @@ public class RouteDto {
     /**
      * 代理协议，如 http https socks5
      */
-    @Pattern(regexp = "^(https?|socks5)$", message = "协议只支持 http|https|socks5")
+    @Pattern(regexp = "^(http|socks5)$", message = "协议只支持 http,socks5")
     private String protocal;
     /**
      * 代理服务所在地域
@@ -52,23 +53,37 @@ public class RouteDto {
     /**
      * 服务运营商
      */
-    @NotNull(message = "运营商不能为空")
+    @Pattern(regexp = "^(unicom|mobile|telecom)$", message = "运营商只支持 unicom,mobile,telecom")
     private String operators;
     /**
-     * 过期的绝对时间
+     * 过期时间，单位秒
      */
-    @NotNull(message = "过期时间不能为空")
-    private LocalDateTime expireTime;
+    @Min(value = 10, message = "过期时间不能小于10")
+    private int expireTime;
 
     public Route mapTo() {
+        String operatorName = "";
+        switch (getOperators()) {
+            case "unicom":
+                operatorName = "中国联通";
+                break;
+            case "mobile":
+                operatorName = "中国移动";
+                break;
+            case "telecom":
+                operatorName = "中国电信";
+                break;
+            default:
+                throw new IllegalArgumentException("无效的运营商");
+        }
         return Route.builder()
                 .id(getId())
                 .ip(getIp())
                 .port(getPort())
                 .protocal(getProtocal())
-                .area(getArea())
-                .operators(getOperators())
-                .expireTime(getExpireTime())
+                .area(CityHelper.getByAreaCode(getArea()))
+                .operators(operatorName)
+                .expireTime(LocalDateTime.now().plusSeconds(getExpireTime()))
                 .build();
     }
 }

@@ -92,19 +92,13 @@
                 <el-input v-model="newRecord.port" placeholder="请输入端口"></el-input>
             </el-form-item>
             <el-form-item label="运营商" label-width="200px">
-                <el-input v-model="newRecord.operators" placeholder="请输入运营商"></el-input>
+                <el-input v-model="newRecord.operators" placeholder="请输入运营商 unicom,mobile,telecom"></el-input>
             </el-form-item>
-            <el-form-item label="地域" label-width="200px">
-                <el-input v-model="newRecord.area" placeholder="请输入地域"></el-input>
+            <el-form-item label="城市区号" label-width="200px">
+                <el-input v-model="newRecord.area" placeholder="请输入城市区号"></el-input>
             </el-form-item>
-            <el-form-item label="过期时间" label-width="200px">
-                <el-date-picker
-                        v-model="newRecord.expireTime"
-                        type="datetime"
-                        placeholder="选择过期时间"
-                        align="right"
-                        :picker-options="pickerOptions">
-                </el-date-picker>
+            <el-form-item label="过期时间-秒" label-width="200px">
+                <el-input v-model="newRecord.expireTime" placeholder="请输入过期时间，单位秒"></el-input>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -125,29 +119,7 @@
                 port: 8080,
                 operators: '',
                 area: '',
-                expireTime: new Date(),
-            },
-            pickerOptions: {
-                shortcuts: [{
-                    text: '今天',
-                    onClick(picker) {
-                        picker.$emit('pick', new Date());
-                    }
-                }, {
-                    text: '一周后',
-                    onClick(picker) {
-                        const date = new Date();
-                        date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
-                        picker.$emit('pick', date);
-                    }
-                }, {
-                    text: '一月后',
-                    onClick(picker) {
-                        const date = new Date();
-                        date.setTime(date.getTime() + 3600 * 1000 * 24 * 31);
-                        picker.$emit('pick', date);
-                    }
-                }]
+                expireTime: 1800,
             },
         },
         created: function () {
