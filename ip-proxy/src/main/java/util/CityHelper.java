@@ -327,7 +327,7 @@ public final class CityHelper {
      * @return 城市或未知
      */
     public static String getByAreaCode(String code) {
-        return citys.getOrDefault(code, "未知");
+        return citys.getOrDefault(code, "");
     }
 
 }

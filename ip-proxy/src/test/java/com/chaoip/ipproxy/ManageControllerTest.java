@@ -73,19 +73,19 @@ class ManageControllerTest extends BaseTest {
                 .ip("12.34.33.22")
                 .port(8901)
                 .protocal("https")
-                .area("福州")
-                .operators("中国电信")
-                .expireTime(LocalDateTime.now().minusDays(10))
+                .area("0591")
+                .operators("mobile")
+                .expireTime(60 * 60 * 24 * 30)
                 .build();
         callAdd(dto, mockMvc); // 失效数据
 
-        dto.setExpireTime(LocalDateTime.now());
+        dto.setExpireTime(1);
         callAdd(dto, mockMvc); // 失效数据
 
-        dto.setExpireTime(LocalDateTime.now().minusSeconds(-61));
+        dto.setExpireTime(-61);
         callAdd(dto, mockMvc); // 一分钟后失效
 
-        dto.setExpireTime(LocalDateTime.now().minusDays(-1));
+        dto.setExpireTime(-3600);
         callAdd(dto, mockMvc); // 明天失效
     }
 

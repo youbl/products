@@ -4,6 +4,7 @@ import com.chaoip.ipproxy.repository.entity.Route;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.util.StringUtils;
 import util.CityHelper;
 
 import javax.validation.constraints.Max;
@@ -74,14 +75,19 @@ public class RouteDto {
                 operatorName = "中国电信";
                 break;
             default:
-                throw new IllegalArgumentException("无效的运营商");
+                throw new IllegalArgumentException("无效的运营商: " + getOperators());
+        }
+        String cityName = CityHelper.getByAreaCode(getArea());
+        if (StringUtils.isEmpty(cityName)) {
+            throw new IllegalArgumentException("无效的城市区号: " + getArea());
+
         }
         return Route.builder()
                 .id(getId())
                 .ip(getIp())
                 .port(getPort())
                 .protocal(getProtocal())
-                .area(CityHelper.getByAreaCode(getArea()))
+                .area(cityName)
                 .operators(operatorName)
                 .expireTime(LocalDateTime.now().plusSeconds(getExpireTime()))
                 .build();
