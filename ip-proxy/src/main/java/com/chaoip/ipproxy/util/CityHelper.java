@@ -1,4 +1,4 @@
-package util;
+package com.chaoip.ipproxy.util;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.util.StringUtils;
-import util.CityHelper;
+import com.chaoip.ipproxy.util.CityHelper;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;

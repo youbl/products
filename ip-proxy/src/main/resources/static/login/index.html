@@ -41,6 +41,14 @@
                 <el-input v-model="register.passwordConfirm" placeholder="请再次输入" maxlength="30"
                           show-password></el-input>
             </el-form-item>
+            <el-form-item label="图形验证码" label-width="200px" prop="imgCode" style="text-align: left">
+                <el-input v-model="register.imgCode" placeholder="请输入图形验证码" maxlength="6" style="width:50%"></el-input>
+                <img :src="imgCode" style="cursor: pointer; height: 30px;" @click="getImgCode"/>
+            </el-form-item>
+            <el-form-item label="短信验证码" label-width="200px" prop="smsCode" style="text-align: left">
+                <el-input v-model="register.smsCode" placeholder="请输入短信验证码" maxlength="6" style="width:50%"></el-input>
+                <el-button @click="sendSmscode">获取验证码</el-button>
+            </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button type="primary" @click="doRegister('registerForm')">注 册</el-button>
@@ -59,6 +67,7 @@
             };
             return {
                 openRegisterOption: false,
+                imgCode: '/code.jpg',
                 login: {
                     beinetUser: '',
                     beinetPwd: '',
@@ -67,6 +76,10 @@
                     name: '',
                     password: '',
                     passwordConfirm: '',
+                    imgSn: '',
+                    imgCode: '',
+                    smsSn: '',
+                    smsCode: '',
                 },
                 rulesRegister: {
                     name: [
@@ -82,6 +95,12 @@
                         {min: 6, max: 30, message: '密码长度为6~30个字符', trigger: 'blur'},
                         {validator: validatePass, trigger: 'blur'},
                     ],
+                    imgCode: [
+                        {required: true, message: '图形验证码不能为空', trigger: 'blur'},
+                    ],
+                    smsCode: [
+                        {required: true, message: '短信验证码不能为空', trigger: 'blur'},
+                    ],
                 },
             }
         },
@@ -90,10 +109,37 @@
         computed: {},
         methods: {
             openRegister: function () {
+                this.getImgCode();
                 this.openRegisterOption = true;
             },
             cancelRegister: function () {
                 this.openRegisterOption = false;
+            },
+            getImgCode: function () {
+                let url = '/user/img';
+                axios.get(url).then(response => {
+                    if (!response || !response.data) {
+                        return alert('获取图形验证码失败');
+                    }
+                    this.imgCode = "data:image/jpg;base64," + response.data.img;
+                    this.register.imgSn = response.data.sn;
+                }).catch(error => this.ajaxError(error));
+            },
+            sendSmscode: function () {
+                if (this.register.imgCode.length <= 0 || this.register.imgSn.length <= 0) {
+                    alert('请输入图形验证码');
+                    return;
+                }
+                let url = '/user/sms';
+                let para = {};
+                para.code = this.register.imgCode;
+                para.sn = this.register.imgSn;
+                axios.post(url, para).then(response => {
+                    if (!response || !response.data || !response.data.id) {
+                        return alert('发送失败');
+                    }
+                    alert('发送成功');
+                }).catch(error => this.ajaxError(error));
             },
             doRegister: function (form) {
                 this.$refs[form].validate(valid => {

@@ -2,8 +2,7 @@ package com.chaoip.ipproxy.controller;
 
 //import org.springframework.boot.autoconfigure.web.ErrorProperties;
 
-import lombok.Builder;
-import lombok.Data;
+import com.chaoip.ipproxy.controller.dto.Result;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,14 +71,4 @@ public class GlobalErrorController implements ErrorController {
         return Result.error(code, msg);
     }
 
-    @Data
-    @Builder
-    public static class Result {
-        private int code;
-        private String msg;
-
-        public static Result error(int code, String msg) {
-            return Result.builder().code(code).msg(msg).build();
-        }
-    }
 }
