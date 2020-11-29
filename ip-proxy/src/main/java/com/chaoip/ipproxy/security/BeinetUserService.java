@@ -65,6 +65,10 @@ public class BeinetUserService implements UserDetailsService {
         return ret;
     }
 
+    public boolean existsByPhone(String phone) {
+        return userRepository.existsByPhone(phone);
+    }
+
     public BeinetUser addUser(UserDto userDto) {
         if (userRepository.findByName(userDto.getName()) != null) {
             throw new RuntimeException("该名称已存在:" + userDto.getName());

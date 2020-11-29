@@ -30,9 +30,14 @@ public class ValidCode {
      */
     private String sn;
     /**
-     * 状态，0为未验证，1为成功，2为失败
+     * 类型，0图形验证码，1为短信验证码
      */
-    private int status;
+    private int type;
+    /**
+     * 允许错误次数，为0表示作废，不再使用.
+     * 图形验证码初始值为1，短信为3
+     */
+    private int enableErrNum;
     /**
      * 过期的绝对时间，并添加索引，
      * Mongo里，会每分钟扫描并自动删除数据，因此不是马上过期

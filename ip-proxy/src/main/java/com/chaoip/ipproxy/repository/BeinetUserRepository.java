@@ -12,4 +12,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  */
 public interface BeinetUserRepository extends MongoRepository<BeinetUser, Long> {
     BeinetUser findByName(String name);
+
+    boolean existsByPhone(String phone);
 }

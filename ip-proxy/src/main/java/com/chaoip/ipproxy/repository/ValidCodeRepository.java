@@ -14,9 +14,9 @@ public interface ValidCodeRepository extends MongoRepository<ValidCode, Long> {
     /**
      * 根据序号和状态，查找第一条数据
      *
-     * @param sn 序号
-     * @param status 状态
+     * @param sn     序号
+     * @param errNum 允许错误次数
      * @return 记录
      */
-    ValidCode findTopBySnAndStatus(String sn, int status);
+    ValidCode findTopBySnAndEnableErrNumIsGreaterThan(String sn, int errNum);
 }

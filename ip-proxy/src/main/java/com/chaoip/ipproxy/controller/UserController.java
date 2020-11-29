@@ -1,6 +1,5 @@
 package com.chaoip.ipproxy.controller;
 
-import com.chaoip.ipproxy.controller.dto.Result;
 import com.chaoip.ipproxy.controller.dto.SmsDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
@@ -52,6 +51,12 @@ public class UserController {
         if (!dto.getPassword().equals(dto.getPasswordConfirm())) {
             throw new IllegalArgumentException("两次密码输入不一致");
         }
+        if (userService.existsByPhone(dto.getPhone())) {
+            throw new IllegalArgumentException("输入的手机号已被注册");
+        }
+        if (!codeService.validByCodeAndSn(dto.getSmsCode(), dto.getSmsSn())) {
+            throw new IllegalArgumentException("输入的短信验证码错误");
+        }
         return userService.addUser(dto);
     }
 
@@ -63,7 +68,7 @@ public class UserController {
      */
     @GetMapping("img")
     public Map<String, String> imgCode() throws IOException {
-        ValidCode code = codeService.addCodeAndGetSn();
+        ValidCode code = codeService.addImgCodeAndGetSn();
 
         Map<String, String> ret = new HashMap<>();
         ImgHelper helper = new ImgHelper();
@@ -79,13 +84,10 @@ public class UserController {
      * @throws IOException 异常
      */
     @PostMapping("sms")
-    public String smsCode(SmsDto dto) throws IOException {
-        if (!codeService.validByCodeAndSn(dto.getCode(), dto.getSn())) {
-            return "";
-        }
-        ValidCode code = codeService.addCodeAndGetSn();
-        // todo sendSms;
-
-        return code.getSn();
+    public Map<String, String> smsCode(@RequestBody SmsDto dto) {
+        String sn = codeService.sendSmsCode(dto);
+        Map<String, String> ret = new HashMap<>();
+        ret.put("sn", sn);
+        return ret;
     }
 }

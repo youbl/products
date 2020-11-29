@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.controller.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,7 +15,16 @@ import javax.validation.constraints.*;
  */
 @Data
 @Builder
+@AllArgsConstructor
 public class SmsDto {
+    public SmsDto() {
+    }
+
+    /**
+     * 输入的手机号
+     */
+    @Pattern(regexp = "^1\\d{10}$", message = "无效的手机号")
+    private String phone;
     /**
      * 输入的验证码
      */

@@ -29,6 +29,15 @@ public class UserDto {
     private String password;
     @NotBlank(message = "确认密码不能为空")
     private String passwordConfirm;
+    /**
+     * 输入的手机号
+     */
+    @Pattern(regexp = "^1\\d{10}$", message = "无效的手机号")
+    private String phone;
+    @NotBlank(message = "短信验证码序号不能为空")
+    private String smsSn;
+    @NotBlank(message = "短信验证码不能为空")
+    private String smsCode;
 
     public BeinetUser mapTo() {
         LocalDateTime now = LocalDateTime.now();
