@@ -42,9 +42,9 @@ public class RouteDto {
     @Max(value = 65535, message = "端口不能大于65535")
     private int port;
     /**
-     * 代理协议，如 http https socks5
+     * 代理协议，如 http socks
      */
-    @Pattern(regexp = "^(http|socks5)$", message = "协议只支持 http,socks5")
+    @Pattern(regexp = "^(http|socks)$", message = "协议只支持 http,socks")
     private String protocal;
     /**
      * 代理服务所在地域

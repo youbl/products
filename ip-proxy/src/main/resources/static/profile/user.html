@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>个人中心</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script src="/res/unpkg/elemeIndex.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+
+        .el-aside {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+<div id="divApp">
+    <el-container style="height: 500px; border: 1px solid #eee">
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+            <el-menu :default-openeds="['1']">
+                <el-submenu index="1">
+                    <template slot="title"><i class="el-icon-menu"></i>账户设置</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="2-1" @click.native="showTab=0">个人信息</el-menu-item>
+                        <el-menu-item index="2-2" @click.native="showTab=1">修改密码</el-menu-item>
+                        <el-menu-item index="2-2" @click.native="showTab=2">实名认证</el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+            </el-menu>
+        </el-aside>
+
+        <el-container>
+            <el-header style="text-align: right; font-size: 12px">
+                <el-dropdown>
+                    <i class="el-icon-setting" style="margin-right: 15px"></i>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item @click.native="goProfile">个人中心</el-dropdown-item>
+                        <el-dropdown-item @click.native="doLogout">退出</el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+                <span>{{user.name}}</span>
+            </el-header>
+
+            <el-main v-show="showTab===0">
+                <el-form>
+                    <el-form-item label="姓名" label-width="200px">
+                        <el-input :value="user.name" style="border:none" readonly></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号" label-width="200px">
+                        <el-input :value="user.phone" style="border:none" readonly></el-input>
+                    </el-form-item>
+                    <el-form-item label="银行卡" label-width="200px">
+                        <el-input :value="user.bankNo" style="border:none" readonly></el-input>
+                    </el-form-item>
+                    <el-form-item label="SecurityKey" label-width="200px">
+                        <el-input :value="user.security" style="border:none" readonly></el-input>
+                    </el-form-item>
+                    <el-form-item label="注册时间" label-width="200px">
+                        <el-input :value="user.creationTime" style="border:none" readonly></el-input>
+                    </el-form-item>
+                </el-form>
+            </el-main>
+
+            <el-main v-show="showTab===1">
+                <el-form :model="changePwd" :rules="rulesChangePwd" ref="changePwdForm">
+                    <el-form-item label="原密码" label-width="200px" prop="passwordOld">
+                        <el-input v-model="changePwd.passwordOld" placeholder="请输入原密码" maxlength="30"
+                                  show-password></el-input>
+                    </el-form-item>
+                    <el-form-item label="新密码" label-width="200px" prop="password">
+                        <el-input v-model="changePwd.password" placeholder="请输入新密码" maxlength="30"
+                                  show-password></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码确认" label-width="200px" prop="passwordConfirm">
+                        <el-input v-model="changePwd.passwordConfirm" placeholder="请再次输入密码" maxlength="30"
+                                  show-password></el-input>
+                    </el-form-item>
+                </el-form>
+                <el-button type="primary" @click="doChangePwd('changePwdForm')">修改密码</el-button>
+            </el-main>
+
+            <el-main v-show="showTab===2">
+                <el-form :model="realnameIdentify" ref="realnameIdentifyForm">
+                </el-form>
+                <el-button type="primary" @click="doRealNameIdentify('realnameIdentifyForm')">提交认证</el-button>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+
+<script>
+    var vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            let validatePass = (rule, value, callback) => {
+                if (this.changePwd.password != this.changePwd.passwordConfirm)
+                    return callback(new Error('两次密码输入不一致.'));
+                return callback();
+            };
+
+            return {
+                showTab: 0,
+                user: {},
+
+                changePwd: {
+                    passwordOld: '',
+                    password: '',
+                    passwordConfirm: '',
+                },
+                rulesChangePwd: {
+                    passwordOld: [
+                        {required: true, message: '旧密码必填', trigger: 'blur'},
+                    ],
+                    password: [
+                        {required: true, message: '新密码必填', trigger: 'blur'},
+                        {min: 6, max: 30, message: '新密码长度为6~30个字符', trigger: 'blur'},
+                    ],
+                    passwordConfirm: [
+                        {required: true, message: '密码必填', trigger: 'blur'},
+                        {min: 6, max: 30, message: '密码长度为6~30个字符', trigger: 'blur'},
+                        {validator: validatePass, trigger: 'blur'},
+                    ],
+                },
+
+                realnameIdentify: {},
+            }
+        },
+        created: function () {
+            let url = '/user';
+            axios.get(url).then(response => {
+                if (!response || !response.data) {
+                    alert('未取得登录信息');
+                    return;
+                }
+                this.user = response.data;
+            }).catch(error => this.ajaxError(error));
+        },
+        computed: {},
+        methods: {
+            goProfile: function () {
+                location.href = '/profile/user.html';
+            },
+            doLogout: function () {
+                let url = '/logout';
+                location.href = url;
+            },
+            doChangePwd: function (form) {
+                this.$refs[form].validate(valid => {
+                    if (!valid)
+                        return false;
+                    let url = '/user/pwd';
+                    axios.post(url, this.changePwd).then(response => {
+                        if (!response || !response.data) {
+                            alert('修改失败');
+                            return;
+                        }
+                        alert('修改成功');
+                    }).catch(error => this.ajaxError(error));
+                });
+            },
+            doRealNameIdentify: function (form) {
+                this.$refs[form].validate(valid => {
+                    if (!valid)
+                        return false;
+                    alert('暂未实现');
+                });
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (!msg)
+                        msg = '出错了';
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+
+
+    /**
+     * 滚动到窗口底部
+     */
+    function toWindowBottom() {
+        window.scrollTo(0, getWindowHeight());
+    }
+
+    /**
+     * 获取窗口高度
+     * @return {number} 窗口高度值
+     */
+    function getWindowHeight() {
+        // body是chrome，documentElement是IE和Firefox
+        return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    }
+
+    /**
+     * 获取url里的变量值
+     * @param {string} name 变量名
+     * @return {string} 变量值
+     */
+    function getQueryString(name) {
+        if (typeof (name) !== 'string') {
+            return '';
+        }
+        name = name.trim();
+        if (name.length === 0) {
+            return '';
+        }
+        let localSearch = location.search.toLocaleLowerCase();
+        name = name.toLowerCase() + '=';
+        let tmpName = '?' + name;
+        let idx = localSearch.indexOf(tmpName);
+        if (idx < 0) {
+            tmpName = '&' + name;
+            idx = localSearch.indexOf(tmpName);
+            if (idx < 0) {
+                return '';
+            }
+        }
+        name = tmpName;
+        let tmp = location.search.substr(idx + name.length);
+        idx = tmp.indexOf('&');
+        if (idx === 0)
+            return '';
+        let ret;
+        if (idx < 0) {
+            ret = tmp;
+        } else {
+            ret = tmp.substr(0, idx);
+        }
+        return decodeURIComponent(ret.trim());
+    }
+</script>
+</body>
+</html>

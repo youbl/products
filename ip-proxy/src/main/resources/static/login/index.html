@@ -146,9 +146,10 @@
                     axios.post(url, para).then(response => {
                         if (!response || !response.data || !response.data.sn) {
                             this.enableSmsButton = 0;
+                            this.getImgCode();
                             return alert('发送失败');
                         }
-                        setTimeout(this.waitForSmsButton, 1000);
+                        this.waitForSmsButton();
                         this.register.smsSn = response.data.sn;
                         alert('发送成功');
                     }).catch(error => {
@@ -163,6 +164,11 @@
                     return;
                 }
                 this.enableSmsButton--;
+
+                let vue = this;
+                setTimeout(function () {
+                    vue.waitForSmsButton();
+                }, 1000);
             },
             doRegister: function (form) {
                 if (this.register.smsCode.length <= 0) {
@@ -195,6 +201,7 @@
                 }).catch(error => this.ajaxError(error));
             },
             ajaxError: function (error) {
+                this.getImgCode();
                 if (error.response && error.response.data) {
                     console.log(JSON.stringify(error.response.data));
                     let msg = error.response.data['msg'];

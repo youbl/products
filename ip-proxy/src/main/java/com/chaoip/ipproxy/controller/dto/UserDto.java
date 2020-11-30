@@ -44,6 +44,8 @@ public class UserDto {
         return BeinetUser.builder()
                 .name(getName())
                 .password(getPassword())
+                .phone(getPhone())
+                .bankNo("")
                 .creationTime(now)
                 .security(BeinetUser.countSecurity(getName(), getPassword(), now))
                 .build();

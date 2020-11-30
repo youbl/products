@@ -36,7 +36,7 @@ public class Route {
      */
     private int port;
     /**
-     * 代理协议，如 http https socks5
+     * 代理协议，如 http socks
      */
     private String protocal;
     /**

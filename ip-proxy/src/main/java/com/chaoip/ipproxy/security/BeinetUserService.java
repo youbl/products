@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.security;
 
+import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.BeinetUserRepository;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
@@ -8,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 
 /**
  * BeinetUserService
@@ -74,6 +76,43 @@ public class BeinetUserService implements UserDetailsService {
             throw new RuntimeException("该名称已存在:" + userDto.getName());
         }
         BeinetUser user = userDto.mapTo();
+        // 使用登录的密码加密器进行加密
+        user.setPassword(encoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    public BeinetUser findByName(String name) {
+        BeinetUser user = userRepository.findByName(name);
+
+        if (user != null) {
+            // 隐藏密码
+            user.setPassword("");
+            // 隐藏手机号
+            if (!StringUtils.isEmpty(user.getPhone())) {
+                user.setPhone(user.getPhone().replaceAll("^(.{3}).+(.{2})$", "$1****$2"));
+            }
+            // 隐藏银行卡
+            if (!StringUtils.isEmpty(user.getBankNo())) {
+                user.setBankNo(user.getBankNo().replaceAll("^(.{3}).+(.{3})$", "$1****$2"));
+            }
+            // 隐藏SecurityKey
+            if (!StringUtils.isEmpty(user.getSecurity())) {
+                user.setSecurity(user.getSecurity().replaceAll("^(.{4}).+(.{4})$", "$1****$2"));
+            }
+        }
+        return user;
+    }
+
+    public boolean changePassword(PasswordDto dto, String username) {
+        BeinetUser user = userRepository.findByName(username);
+        if (user == null) {
+            throw new RuntimeException("指定的用户未找到: " + username);
+        }
+        if (!encoder.matches(dto.getPasswordOld(), user.getPassword())) {
+            throw new RuntimeException("输入的旧密码不匹配: " + username);
+        }
+        user.setPassword(encoder.encode(dto.getPassword()));
+        userRepository.save(user);
+        return true;
     }
 }

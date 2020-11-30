@@ -80,7 +80,8 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 .antMatchers("/favicon.ico").permitAll()     // ico不限制访问
                 .antMatchers("/user/**").permitAll()    // user控制器请求，不限制访问
                 .antMatchers("/login/**").permitAll()   // login相关页面请求，不限制访问
-                .antMatchers("/admin/**").hasRole("ADMIN")// news根路径及子目录请求，要求ADMIN角色才能访问
+                .antMatchers("/admin/**").hasRole("ADMIN") // 管理页面请求，要求ADMIN角色才能访问
+                .antMatchers("/manage/**").hasRole("ADMIN")// 管理页面请求，要求ADMIN角色才能访问
                 //.antMatchers("/**").permitAll()
                 //.antMatchers("/role/**").permitAll()    // 忽略配置里的权限，改用 EnableGlobalMethodSecurity 和 PreAuthorize 注解
                 .anyRequest().authenticated();      // 其它所有请求都要求登录后访问，但是不限制角色

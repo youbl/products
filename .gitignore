@@ -386,3 +386,4 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 /src/DemoCodeWeb/logs
+/ip-proxy/logs

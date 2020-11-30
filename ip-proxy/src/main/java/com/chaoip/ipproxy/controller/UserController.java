@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.controller;
 
+import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.SmsDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
@@ -8,6 +9,8 @@ import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.service.ValidCodeService;
 import com.chaoip.ipproxy.util.ImgHelper;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,10 +37,10 @@ public class UserController {
     }
 
     @GetMapping("")
-    public String userName(AuthDetails details) {
+    public BeinetUser userName(AuthDetails details) {
         if (details == null)
-            return "未登录";
-        return details.getUserName();
+            return null;
+        return userService.findByName(details.getUserName());
     }
 
     /**
@@ -52,13 +55,27 @@ public class UserController {
             throw new IllegalArgumentException("两次密码输入不一致");
         }
         if (userService.existsByPhone(dto.getPhone())) {
-            throw new IllegalArgumentException("输入的手机号已被注册");
+            throw new IllegalArgumentException("该手机号已被注册");
         }
         if (!codeService.validByCodeAndSn(dto.getSmsCode(), dto.getSmsSn())) {
-            throw new IllegalArgumentException("输入的短信验证码错误");
+            throw new IllegalArgumentException("短信验证码错误");
         }
         return userService.addUser(dto);
     }
+
+    //@PreAuthorize("hasAnyRole('ROOT')")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("pwd")
+    public boolean changePwd(@Valid @RequestBody PasswordDto dto, AuthDetails details) {
+        if (details == null) {
+            throw new IllegalArgumentException("获取登录信息失败");
+        }
+        if (!dto.getPassword().equals(dto.getPasswordConfirm())) {
+            throw new IllegalArgumentException("两次密码输入不一致");
+        }
+        return userService.changePassword(dto, details.getUserName());
+    }
+
 
     /**
      * 获取图形验证码和序号
@@ -85,7 +102,16 @@ public class UserController {
      */
     @PostMapping("sms")
     public Map<String, String> smsCode(@RequestBody SmsDto dto) {
+        if (!codeService.validByCodeAndSn(dto.getCode(), dto.getSn())) {
+            throw new IllegalArgumentException("图形验证码错误");
+        }
+
+        if (userService.existsByPhone(dto.getPhone())) {
+            throw new IllegalArgumentException("该手机号已被注册");
+        }
+
         String sn = codeService.sendSmsCode(dto);
+
         Map<String, String> ret = new HashMap<>();
         ret.put("sn", sn);
         return ret;

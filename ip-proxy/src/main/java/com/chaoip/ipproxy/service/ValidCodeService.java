@@ -76,10 +76,6 @@ public class ValidCodeService {
      * @return 验证码序号
      */
     public String sendSmsCode(SmsDto dto) {
-        if (!validByCodeAndSn(dto.getCode(), dto.getSn())) {
-            throw new IllegalArgumentException("图形验证码错误");
-        }
-
         // 获取一个新的验证码
         ValidCode code = addCodeAndGetSn(dto.getPhone());
         // 发短信
