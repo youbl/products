@@ -35,6 +35,7 @@ public class BeinetUser implements UserDetails {
     @Indexed(unique = true)
     private String phone;
     private String password;
+    private String realName;
     private String identity;
     private String bankNo;
     private String security;

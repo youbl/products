@@ -30,9 +30,9 @@
                 <el-submenu index="1">
                     <template slot="title"><i class="el-icon-menu"></i>账户设置</template>
                     <el-menu-item-group>
-                        <el-menu-item index="2-1" @click.native="showTab=0">个人信息</el-menu-item>
-                        <el-menu-item index="2-2" @click.native="showTab=1">修改密码</el-menu-item>
-                        <el-menu-item index="2-2" @click.native="showTab=2">实名认证</el-menu-item>
+                        <el-menu-item index="2-1" @click.native="switchTab(0)">个人信息</el-menu-item>
+                        <el-menu-item index="2-2" @click.native="switchTab(1)">修改密码</el-menu-item>
+                        <el-menu-item index="2-2" @click.native="switchTab(2)">实名认证</el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
             </el-menu>
@@ -52,14 +52,17 @@
 
             <el-main v-show="showTab===0">
                 <el-form>
-                    <el-form-item label="姓名" label-width="200px">
+                    <el-form-item label="账号" label-width="200px">
                         <el-input :value="user.name" style="border:none" readonly></el-input>
                     </el-form-item>
                     <el-form-item label="手机号" label-width="200px">
                         <el-input :value="user.phone" style="border:none" readonly></el-input>
                     </el-form-item>
-                    <el-form-item label="银行卡" label-width="200px">
-                        <el-input :value="user.bankNo" style="border:none" readonly></el-input>
+                    <el-form-item label="姓名" label-width="200px">
+                        <el-input :value="user.realName" style="border:none" readonly></el-input>
+                    </el-form-item>
+                    <el-form-item label="身份证" label-width="200px">
+                        <el-input :value="user.identity" style="border:none" readonly></el-input>
                     </el-form-item>
                     <el-form-item label="SecurityKey" label-width="200px">
                         <el-input :value="user.security" style="border:none" readonly></el-input>
@@ -89,7 +92,18 @@
             </el-main>
 
             <el-main v-show="showTab===2">
-                <el-form :model="realnameIdentify" ref="realnameIdentifyForm">
+                <el-form :model="realnameIdentify" :rules="rulesRealnameIdentify" ref="realnameIdentifyForm">
+                    <el-form-item label="真实姓名" label-width="200px" prop="realName">
+                        <el-input v-model="realnameIdentify.realName" placeholder="请输入真实姓名" maxlength="20"></el-input>
+                    </el-form-item>
+                    <el-form-item label="身份证号" label-width="200px" prop="identity">
+                        <el-input v-model="realnameIdentify.identity" placeholder="请输入身份证号" maxlength="20"></el-input>
+                    </el-form-item>
+                    <el-form-item label="图形验证码" label-width="200px" prop="imgCode" style="text-align: left">
+                        <el-input v-model="realnameIdentify.imgCode" placeholder="请输入图形验证码" maxlength="6"
+                                  style="width:50%"></el-input>
+                        <img :src="imgSrc" style="cursor: pointer; height: 30px;" @click="getImgCode"/>
+                    </el-form-item>
                 </el-form>
                 <el-button type="primary" @click="doRealNameIdentify('realnameIdentifyForm')">提交认证</el-button>
             </el-main>
@@ -110,6 +124,7 @@
             return {
                 showTab: 0,
                 user: {},
+                imgSrc: '/favicon.ico',
 
                 changePwd: {
                     passwordOld: '',
@@ -131,7 +146,21 @@
                     ],
                 },
 
-                realnameIdentify: {},
+                realnameIdentify: {
+                    realName: '',
+                    identity: '',
+                    imgSn: '',
+                    imgCode: '',
+                },
+                rulesRealnameIdentify: {
+                    realName: [
+                        {required: true, message: '真实姓名必填', trigger: 'blur'},
+                    ],
+                    identity: [
+                        {required: true, message: '身份证号必填', trigger: 'blur'},
+                        {pattern: /^\d{17}[\dXx]$/, message: '身份证号格式有误'}
+                    ],
+                },
             }
         },
         created: function () {
@@ -146,6 +175,11 @@
         },
         computed: {},
         methods: {
+            switchTab: function (tab) {
+                this.showTab = tab;
+                if (tab === 2)
+                    this.getImgCode();
+            },
             goProfile: function () {
                 location.href = '/profile/user.html';
             },
@@ -167,11 +201,28 @@
                     }).catch(error => this.ajaxError(error));
                 });
             },
+            getImgCode: function () {
+                let url = '/user/img';
+                axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.sn) {
+                        return alert('获取图形验证码失败');
+                    }
+                    this.imgSrc = "data:image/jpg;base64," + response.data.img;
+                    this.realnameIdentify.imgSn = response.data.sn;
+                }).catch(error => this.ajaxError(error));
+            },
             doRealNameIdentify: function (form) {
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
-                    alert('暂未实现');
+                    let url = '/user/identify';
+                    axios.post(url, this.realnameIdentify).then(response => {
+                        if (!response || !response.data) {
+                            alert('认证失败');
+                            return;
+                        }
+                        alert('认证成功');
+                    }).catch(error => this.ajaxError(error));
                 });
             },
             ajaxError: function (error) {

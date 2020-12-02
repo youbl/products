@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.security;
 
+import com.chaoip.ipproxy.controller.dto.IdentifyDto;
 import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.BeinetUserRepository;
@@ -99,6 +100,10 @@ public class BeinetUserService implements UserDetailsService {
             if (!StringUtils.isEmpty(user.getSecurity())) {
                 user.setSecurity(user.getSecurity().replaceAll("^(.{4}).+(.{4})$", "$1****$2"));
             }
+            // 隐藏身份证
+            if (!StringUtils.isEmpty(user.getIdentity())) {
+                user.setIdentity(user.getIdentity().replaceAll("^(.{4}).+(.{4})$", "$1****$2"));
+            }
         }
         return user;
     }
@@ -112,6 +117,19 @@ public class BeinetUserService implements UserDetailsService {
             throw new RuntimeException("输入的旧密码不匹配: " + username);
         }
         user.setPassword(encoder.encode(dto.getPassword()));
+        userRepository.save(user);
+        return true;
+    }
+
+    public boolean realNameIdentify(IdentifyDto dto, String username) {
+        BeinetUser user = userRepository.findByName(username);
+        if (user == null) {
+            throw new RuntimeException("指定的用户未找到: " + username);
+        }
+
+
+        user.setRealName(dto.getRealName());
+        user.setIdentity(dto.getIdentity());
         userRepository.save(user);
         return true;
     }

@@ -83,6 +83,13 @@
             <artifactId>aliyun-java-sdk-sms</artifactId>
             <version>3.0.0-rc1</version>
         </dependency>
+
+        <!-- 阿里云认证SDK -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.10.192.ALL</version>
+        </dependency>
     </dependencies>
 
     <build>

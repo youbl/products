@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.controller;
 
+import com.chaoip.ipproxy.controller.dto.IdentifyDto;
 import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.SmsDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
@@ -74,6 +75,16 @@ public class UserController {
             throw new IllegalArgumentException("两次密码输入不一致");
         }
         return userService.changePassword(dto, details.getUserName());
+    }
+
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("identify")
+    public boolean realNameIdentify(@Valid @RequestBody IdentifyDto dto, AuthDetails details) {
+        if (details == null) {
+            throw new IllegalArgumentException("获取登录信息失败");
+        }
+        return userService.realNameIdentify(dto, details.getUserName());
     }
 
 
