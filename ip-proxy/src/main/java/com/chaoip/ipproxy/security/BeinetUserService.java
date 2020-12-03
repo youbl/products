@@ -23,12 +23,6 @@ public class BeinetUserService implements UserDetailsService {
     private final PasswordEncoder encoder;
     private final BeinetUserRepository userRepository;
 
-    @Value("${beinet.security.user:sdk}")
-    private String sdkUser;
-
-    @Value("${beinet.security.password:beinet.123}")
-    private String sdkPassword;
-
     /**
      * 带密码编码器的构造函数
      *
@@ -45,22 +39,12 @@ public class BeinetUserService implements UserDetailsService {
      *
      * @param username 用户名
      * @return 找到的用户信息
-     * @throws UsernameNotFoundException
+     * @throws UsernameNotFoundException exp
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (username == null || username.isEmpty())
             throw new IllegalArgumentException("username can't be empty.");
-
-        // 管理员登录判断
-        if (username.equalsIgnoreCase(sdkUser)) {
-            BeinetUser ret = BeinetUser.builder()
-                    .name(sdkUser)
-                    .password(encoder.encode(sdkPassword))
-                    .roles("USER,ADMIN")
-                    .build();
-            return ret;
-        }
 
         BeinetUser ret = userRepository.findByName(username);
         if (ret == null)

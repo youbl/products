@@ -1,5 +1,7 @@
 package com.chaoip.ipproxy.util;
 
+import org.springframework.util.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -327,6 +329,9 @@ public final class CityHelper {
      * @return 城市或未知
      */
     public static String getByAreaCode(String code) {
+        if (StringUtils.isEmpty(code)) {
+            return "";
+        }
         return citys.getOrDefault(code, "");
     }
 

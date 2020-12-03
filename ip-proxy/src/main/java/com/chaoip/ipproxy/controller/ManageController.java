@@ -26,8 +26,8 @@ public class ManageController {
     }
 
     @GetMapping("routes")
-    public List<Route> getAll() {
-        return routeService.getAll();
+    public List<Route> getAll(RouteDto dto) {
+        return routeService.getAll(dto);
     }
 
     /**

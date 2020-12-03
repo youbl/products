@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class RouteDto {
     public RouteDto() {
-
+        // empty
     }
 
     private int id;
@@ -64,23 +64,28 @@ public class RouteDto {
 
     public Route mapTo() {
         String operatorName = "";
-        switch (getOperators()) {
-            case "unicom":
-                operatorName = "中国联通";
-                break;
-            case "mobile":
-                operatorName = "中国移动";
-                break;
-            case "telecom":
-                operatorName = "中国电信";
-                break;
-            default:
-                throw new IllegalArgumentException("无效的运营商: " + getOperators());
-        }
-        String cityName = CityHelper.getByAreaCode(getArea());
-        if (StringUtils.isEmpty(cityName)) {
-            throw new IllegalArgumentException("无效的城市区号: " + getArea());
 
+        if (getOperators() != null) {
+            switch (getOperators()) {
+                case "unicom":
+                    operatorName = "中国联通";
+                    break;
+                case "mobile":
+                    operatorName = "中国移动";
+                    break;
+                case "telecom":
+                    operatorName = "中国电信";
+                    break;
+                default:
+                    throw new IllegalArgumentException("无效的运营商: " + getOperators());
+            }
+        }
+        String cityName = "";
+        if (getArea() != null) {
+            cityName = CityHelper.getByAreaCode(getArea());
+            if (StringUtils.isEmpty(cityName)) {
+                throw new IllegalArgumentException("无效的城市区号: " + getArea());
+            }
         }
         return Route.builder()
                 .id(getId())
