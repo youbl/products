@@ -18,9 +18,11 @@ import java.time.LocalDateTime;
 @Slf4j
 public class ValidCodeService {
     private final ValidCodeRepository validCodeRepository;
+    private final SmsHelper smsHelper;
 
-    public ValidCodeService(ValidCodeRepository validCodeRepository) {
+    public ValidCodeService(ValidCodeRepository validCodeRepository, SmsHelper smsHelper) {
         this.validCodeRepository = validCodeRepository;
+        this.smsHelper = smsHelper;
     }
 
     /**
@@ -79,7 +81,7 @@ public class ValidCodeService {
         // 获取一个新的验证码
         ValidCode code = addCodeAndGetSn(dto.getPhone());
         // 发短信
-        String result = SmsHelper.send(dto.getPhone(), code.getCode());
+        String result = smsHelper.send(dto.getPhone(), code.getCode());
 
         StringBuilder sbMsg = new StringBuilder();
         sbMsg.append("发验证码:")

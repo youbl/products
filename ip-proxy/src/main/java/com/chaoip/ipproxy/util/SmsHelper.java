@@ -6,6 +6,8 @@ import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import com.chaoip.ipproxy.util.config.SmsConfig;
+import org.springframework.stereotype.Component;
 
 /**
  * SmsHelper
@@ -15,11 +17,14 @@ import com.aliyuncs.profile.DefaultProfile;
  * @version 1.0
  * @date 2020/11/29 19:57
  */
+@Component
 public final class SmsHelper {
-    private static final String AK = "aa";
-    private static final String SK = "bb";
-    private static final String SIGN = "超巴云计算"; // 短信里的签名，如 百度网盘
-    private static final String TEMPLATE = "SMS_205881852"; // 短信模板
+    private final SmsConfig config;
+
+    public SmsHelper(SmsConfig config) {
+        this.config = config;
+    }
+
 
     /**
      * 发送短信验证码，并返回结果
@@ -28,19 +33,19 @@ public final class SmsHelper {
      * @param code  验证码
      * @return 结果
      */
-    public static String send(String phone, String code) {
-        DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", AK, SK);
+    public String send(String phone, String code) {
+        DefaultProfile profile = DefaultProfile.getProfile(config.getRegion(), config.getAk(), config.getSk());
         IAcsClient client = new DefaultAcsClient(profile);
 
         CommonRequest request = new CommonRequest();
         request.setSysMethod(MethodType.POST);
-        request.setSysDomain("dysmsapi.aliyuncs.com");
-        request.setSysVersion("2017-05-25");
+        request.setSysDomain(config.getDomain());
+        request.setSysVersion(config.getVersion());
         request.setSysAction("SendSms");
-        request.putQueryParameter("RegionId", "cn-hangzhou");
+        request.putQueryParameter("RegionId", config.getRegion());
         request.putQueryParameter("PhoneNumbers", phone);
-        request.putQueryParameter("SignName", SIGN);
-        request.putQueryParameter("TemplateCode", TEMPLATE);
+        request.putQueryParameter("SignName", config.getSign());
+        request.putQueryParameter("TemplateCode", config.getTemplate());
         request.putQueryParameter("TemplateParam", "{\"code\":\"" + code + "\"}");
 
         try {
