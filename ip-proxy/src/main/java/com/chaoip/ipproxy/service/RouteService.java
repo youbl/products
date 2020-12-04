@@ -3,8 +3,7 @@ package com.chaoip.ipproxy.service;
 import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.repository.RouteRepository;
 import com.chaoip.ipproxy.repository.entity.Route;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -32,36 +31,41 @@ public class RouteService {
         return dtos.size();
     }
 
-    public List<Route> getAll(RouteDto dto) {
-        if (dto == null) {
-            return routeRepository.findAll();
-        }
-        boolean hasCond = false;
-        ExampleMatcher matcher = ExampleMatcher.matching();
+    public Page<Route> getAll(RouteDto dto) {
+        // 不使用的属性，必须要用 withIgnorePaths 忽略，否则会列入条件
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnorePaths("id", "expireTime");
         if (!StringUtils.isEmpty(dto.getArea())) {
-            hasCond = true;
             matcher = matcher.withMatcher("area", ExampleMatcher.GenericPropertyMatchers.exact());
+        } else {
+            matcher = matcher.withIgnorePaths("area");
         }
         if (!StringUtils.isEmpty(dto.getOperators())) {
-            hasCond = true;
             matcher = matcher.withMatcher("operators", ExampleMatcher.GenericPropertyMatchers.exact());
+        } else {
+            matcher = matcher.withIgnorePaths("operators");
         }
         if (!StringUtils.isEmpty(dto.getIp())) {
-            hasCond = true;
             matcher = matcher.withMatcher("ip", ExampleMatcher.GenericPropertyMatchers.exact());
+        } else {
+            matcher = matcher.withIgnorePaths("ip");
         }
         if (dto.getPort() > 0) {
-            hasCond = true;
             matcher = matcher.withMatcher("port", ExampleMatcher.GenericPropertyMatchers.exact());
+        } else {
+            matcher = matcher.withIgnorePaths("port");
         }
         if (!StringUtils.isEmpty(dto.getProtocal())) {
-            hasCond = true;
             matcher = matcher.withMatcher("protocal", ExampleMatcher.GenericPropertyMatchers.exact());
-        }
-        if (!hasCond) {
-            return routeRepository.findAll();
+        } else {
+            matcher = matcher.withIgnorePaths("protocal");
         }
         Example<Route> example = Example.of(dto.mapTo(), matcher);
-        return routeRepository.findAll(example);
+
+        int pageNum = dto.getPageNum() > 0 ? dto.getPageNum() : 0;
+        int pageSize = dto.getPageSize() > 0 && dto.getPageSize() < 100 ? dto.getPageSize() : 20;
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        // getContent是记录，getTotalElements是总记录数，用于前端分页
+        return routeRepository.findAll(example, pageable);
     }
 }

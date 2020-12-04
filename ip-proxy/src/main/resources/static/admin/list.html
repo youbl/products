@@ -19,6 +19,10 @@
     <div>
         <div style="float: left;">
             <el-button type="primary" icon="el-icon-edit" @click="showAddDialog">添加记录</el-button>
+
+            <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
+            <el-button @click="getAfterPage" :disabled="isLastPage">下一页</el-button>
+            <span>&nbsp;当前第 {{page+1}} 页，总记录数 {{ipTotalNum}} 条</span>
         </div>
         <div style="float: right">
             <el-link type="warning" href="/logout">退出登录</el-link>
@@ -111,6 +115,9 @@
         el: '#divApp',
         data: {
             ipData: [],
+            ipTotalNum: 0,
+            page: 0,
+            isLastPage: false,
             openEditDialog: false,
             newRecord: {
                 protocal: 'http',
@@ -127,15 +134,28 @@
         computed: {},
         methods: {
             showAllIP: function () {
-                let url = '/manage/routes';
+                let url = '/manage/routes?pageNum=' + this.page;
                 axios.get(url).then(response => {
-                    if (!response || !response.data || response.data.length <= 0) {
+                    if (!response || !response.data || !response.data.content || response.data.content.length <= 0) {
                         this.ipData = [];
+                        this.isLastPage = true;
                         alert('无数据');
                         return;
                     }
-                    this.ipData = response.data;
+                    this.ipData = response.data.content;
+                    this.ipTotalNum = response.data.totalElements;
+                    this.isLastPage = (response.data.numberOfElements < response.data.size);
                 }).catch(error => this.ajaxError(error));
+            },
+            getPrevPage: function () {
+                if (this.page > 0) {
+                    this.page--;
+                    this.showAllIP();
+                }
+            },
+            getAfterPage: function () {
+                this.page++;
+                this.showAllIP();
             },
             showAddDialog: function () {
                 this.openEditDialog = true;

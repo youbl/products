@@ -3,6 +3,7 @@ package com.chaoip.ipproxy.controller;
 import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.service.RouteService;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,7 +27,7 @@ public class ManageController {
     }
 
     @GetMapping("routes")
-    public List<Route> getAll(RouteDto dto) {
+    public Page<Route> getAll(RouteDto dto) {
         return routeService.getAll(dto);
     }
 

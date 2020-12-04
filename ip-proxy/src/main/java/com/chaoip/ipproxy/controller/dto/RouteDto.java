@@ -62,6 +62,15 @@ public class RouteDto {
     @Min(value = 10, message = "过期时间不能小于10")
     private int expireTime;
 
+    /**
+     * 第几页
+     */
+    private int pageNum;
+    /**
+     * 每页条数
+     */
+    private int pageSize;
+
     public Route mapTo() {
         String operatorName = "";
 
