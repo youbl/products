@@ -19,6 +19,10 @@
         .el-aside {
             color: #333;
         }
+
+        .noborder input {
+            border: none;
+        }
     </style>
 </head>
 
@@ -26,13 +30,22 @@
 <div id="divApp">
     <el-container style="height: 500px; border: 1px solid #eee">
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-            <el-menu :default-openeds="['1']">
+            <el-menu :default-openeds="['1', '2']">
                 <el-submenu index="1">
                     <template slot="title"><i class="el-icon-menu"></i>账户设置</template>
                     <el-menu-item-group>
-                        <el-menu-item index="2-1" @click.native="switchTab(0)">个人信息</el-menu-item>
-                        <el-menu-item index="2-2" @click.native="switchTab(1)">修改密码</el-menu-item>
-                        <el-menu-item index="2-2" @click.native="switchTab(2)">实名认证</el-menu-item>
+                        <el-menu-item index="1-1" @click.native="switchTab(0)">个人信息</el-menu-item>
+                        <el-menu-item index="1-2" @click.native="switchTab(1)">修改密码</el-menu-item>
+                        <el-menu-item index="1-3" @click.native="switchTab(2)">实名认证</el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+                <el-submenu index="2">
+                    <template slot="title"><i class="el-icon-menu"></i>代理相关</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="2-1" @click.native="switchTab(3)">IP列表</el-menu-item>
+                        <el-menu-item index="2-2" @click.native="switchTab(4)"
+                                      v-if="user && user.roles && user.roles.indexOf('ADMIN')>=0">IP维护
+                        </el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
             </el-menu>
@@ -53,22 +66,22 @@
             <el-main v-show="showTab===0">
                 <el-form>
                     <el-form-item label="账号" label-width="200px">
-                        <el-input :value="user.name" style="border:none" readonly></el-input>
+                        <el-input :value="user.name" class="noborder" readonly></el-input>
                     </el-form-item>
                     <el-form-item label="手机号" label-width="200px">
-                        <el-input :value="user.phone" style="border:none" readonly></el-input>
+                        <el-input :value="user.phone" class="noborder" readonly></el-input>
                     </el-form-item>
                     <el-form-item label="姓名" label-width="200px">
-                        <el-input :value="user.realName" style="border:none" readonly></el-input>
+                        <el-input :value="user.realName" class="noborder" readonly></el-input>
                     </el-form-item>
                     <el-form-item label="身份证" label-width="200px">
-                        <el-input :value="user.identity" style="border:none" readonly></el-input>
+                        <el-input :value="user.identity" class="noborder" readonly></el-input>
                     </el-form-item>
                     <el-form-item label="SecurityKey" label-width="200px">
-                        <el-input :value="user.security" style="border:none" readonly></el-input>
+                        <el-input :value="user.security" class="noborder" readonly></el-input>
                     </el-form-item>
                     <el-form-item label="注册时间" label-width="200px">
-                        <el-input :value="user.creationTime" style="border:none" readonly></el-input>
+                        <el-input :value="user.creationTime" class="noborder" readonly></el-input>
                     </el-form-item>
                 </el-form>
             </el-main>
@@ -107,6 +120,14 @@
                 </el-form>
                 <el-button type="primary" @click="doRealNameIdentify('realnameIdentifyForm')">提交认证</el-button>
             </el-main>
+
+            <el-main v-show="showTab===3">
+                <iframe :src="userIpPage" width="100%" height="100%" scrolling="no" frameborder="0"></iframe>
+            </el-main>
+
+            <el-main v-show="showTab===4" v-if="user && user.roles && user.roles.indexOf('ADMIN')>=0">
+                <iframe :src="adminIpPage" width="100%" height="100%" scrolling="no" frameborder="0"></iframe>
+            </el-main>
         </el-container>
     </el-container>
 </div>
@@ -125,6 +146,9 @@
                 showTab: 0,
                 user: {},
                 imgSrc: '/favicon.ico',
+                iframeSrc: '',
+                userIpPage: '',
+                adminIpPage: '',
 
                 changePwd: {
                     passwordOld: '',
@@ -164,6 +188,9 @@
             }
         },
         created: function () {
+            this.userIpPage = '/list.html';
+            this.adminIpPage = '/admin/list.html';
+
             let url = '/user';
             axios.get(url).then(response => {
                 if (!response || !response.data) {

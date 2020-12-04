@@ -49,6 +49,8 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
 
         // 先关闭csrf，影响登录和退出
         http.csrf().disable();
+        // 默认是 X-Frame-Options: DENY 不允许在frame内
+        http.headers().frameOptions().sameOrigin();
 
         // antMatchers 规则：
         // ? 匹配1个字符
