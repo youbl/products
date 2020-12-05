@@ -23,6 +23,6 @@ public class VerifyHelperTest {
 
     @Test
     public void test_verify() throws AlipayApiException {
-        verifyHelper.getBizcode2("张三", "100000199901010011");
+        verifyHelper.getBizcode("张三", "100000199901010011");
     }
 }

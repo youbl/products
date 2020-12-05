@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.controller;
 
+import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.IdentifyDto;
 import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.SmsDto;
@@ -10,12 +11,14 @@ import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.service.ValidCodeService;
 import com.chaoip.ipproxy.util.ImgHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +31,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("user")
+@Slf4j
 public class UserController {
     private final BeinetUserService userService;
     private final ValidCodeService codeService;
@@ -77,14 +81,42 @@ public class UserController {
         return userService.changePassword(dto, details.getUserName());
     }
 
-
+    /**
+     * 请求阿里的实名认证，并返回认证html
+     * @param dto dto
+     * @param details 登录信息
+     * @return html
+     * @throws AlipayApiException 异常
+     */
     @PreAuthorize("isAuthenticated()")
     @PostMapping("identify")
-    public boolean realNameIdentify(@Valid @RequestBody IdentifyDto dto, AuthDetails details) {
+    public String realNameIdentify(@Valid @RequestBody IdentifyDto dto, AuthDetails details) throws AlipayApiException {
+        if (!codeService.validByCodeAndSn(dto.getImgCode(), dto.getImgSn())) {
+            throw new IllegalArgumentException("图形验证码错误");
+        }
         if (details == null) {
             throw new IllegalArgumentException("获取登录信息失败");
         }
         return userService.realNameIdentify(dto, details.getUserName());
+    }
+
+
+    @GetMapping("callback")
+    public String callback(HttpServletRequest request) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(request.getMethod()).append(" ").append(request.getRequestURI()).append("\n");
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames != null && headerNames.hasMoreElements()) {
+            String header = headerNames.nextElement();
+            Enumeration<String> values = request.getHeaders(header);
+            while (values != null && values.hasMoreElements()) {
+                String val = values.nextElement();
+                sb.append("  ").append(header).append(" : ").append(val).append("\n");
+            }
+        }
+        String ret = sb.toString();
+        log.info(ret);
+        return ret;
     }
 
 
@@ -109,7 +141,6 @@ public class UserController {
      * 获取短信验证码和序号
      *
      * @return 序号
-     * @throws IOException 异常
      */
     @PostMapping("sms")
     public Map<String, String> smsCode(@RequestBody SmsDto dto) {

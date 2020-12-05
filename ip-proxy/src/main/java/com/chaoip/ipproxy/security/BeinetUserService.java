@@ -1,10 +1,12 @@
 package com.chaoip.ipproxy.security;
 
+import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.IdentifyDto;
 import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.BeinetUserRepository;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
+import com.chaoip.ipproxy.util.VerifyHelper;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,6 +26,8 @@ import java.util.Optional;
 public class BeinetUserService implements UserDetailsService {
     private final PasswordEncoder encoder;
     private final BeinetUserRepository userRepository;
+    private final VerifyHelper verifyHelper;
+
     private static final String noUserMsg = "指定的用户未找到: ";
 
 
@@ -32,9 +36,10 @@ public class BeinetUserService implements UserDetailsService {
      *
      * @param encoder 编码器
      */
-    public BeinetUserService(PasswordEncoder encoder, BeinetUserRepository userRepository) {
+    public BeinetUserService(PasswordEncoder encoder, BeinetUserRepository userRepository, VerifyHelper verifyHelper) {
         this.encoder = encoder;
         this.userRepository = userRepository;
+        this.verifyHelper = verifyHelper;
     }
 
     /**
@@ -142,17 +147,18 @@ public class BeinetUserService implements UserDetailsService {
      * @param username 账号
      * @return 是否
      */
-    public boolean realNameIdentify(IdentifyDto dto, String username) {
+    public String realNameIdentify(IdentifyDto dto, String username) throws AlipayApiException {
         BeinetUser user = userRepository.findByName(username);
         if (user == null) {
             throw new RuntimeException(noUserMsg + username);
         }
+        String bizCode = verifyHelper.getBizcode(dto.getRealName(), dto.getIdentity());
+        return verifyHelper.beginValidate(bizCode);
 
-
-        user.setRealName(dto.getRealName());
-        user.setIdentity(dto.getIdentity());
-        userRepository.save(user);
-        return true;
+//        user.setRealName(dto.getRealName());
+//        user.setIdentity(dto.getIdentity());
+//        userRepository.save(user);
+//        return true;
     }
 
     /**

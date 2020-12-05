@@ -1,6 +1,7 @@
 package com.chaoip.ipproxy.security;
 
 import com.chaoip.ipproxy.repository.BeinetUserRepository;
+import com.chaoip.ipproxy.util.VerifyHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,8 +39,8 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
     }
 
     @Bean
-    public BeinetUserService createUserDetailService(PasswordEncoder encoder, BeinetUserRepository userRepository) {
-        return new BeinetUserService(encoder, userRepository);
+    public BeinetUserService createUserDetailService(PasswordEncoder encoder, BeinetUserRepository userRepository, VerifyHelper verifyHelper) {
+        return new BeinetUserService(encoder, userRepository, verifyHelper);
     }
 
     @Override

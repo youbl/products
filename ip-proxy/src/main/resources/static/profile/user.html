@@ -89,7 +89,7 @@
                 </el-form>
             </el-main>
 
-            <el-main v-show="showTab===1">
+            <el-main v-show="showTab===1" style="width: 500px;">
                 <el-form :model="changePwd" :rules="rulesChangePwd" ref="changePwdForm">
                     <el-form-item label="原密码" label-width="200px" prop="passwordOld">
                         <el-input v-model="changePwd.passwordOld" placeholder="请输入原密码" maxlength="30"
@@ -104,10 +104,12 @@
                                   show-password></el-input>
                     </el-form-item>
                 </el-form>
-                <el-button type="primary" @click="doChangePwd('changePwdForm')">修改密码</el-button>
+                <div style="text-align: center">
+                    <el-button type="primary" @click="doChangePwd('changePwdForm')">修改密码</el-button>
+                </div>
             </el-main>
 
-            <el-main v-show="showTab===2">
+            <el-main v-show="showTab===2" style="width: 500px;">
                 <el-form :model="realnameIdentify" :rules="rulesRealnameIdentify" ref="realnameIdentifyForm">
                     <el-form-item label="真实姓名" label-width="200px" prop="realName">
                         <el-input v-model="realnameIdentify.realName" placeholder="请输入真实姓名" maxlength="20"></el-input>
@@ -121,7 +123,12 @@
                         <img :src="imgSrc" style="cursor: pointer; height: 30px;" @click="getImgCode"/>
                     </el-form-item>
                 </el-form>
-                <el-button type="primary" @click="doRealNameIdentify('realnameIdentifyForm')">提交认证</el-button>
+                <div style="text-align: center">
+                    <el-button type="primary" @click="doRealNameIdentify('realnameIdentifyForm')"
+                               v-if="!isRealNameValidated">提交认证
+                    </el-button>
+                    <span v-if="isRealNameValidated">已认证</span>
+                </div>
             </el-main>
 
             <el-main v-show="showTab===3">
@@ -137,6 +144,9 @@
             </el-main>
         </el-container>
     </el-container>
+    <div>
+        <iframe name="frameRealName" style="width:1px;height: 1px;"></iframe>
+    </div>
 </div>
 
 <script>
@@ -157,6 +167,7 @@
                 userIpPage: '',
                 adminIpPage: '',
                 adminUserPage: '',
+                isRealNameValidated: false,
 
                 changePwd: {
                     passwordOld: '',
@@ -208,6 +219,11 @@
                     return;
                 }
                 this.user = response.data;
+                this.realnameIdentify.realName = this.user.realName;
+                this.realnameIdentify.identity = this.user.identity;
+                if (this.user.realName && this.user.identity) {
+                    this.isRealNameValidated = true;
+                }
             }).catch(error => this.ajaxError(error));
         },
         mounted: function () {
@@ -266,12 +282,33 @@
                     let url = '/user/identify';
                     axios.post(url, this.realnameIdentify).then(response => {
                         if (!response || !response.data) {
+                            this.getImgCode();
                             alert('认证失败');
                             return;
                         }
-                        alert('认证成功');
-                    }).catch(error => this.ajaxError(error));
+                        this.openAliVerify(response.data);
+                    }).catch(error => {
+                        this.getImgCode();
+                        this.ajaxError(error);
+                    });
                 });
+            },
+
+            openAliVerify: function (html) {
+                // let html =
+                //     '<form name="punchout_form" method="post" action="https://openapi.alipay.com/gateway.do?charset=GBK&method=alipay.user.certify.open.certify&sign=Yff9oiuPwNMu49Wr6Kr46X%2BLgDuPWu3Nle4W0GTdRqAy9Dn3zHcH5UwQ385il3YBmiFiDd9gci5ujB03fbvfCI0M%2F4TTpTW%2BidiwYRJYbnL2wENuMycR3ocQqrnXrzT1TqyxpRyr9OGEpTVVugEJ2y06TgocinLldRdjtdFAGnGhVGUJm%2B4hPFGdfbcHpYDOqzM6YYDvWJRMl3SkkqEI9trLfHe5x4ZLCmwtgcgvTiEQIr3CwTOK8235q1JWtdROBKpf6bIRc%2BRqf4VM%2Fybzdcg6aG4me1E3Oi9%2F%2F4T0W53mYgQds0jT5B0sw6%2BGaC4nBHDrtGsKfQcg0F0XndEeRw%3D%3D&version=1.0&app_id=2021002114679058&sign_type=RSA2&timestamp=2020-12-06+00%3A03%3A41&alipay_sdk=alipay-sdk-java-4.10.192.ALL&format=json">' +
+                //     '<input type="hidden" name="biz_content" value="{&quot;certify_id&quot;:&quot;8fe24640eee6e4bbae8ef0265c9769d6&quot;}">' +
+                //     '<input type="submit" value="立即支付" style="display:none" >' +
+                //     '</form>' +
+                //     '<script>document.forms[0].submit();</scr' + 'ipt>';
+                html = html.replace("<form", "<form target=\"_blank\"");
+                let frame = document.getElementsByName("frameRealName")[0];
+                frame.contentWindow.document.write(html);
+                setTimeout(function () {
+                    frame.contentWindow.document.close();// 避免认证失败，再次提交不了
+                }, 1000);
+                // let newWin = window.open('');
+                // newWin.document.write(html);
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {
