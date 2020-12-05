@@ -26,9 +26,9 @@
     </style>
 </head>
 
-<body>
-<div id="divApp">
-    <el-container style="height: 500px; border: 1px solid #eee">
+<body style="height: 900px;">
+<div id="divApp" style="height: 100%;">
+    <el-container style="height: 100%; border: 1px solid #eee">
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
             <el-menu :default-openeds="['1', '2']">
                 <el-submenu index="1">
@@ -44,6 +44,9 @@
                     <el-menu-item-group>
                         <el-menu-item index="2-1" @click.native="switchTab(3)">IP列表</el-menu-item>
                         <el-menu-item index="2-2" @click.native="switchTab(4)"
+                                      v-if="user && user.roles && user.roles.indexOf('ADMIN')>=0">用户维护
+                        </el-menu-item>
+                        <el-menu-item index="2-3" @click.native="switchTab(5)"
                                       v-if="user && user.roles && user.roles.indexOf('ADMIN')>=0">IP维护
                         </el-menu-item>
                     </el-menu-item-group>
@@ -122,11 +125,15 @@
             </el-main>
 
             <el-main v-show="showTab===3">
-                <iframe :src="userIpPage" width="100%" height="100%" scrolling="no" frameborder="0"></iframe>
+                <iframe :src="userIpPage" width="100%" height="95%" scrolling="no" frameborder="0"></iframe>
             </el-main>
 
             <el-main v-show="showTab===4" v-if="user && user.roles && user.roles.indexOf('ADMIN')>=0">
-                <iframe :src="adminIpPage" width="100%" height="100%" scrolling="no" frameborder="0"></iframe>
+                <iframe :src="adminUserPage" width="100%" height="95%" scrolling="no" frameborder="0"></iframe>
+            </el-main>
+
+            <el-main v-show="showTab===5" v-if="user && user.roles && user.roles.indexOf('ADMIN')>=0">
+                <iframe :src="adminIpPage" width="100%" height="95%" scrolling="no" frameborder="0"></iframe>
             </el-main>
         </el-container>
     </el-container>
@@ -149,6 +156,7 @@
                 iframeSrc: '',
                 userIpPage: '',
                 adminIpPage: '',
+                adminUserPage: '',
 
                 changePwd: {
                     passwordOld: '',
@@ -188,8 +196,10 @@
             }
         },
         created: function () {
+            // 这3个值在created才赋值，是避免iframe加载2次html
             this.userIpPage = '/list.html';
             this.adminIpPage = '/admin/list.html';
+            this.adminUserPage = '/admin/user.html';
 
             let url = '/user';
             axios.get(url).then(response => {
@@ -199,6 +209,17 @@
                 }
                 this.user = response.data;
             }).catch(error => this.ajaxError(error));
+        },
+        mounted: function () {
+            // //* iframe-宽高自适应显示
+            // let frames = document.getElementsByTagName('IFRAME');
+            // let deviceWidth = document.documentElement.clientWidth;
+            // let deviceHeight = document.documentElement.clientHeight;
+            // for (let i = 0, j = frames.length; i < j; i++) {
+            //     let item = frames[i];
+            //     item.style.width = (Number(deviceWidth) - 220) + 'px'; //数字是页面布局宽度差值
+            //     item.style.height = (Number(deviceHeight) - 120) + 'px'; //数字是页面布局高度差
+            // }
         },
         computed: {},
         methods: {

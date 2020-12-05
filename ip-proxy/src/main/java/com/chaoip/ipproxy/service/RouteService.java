@@ -61,11 +61,6 @@ public class RouteService {
             matcher = matcher.withIgnorePaths("protocal");
         }
         Example<Route> example = Example.of(dto.mapTo(), matcher);
-
-        int pageNum = dto.getPageNum() > 0 ? dto.getPageNum() : 0;
-        int pageSize = dto.getPageSize() > 0 && dto.getPageSize() < 100 ? dto.getPageSize() : 20;
-        Pageable pageable = PageRequest.of(pageNum, pageSize);
-        // getContent是记录，getTotalElements是总记录数，用于前端分页
-        return routeRepository.findAll(example, pageable);
+        return routeRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize());
     }
 }

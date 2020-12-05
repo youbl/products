@@ -13,7 +13,7 @@ import java.util.List;
  * @version 1.0
  * @date 2020/11/17 19:56
  */
-public interface RouteRepository extends MongoRepository<Route, Long> {
+public interface RouteRepository extends BaseRepository<Route, Long> {
     // 调用方法 routeRepository.findLikeIp("222");
     @Query(value = "{'ip':{'$regex':?0,'$options':'i'}}", fields = "{'ip':1, 'port': 1}")
     List<Route> findLikeIp(String ip);

@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserDto {
     public UserDto() {
-
+        // empty
     }
 
     @NotBlank(message = "用户名不能为空")
@@ -39,6 +39,14 @@ public class UserDto {
     @NotBlank(message = "短信验证码不能为空")
     private String smsCode;
 
+    private String bankNo;
+    private String realName;
+    private String identity;
+    private LocalDateTime creationTime;
+
+    private int pageNum;
+    private int pageSize;
+
     public BeinetUser mapTo() {
         LocalDateTime now = LocalDateTime.now();
         return BeinetUser.builder()
@@ -46,6 +54,8 @@ public class UserDto {
                 .password(getPassword())
                 .phone(getPhone())
                 .bankNo("")
+                .realName("")
+                .identity("")
                 .creationTime(now)
                 .security(BeinetUser.countSecurity(getName(), getPassword(), now))
                 .build();

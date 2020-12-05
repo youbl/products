@@ -193,9 +193,9 @@
                 // 默认登录使用的是form形式，因此要用Qs转换一下
                 axios.post(url, Qs.stringify(this.login)).then(response => {
                     // 能到这里，表示登录成功
-                    let goUrl = getQueryString('returnUrl');
-                    if (!goUrl)
-                        goUrl = '/index.html';
+                    //let goUrl = getQueryString('returnUrl');
+                    //if (!goUrl)
+                    let goUrl = '/profile/user.html';
 
                     location.href = goUrl;
                 }).catch(error => this.ajaxError(error));

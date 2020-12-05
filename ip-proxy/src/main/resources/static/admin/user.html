@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script src="/res/unpkg/elemeIndex.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+</head>
+
+<body>
+<div id="divApp">
+    <h1 style="text-align: center">
+        用户列表
+    </h1>
+    <div>
+        <div style="float: left;">
+            <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
+            <el-button @click="getAfterPage" :disabled="isLastPage">下一页</el-button>
+            <span>&nbsp;当前第 {{page+1}} 页，总记录数 {{userTotalNum}} 条</span>
+        </div>
+        <div style="float: right">
+            <el-link type="warning" href="/logout">退出登录</el-link>
+        </div>
+        <div style="float: right; width:200px;">&nbsp;</div>
+    </div>
+    <div style="clear: both"></div>
+    <div class="tab-content">
+        <template>
+            <el-table
+                    :data="userData"
+                    stripe
+                    style="width: 100%">
+                <el-table-column
+                        prop="id"
+                        label="ID"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="name"
+                        label="账号"
+                        width="150">
+                </el-table-column>
+                <el-table-column
+                        prop="phone"
+                        label="手机"
+                        width="150">
+                </el-table-column>
+                <el-table-column
+                        prop="realName"
+                        label="实名"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="identity"
+                        label="身份证"
+                        width="300">
+                </el-table-column>
+                <el-table-column
+                        prop="creationTime"
+                        label="注册时间"
+                        width="230">
+                </el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button
+                                size="mini"
+                                @click="handleResetPwd(scope.$index, scope.row)">密码重置
+                        </el-button>
+                        <el-button v-text="getAdminTxt(scope.row.roles)"
+                                   size="mini"
+                                   type="danger"
+                                   @click="handleSetAdmin(scope.$index, scope.row)"></el-button>
+                        <el-button v-text="getStatusTxt(scope.row.status)"
+                                   size="mini"
+                                   type="danger"
+                                   @click="handleDisable(scope.$index, scope.row)"></el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </template>
+    </div>
+
+    <el-dialog title="用户详情" :visible.sync="openEditDialog">
+        <el-form>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button icon="el-icon-success" type="primary">保 存</el-button>
+            <el-button @click="hideAddDialog">取 消</el-button>
+        </div>
+    </el-dialog>
+</div>
+<script>
+    var vueApp = new Vue({
+        el: '#divApp',
+        data: {
+            userData: [],
+            userTotalNum: 0,
+            page: 0,
+            isLastPage: false,
+            openEditDialog: false,
+        },
+        created: function () {
+            this.showAllUser();
+        },
+        computed: {},
+        methods: {
+            showAllUser: function () {
+                let url = '/manage/users?pageNum=' + this.page;
+                axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.content || response.data.content.length <= 0) {
+                        this.userData = [];
+                        this.isLastPage = true;
+                        alert('无数据');
+                        return;
+                    }
+                    this.userData = response.data.content;
+                    this.userTotalNum = response.data.totalElements;
+                    this.isLastPage = (response.data.numberOfElements < response.data.size);
+                }).catch(error => this.ajaxError(error));
+            },
+            getPrevPage: function () {
+                if (this.page > 0) {
+                    this.page--;
+                    this.showAllUser();
+                }
+            },
+            getAfterPage: function () {
+                this.page++;
+                this.showAllUser();
+            },
+            handleResetPwd: function (index, row) {
+                if (!confirm('确认要把该账户:' + row.name + ' 的密码重置为 123456 吗？')) {
+                    return;
+                }
+
+                let url = '/manage/user/password/' + row.id;
+                axios.post(url).then(response => {
+                    if (!response || !response.data) {
+                        alert('重置失败');
+                        return;
+                    }
+                    alert('成功重置为 123456');
+                }).catch(error => this.ajaxError(error));
+            },
+            handleSetAdmin: function (index, row) {
+                let txt = this.getAdminTxt(row.roles);
+                if (!confirm('确认要对该账户:' + row.name + ' ' + txt + '吗？')) {
+                    return;
+                }
+                let url = '/manage/user/admin/' + row.id;
+                axios.post(url).then(response => {
+                    if (!response || !response.data) {
+                        alert(txt + '失败');
+                        return;
+                    }
+                    if (txt === '取消管理员') {
+                        row.roles = row.roles.replace('ADMIN', '');
+                    } else {
+                        row.roles += ',ADMIN';
+                    }
+                    alert(txt + '成功');
+                }).catch(error => this.ajaxError(error));
+            },
+            handleDisable: function (index, row) {
+                let txt = this.getStatusTxt(row.status);
+                if (!confirm('确认要 ' + txt + ' 该账户:' + row.name + '吗？')) {
+                    return;
+                }
+                let url = '/manage/user/status/' + row.id;
+                axios.post(url).then(response => {
+                    if (!response || !response.data) {
+                        alert(txt + '失败');
+                        return;
+                    }
+                    if (row.status === 0) {
+                        row.status = 1;
+                    } else {
+                        row.status = 0;
+                    }
+                    alert(txt + '成功');
+                }).catch(error => this.ajaxError(error));
+            },
+            getAdminTxt: function (roles) {
+                return (roles && roles.indexOf('ADMIN') > 0) ? '取消管理员' : '设置管理员';
+            },
+            getStatusTxt: function (status) {
+                return status === 0 ? '禁用' : '启用';
+            },
+            showAddDialog: function () {
+                this.openEditDialog = true;
+            },
+            hideAddDialog: function () {
+                this.openEditDialog = false;
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    let msg = error.response.data['Msg'];
+                    if (msg === 'Unauthorized') {
+                        location.href = '/login?r=%2Fadmin%23%2FserverStatus.html';
+                        return;
+                    }
+                    console.log(JSON.stringify(error.response.data));
+                    alert('出错了');
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+
+
+    /**
+     * 滚动到窗口底部
+     */
+    function toWindowBottom() {
+        window.scrollTo(0, getWindowHeight());
+    }
+
+    /**
+     * 获取窗口高度
+     * @return {number} 窗口高度值
+     */
+    function getWindowHeight() {
+        // body是chrome，documentElement是IE和Firefox
+        return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    }
+
+    /**
+     * 获取url里的变量值
+     * @param {string} name 变量名
+     * @return {string} 变量值
+     */
+    function getQueryString(name) {
+        if (typeof (name) !== 'string') {
+            return '';
+        }
+        name = name.trim();
+        if (name.length === 0) {
+            return '';
+        }
+        let localSearch = location.search.toLocaleLowerCase();
+        name = name.toLowerCase() + '=';
+        let tmpName = '?' + name;
+        let idx = localSearch.indexOf(tmpName);
+        if (idx < 0) {
+            tmpName = '&' + name;
+            idx = localSearch.indexOf(tmpName);
+            if (idx < 0) {
+                return '';
+            }
+        }
+        name = tmpName;
+        let tmp = location.search.substr(idx + name.length);
+        idx = tmp.indexOf('&');
+        if (idx === 0)
+            return '';
+        let ret;
+        if (idx < 0) {
+            ret = tmp;
+        } else {
+            ret = tmp.substr(0, idx);
+        }
+        return decodeURIComponent(ret.trim());
+    }
+</script>
+</body>
+
+</html>

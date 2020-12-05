@@ -41,9 +41,11 @@ public class BeinetUser implements UserDetails {
     private String security;
     private String roles = "USER";
     private LocalDateTime creationTime = LocalDateTime.now();
+    private int status;
 
     /**
      * 给用户计算一个密钥，后续作为api使用
+     *
      * @param name
      * @param password
      * @param time
@@ -90,7 +92,7 @@ public class BeinetUser implements UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return status == 0;
     }
 
     /**
