@@ -5,17 +5,12 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayUserCertifyOpenCertifyRequest;
 import com.alipay.api.request.AlipayUserCertifyOpenInitializeRequest;
-import com.alipay.api.request.ZhimaCustomerCertificationCertifyRequest;
-import com.alipay.api.request.ZhimaCustomerCertificationInitializeRequest;
 import com.alipay.api.response.AlipayUserCertifyOpenCertifyResponse;
 import com.alipay.api.response.AlipayUserCertifyOpenInitializeResponse;
-import com.alipay.api.response.ZhimaCustomerCertificationCertifyResponse;
-import com.alipay.api.response.ZhimaCustomerCertificationInitializeResponse;
 import com.chaoip.ipproxy.repository.entity.QrCode;
 import com.chaoip.ipproxy.util.config.VerifyConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -70,7 +65,9 @@ public class VerifyHelper {
 
     public QrCode getVerifyData(String account, String realName, String identity) throws AlipayApiException {
         String orderNo = getTransId();
-        String certId = getBizcode(realName, identity, orderNo);
+        String callbackUrl = getCallback(account);
+
+        String certId = getBizcode(realName, identity, orderNo, callbackUrl);
         String url = beginValidate(certId);
         QrCode ret = QrCode.builder()
                 .orderNo(orderNo)
@@ -87,8 +84,7 @@ public class VerifyHelper {
 
     // https://opendocs.alipay.com/apis/api_2/alipay.user.certify.open.initialize
     // 原始文档是有问题的，参考： https://opensupport.alipay.com/support/helpcenter/172/201602489641
-    public String getBizcode(String name, String identity, String orderNo) throws AlipayApiException {
-        String callbackUrl = getCallback(name);
+    public String getBizcode(String name, String identity, String orderNo, String callbackUrl) throws AlipayApiException {
 
         AlipayUserCertifyOpenInitializeRequest request = new AlipayUserCertifyOpenInitializeRequest();
         request.setBizContent("{" +
