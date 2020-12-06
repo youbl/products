@@ -6,16 +6,22 @@ import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.SmsDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
+import com.chaoip.ipproxy.repository.entity.QrCode;
 import com.chaoip.ipproxy.repository.entity.ValidCode;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
+import com.chaoip.ipproxy.service.QrCodeService;
 import com.chaoip.ipproxy.service.ValidCodeService;
 import com.chaoip.ipproxy.util.ImgHelper;
+import com.chaoip.ipproxy.util.QrcodeHelper;
+import com.google.zxing.WriterException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Enumeration;
@@ -35,10 +41,12 @@ import java.util.Map;
 public class UserController {
     private final BeinetUserService userService;
     private final ValidCodeService codeService;
+    private final QrCodeService qrCodeService;
 
-    public UserController(BeinetUserService userService, ValidCodeService codeService) {
+    public UserController(BeinetUserService userService, ValidCodeService codeService, QrCodeService qrCodeService) {
         this.userService = userService;
         this.codeService = codeService;
+        this.qrCodeService = qrCodeService;
     }
 
     @GetMapping("")
@@ -82,29 +90,52 @@ public class UserController {
     }
 
     /**
-     * 请求阿里的实名认证，并返回认证html
-     * @param dto dto
+     * 请求阿里的实名认证，并返回认证url二维码
+     *
+     * @param dto     dto
      * @param details 登录信息
-     * @return html
+     * @return 二维码图片的base64字符串
      * @throws AlipayApiException 异常
      */
     @PreAuthorize("isAuthenticated()")
     @PostMapping("identify")
-    public String realNameIdentify(@Valid @RequestBody IdentifyDto dto, AuthDetails details) throws AlipayApiException {
+    public String realNameIdentify(@Valid @RequestBody IdentifyDto dto, AuthDetails details) throws AlipayApiException, IOException, WriterException {
         if (!codeService.validByCodeAndSn(dto.getImgCode(), dto.getImgSn())) {
             throw new IllegalArgumentException("图形验证码错误");
         }
         if (details == null) {
             throw new IllegalArgumentException("获取登录信息失败");
         }
-        return userService.realNameIdentify(dto, details.getUserName());
+        String url = userService.realNameIdentify(dto, details.getUserName());
+        return new QrcodeHelper().getQrcode(url);
     }
 
+    @GetMapping("qrcode/{name}")
+    public void shortUrl302(@PathVariable String name, HttpServletResponse response) throws IOException {
+        QrCode code = qrCodeService.findByName(name);
+        if (code == null || StringUtils.isEmpty(code.getAliUrl())) {
+            throw new RuntimeException("实名认证地址不存在");
+        }
+        response.sendRedirect(code.getAliUrl());
+    }
 
-    @GetMapping("callback")
-    public String callback(HttpServletRequest request) {
+    /**
+     * 回调接口，用于支付宝身份认证回调.
+     * 注：是在手机上的支付宝访问，不是PC上
+     *
+     * @param request 请求上下文
+     * @param name    回调用户
+     * @return 无
+     */
+    @GetMapping("callback/{name}")
+    public String callback(HttpServletRequest request, @PathVariable String name) {
         StringBuilder sb = new StringBuilder();
-        sb.append(request.getMethod()).append(" ").append(request.getRequestURI()).append("\n");
+        sb.append(request.getMethod()).append(" ").append(request.getRequestURI());
+        String strQuery = request.getQueryString();
+        if (!StringUtils.isEmpty(strQuery)) {
+            sb.append('?').append(strQuery);
+        }
+        sb.append("\n");
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames != null && headerNames.hasMoreElements()) {
             String header = headerNames.nextElement();
@@ -116,7 +147,8 @@ public class UserController {
         }
         String ret = sb.toString();
         log.info(ret);
-        return ret;
+
+        return "认证成功，请回到你的认证页面，进行刷新。\n回调信息：\n" + ret;
     }
 
 

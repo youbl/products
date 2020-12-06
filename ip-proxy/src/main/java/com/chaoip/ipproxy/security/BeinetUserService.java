@@ -6,6 +6,8 @@ import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.BeinetUserRepository;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
+import com.chaoip.ipproxy.repository.entity.QrCode;
+import com.chaoip.ipproxy.service.QrCodeService;
 import com.chaoip.ipproxy.util.VerifyHelper;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +28,7 @@ import java.util.Optional;
 public class BeinetUserService implements UserDetailsService {
     private final PasswordEncoder encoder;
     private final BeinetUserRepository userRepository;
+    private final QrCodeService qrCodeService;
     private final VerifyHelper verifyHelper;
 
     private static final String noUserMsg = "指定的用户未找到: ";
@@ -36,9 +39,10 @@ public class BeinetUserService implements UserDetailsService {
      *
      * @param encoder 编码器
      */
-    public BeinetUserService(PasswordEncoder encoder, BeinetUserRepository userRepository, VerifyHelper verifyHelper) {
+    public BeinetUserService(PasswordEncoder encoder, BeinetUserRepository userRepository, QrCodeService qrCodeService, VerifyHelper verifyHelper) {
         this.encoder = encoder;
         this.userRepository = userRepository;
+        this.qrCodeService = qrCodeService;
         this.verifyHelper = verifyHelper;
     }
 
@@ -141,20 +145,22 @@ public class BeinetUserService implements UserDetailsService {
     }
 
     /**
-     * 实名认证，通过后保存用户名
+     * 实名认证，通过后保存用户名。
+     * 注：要使用短码，因为阿里返回的url太长，生成的二维码可能无法扫描
      *
      * @param dto      dto
      * @param username 账号
-     * @return 是否
+     * @return 实名认证的短码地址
      */
     public String realNameIdentify(IdentifyDto dto, String username) throws AlipayApiException {
         BeinetUser user = userRepository.findByName(username);
         if (user == null) {
             throw new RuntimeException(noUserMsg + username);
         }
-        String bizCode = verifyHelper.getBizcode(dto.getRealName(), dto.getIdentity());
-        return verifyHelper.beginValidate(bizCode);
+        QrCode code = verifyHelper.getVerifyData(username, dto.getRealName(), dto.getIdentity());
+        qrCodeService.addQrCode(code);
 
+        return verifyHelper.getShortUrl(username);
 //        user.setRealName(dto.getRealName());
 //        user.setIdentity(dto.getIdentity());
 //        userRepository.save(user);

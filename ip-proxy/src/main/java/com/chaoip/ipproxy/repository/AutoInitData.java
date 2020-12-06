@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 /**
- * AutoInitData
+ * 自动初始化数据库的类。首次启动时，新建管理员
  *
  * @author youbl
  * @version 1.0
@@ -37,7 +37,6 @@ public class AutoInitData {
                     .roles("USER,ADMIN")
                     .realName("超级管理员")
                     .phone("13000000000")
-                    .creationTime(LocalDateTime.now())
                     .build();
             admin = repository.save(admin);
             log.info("管理员创建成功: {} {}", admin.getId(), admin.getName());

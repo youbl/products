@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 
 /**
  * AutoIncListener
@@ -56,6 +57,12 @@ public class AutoIncListener extends AbstractMongoEventListener {
             if (val == null || val.toString().equals("0")) {
                 // 设置自增ID
                 field.set(source, getNextId(source.getClass().getSimpleName()));
+            }
+        } else if (field.getName().equalsIgnoreCase("creationTime")) {
+            Object val = field.get(source);
+            if (val == null) {
+                // 设置插入时间
+                field.set(source, LocalDateTime.now());
             }
         }
     }

@@ -44,4 +44,6 @@ public class ValidCode {
      */
     @Indexed(expireAfterSeconds = 0)
     private LocalDateTime expireTime;
+
+    private LocalDateTime creationTime;
 }

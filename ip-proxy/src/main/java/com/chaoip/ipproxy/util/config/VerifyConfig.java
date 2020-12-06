@@ -22,4 +22,7 @@ public class VerifyConfig {
     private String charset;
     private String signType;
     private String format;
+
+    private String callback;
+    private String shortUrl;  // 短码二维码地址
 }

@@ -43,7 +43,7 @@
             </el-form-item>
             <el-form-item label="图形验证码" label-width="200px" prop="imgCode" style="text-align: left">
                 <el-input v-model="register.imgCode" placeholder="请输入图形验证码" maxlength="6" style="width:50%"></el-input>
-                <img :src="imgCode" style="cursor: pointer; height: 30px;" @click="getImgCode"/>
+                <img :src="imgCodeBase64" style="cursor: pointer; height: 30px;" @click="getImgCode"/>
             </el-form-item>
             <el-form-item label="手机号" label-width="200px" prop="phone">
                 <el-input v-model="register.phone" placeholder="请输入手机号" maxlength="30"></el-input>
@@ -72,7 +72,7 @@
             };
             return {
                 openRegisterOption: false,
-                imgCode: '/favicon.ico',
+                imgCodeBase64: '/favicon.ico',
                 enableSmsButton: 0,
                 login: {
                     beinetUser: '',
@@ -129,7 +129,7 @@
                     if (!response || !response.data || !response.data.sn) {
                         return alert('获取图形验证码失败');
                     }
-                    this.imgCode = "data:image/jpg;base64," + response.data.img;
+                    this.imgCodeBase64 = "data:image/jpg;base64," + response.data.img;
                     this.register.imgSn = response.data.sn;
                 }).catch(error => this.ajaxError(error));
             },

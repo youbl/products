@@ -56,7 +56,6 @@ public class UserDto {
                 .bankNo("")
                 .realName("")
                 .identity("")
-                .creationTime(now)
                 .security(BeinetUser.countSecurity(getName(), getPassword(), now))
                 .build();
     }

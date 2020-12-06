@@ -40,7 +40,7 @@ public class BeinetUser implements UserDetails {
     private String bankNo;
     private String security;
     private String roles = "USER";
-    private LocalDateTime creationTime = LocalDateTime.now();
+    private LocalDateTime creationTime;
     private int status;
 
     /**
