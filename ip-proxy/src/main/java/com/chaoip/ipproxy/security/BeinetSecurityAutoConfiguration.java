@@ -1,7 +1,7 @@
 package com.chaoip.ipproxy.security;
 
 import com.chaoip.ipproxy.repository.BeinetUserRepository;
-import com.chaoip.ipproxy.service.QrCodeService;
+import com.chaoip.ipproxy.service.RealOrderService;
 import com.chaoip.ipproxy.util.VerifyHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
@@ -42,9 +42,9 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
     @Bean
     public BeinetUserService createUserDetailService(PasswordEncoder encoder,
                                                      BeinetUserRepository userRepository,
-                                                     QrCodeService qrCodeService,
+                                                     RealOrderService realOrderService,
                                                      VerifyHelper verifyHelper) {
-        return new BeinetUserService(encoder, userRepository, qrCodeService, verifyHelper);
+        return new BeinetUserService(encoder, userRepository, realOrderService, verifyHelper);
     }
 
     @Override

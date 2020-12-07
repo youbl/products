@@ -6,11 +6,11 @@ import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.SmsDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
-import com.chaoip.ipproxy.repository.entity.QrCode;
+import com.chaoip.ipproxy.repository.entity.RealOrder;
 import com.chaoip.ipproxy.repository.entity.ValidCode;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
-import com.chaoip.ipproxy.service.QrCodeService;
+import com.chaoip.ipproxy.service.RealOrderService;
 import com.chaoip.ipproxy.service.ValidCodeService;
 import com.chaoip.ipproxy.util.ImgHelper;
 import com.chaoip.ipproxy.util.QrcodeHelper;
@@ -39,12 +39,12 @@ import java.util.Map;
 public class UserController {
     private final BeinetUserService userService;
     private final ValidCodeService codeService;
-    private final QrCodeService qrCodeService;
+    private final RealOrderService realOrderService;
 
-    public UserController(BeinetUserService userService, ValidCodeService codeService, QrCodeService qrCodeService) {
+    public UserController(BeinetUserService userService, ValidCodeService codeService, RealOrderService realOrderService) {
         this.userService = userService;
         this.codeService = codeService;
-        this.qrCodeService = qrCodeService;
+        this.realOrderService = realOrderService;
     }
 
     @GetMapping("")
@@ -110,40 +110,29 @@ public class UserController {
 
     @GetMapping("qr/{orderNo}")
     public void shortUrl302(@PathVariable String orderNo, HttpServletResponse response) throws IOException {
-        QrCode code = qrCodeService.findByOrder(orderNo);
+        RealOrder code = realOrderService.findByOrder(orderNo);
         if (code == null || StringUtils.isEmpty(code.getAliUrl())) {
             throw new RuntimeException("实名认证地址不存在");
         }
         response.sendRedirect(code.getAliUrl());
     }
 
-//    @GetMapping("certinfo/{name}")
-//    public QrCode getCertInfo(@PathVariable String name) throws IOException {
-//        QrCode code = qrCodeService.findByName(name);
-//        if (code == null || StringUtils.isEmpty(code.getAliUrl())) {
-//            throw new RuntimeException("实名认证地址不存在");
-//        }
-//        code.setIdentity("");
-//        code.setRealName("");
-//        code.setResult("");
-//        return code;
-//    }
-
     /**
-     * 回调接口，用于支付宝身份认证回调.
+     * 实名认证回调接口，用于支付宝身份认证回调.
      * 注：是在手机上的支付宝访问，不是PC上.
      * 另：无论成功失败，支付宝都会回调过来，而且不带任何额外的信息。
      * 需要自己去调阿里接口进行确认
      *
      * @param orderNo 订单号
-     * @return 无
+     * @return 提示语
+     * @throws AlipayApiException 异常
      */
     @GetMapping("callback/{orderNo}")
     public String callback(@PathVariable(required = false) String orderNo) throws AlipayApiException {
         if (StringUtils.isEmpty(orderNo)) {
             return phoneStr("订单号不能为空");
         }
-        QrCode code = qrCodeService.findByOrder(orderNo);
+        RealOrder code = realOrderService.findByOrder(orderNo);
         if (code == null || StringUtils.isEmpty(code.getCertId())) {
             return phoneStr("订单不存在: " + orderNo);
         }
@@ -171,6 +160,25 @@ public class UserController {
             return phoneStr(code.getRealName() + ", 您好，您已认证成功。<p>请回到认证页面，进行刷新。</p>");
         }
         return phoneStr("您好，您的认证信息有误，请确认: " + code.getRealName());
+    }
+
+    /**
+     * 支付回调接口
+     *
+     * @param orderNo 订单号
+     * @return 提示语
+     * @throws AlipayApiException 异常
+     */
+    @GetMapping("payback/{orderNo}")
+    public String payback(@PathVariable(required = false) String orderNo) throws AlipayApiException {
+        if (StringUtils.isEmpty(orderNo)) {
+            return phoneStr("订单号不能为空");
+        }
+        RealOrder code = realOrderService.findByOrder(orderNo);
+        if (code == null || StringUtils.isEmpty(code.getCertId())) {
+            return phoneStr("订单不存在: " + orderNo);
+        }
+        return "OK";
     }
 
     private String phoneStr(String msg) {

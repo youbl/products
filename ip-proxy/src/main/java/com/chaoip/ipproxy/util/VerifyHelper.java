@@ -1,22 +1,16 @@
 package com.chaoip.ipproxy.util;
 
 import com.alipay.api.AlipayApiException;
-import com.alipay.api.AlipayClient;
-import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayUserCertifyOpenCertifyRequest;
 import com.alipay.api.request.AlipayUserCertifyOpenInitializeRequest;
 import com.alipay.api.request.AlipayUserCertifyOpenQueryRequest;
 import com.alipay.api.response.AlipayUserCertifyOpenCertifyResponse;
 import com.alipay.api.response.AlipayUserCertifyOpenInitializeResponse;
 import com.alipay.api.response.AlipayUserCertifyOpenQueryResponse;
-import com.chaoip.ipproxy.repository.entity.QrCode;
+import com.chaoip.ipproxy.repository.entity.RealOrder;
 import com.chaoip.ipproxy.util.config.VerifyConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 /**
  * 支付宝身份认证辅助类。
@@ -30,12 +24,10 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class VerifyHelper {
-    //private static final String INIT_TEMPLATE = "";
-    private final VerifyConfig config;
+public class VerifyHelper extends AliBase {
 
     public VerifyHelper(VerifyConfig verifyConfig) {
-        this.config = verifyConfig;
+        super(verifyConfig);
     }
 
     /**
@@ -60,17 +52,8 @@ public class VerifyHelper {
         return callback + orderNo;
     }
 
-    private String checkUrl(String url) {
-        assert url != null;
-        url = url.trim();
-        assert !url.isEmpty();
-        if (url.charAt(url.length() - 1) != '/')
-            url += '/';
-        return url;
-    }
-
     /**
-     * 获取认证跳转地址，并返回QrCode实体对象
+     * 获取认证跳转地址，并返回认证订单对象
      *
      * @param account  账号
      * @param realName 实名
@@ -78,13 +61,13 @@ public class VerifyHelper {
      * @return 对象
      * @throws AlipayApiException 异常
      */
-    public QrCode getVerifyData(String account, String realName, String identity) throws AlipayApiException {
+    public RealOrder getVerifyData(String account, String realName, String identity) throws AlipayApiException {
         String orderNo = getTransId();
         String callbackUrl = getCallback(orderNo);
 
         String certId = getBizcode(realName, identity, orderNo, callbackUrl);
         String url = beginValidate(certId, account);
-        QrCode ret = QrCode.builder()
+        RealOrder ret = RealOrder.builder()
                 .orderNo(orderNo)
                 .certId(certId)
                 .aliUrl(url)
@@ -146,10 +129,7 @@ public class VerifyHelper {
 
     /**
      * https://opendocs.alipay.com/apis/api_2/alipay.user.certify.open.query/
-     *
-     * @throws AlipayApiException
-     */
-    /**
+     * <p>
      * 查询人脸认证结果
      *
      * @param certifyId getBizcode方法返回的支付宝认证唯一id
@@ -210,14 +190,5 @@ public class VerifyHelper {
         }
     */
 
-    private AlipayClient getClient() {
-        return new DefaultAlipayClient(config.getUrl(), config.getAppId(), config.getPrivateKey(),
-                config.getFormat(), config.getCharset(), config.getPublicKey(), config.getSignType());
-    }
 
-    private static String getTransId() {
-        String ret = "CHDL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
-        ret += StrHelper.getRndStr(4, 1);
-        return ret;
-    }
 }

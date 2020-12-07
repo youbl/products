@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 /**
- * 二维码短码列表
+ * 实名认证订单表
  *
  * @author youbl
  * @version 1.0
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @Document
-public class QrCode {
+public class RealOrder {
     /**
      * 主键
      */

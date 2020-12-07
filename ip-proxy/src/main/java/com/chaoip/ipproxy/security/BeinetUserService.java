@@ -6,8 +6,8 @@ import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.BeinetUserRepository;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
-import com.chaoip.ipproxy.repository.entity.QrCode;
-import com.chaoip.ipproxy.service.QrCodeService;
+import com.chaoip.ipproxy.repository.entity.RealOrder;
+import com.chaoip.ipproxy.service.RealOrderService;
 import com.chaoip.ipproxy.util.VerifyHelper;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +28,7 @@ import java.util.Optional;
 public class BeinetUserService implements UserDetailsService {
     private final PasswordEncoder encoder;
     private final BeinetUserRepository userRepository;
-    private final QrCodeService qrCodeService;
+    private final RealOrderService realOrderService;
     private final VerifyHelper verifyHelper;
 
     private static final String noUserMsg = "指定的用户未找到: ";
@@ -39,10 +39,10 @@ public class BeinetUserService implements UserDetailsService {
      *
      * @param encoder 编码器
      */
-    public BeinetUserService(PasswordEncoder encoder, BeinetUserRepository userRepository, QrCodeService qrCodeService, VerifyHelper verifyHelper) {
+    public BeinetUserService(PasswordEncoder encoder, BeinetUserRepository userRepository, RealOrderService realOrderService, VerifyHelper verifyHelper) {
         this.encoder = encoder;
         this.userRepository = userRepository;
-        this.qrCodeService = qrCodeService;
+        this.realOrderService = realOrderService;
         this.verifyHelper = verifyHelper;
     }
 
@@ -157,8 +157,8 @@ public class BeinetUserService implements UserDetailsService {
         if (user == null) {
             throw new RuntimeException(noUserMsg + username);
         }
-        QrCode code = verifyHelper.getVerifyData(username, dto.getRealName(), dto.getIdentity());
-        qrCodeService.addQrCode(code);
+        RealOrder code = verifyHelper.getVerifyData(username, dto.getRealName(), dto.getIdentity());
+        realOrderService.addOrder(code);
 
         return verifyHelper.getShortUrl(code.getOrderNo());
     }
@@ -170,7 +170,7 @@ public class BeinetUserService implements UserDetailsService {
      * @return 是否通过
      * @throws AlipayApiException 异常
      */
-    public boolean realNameResultQuery(QrCode code) throws AlipayApiException {
+    public boolean realNameResultQuery(RealOrder code) throws AlipayApiException {
         boolean ret = verifyHelper.queryValidate(code.getCertId(), code.getName());
         if (ret) {
             BeinetUser user = userRepository.findByName(code.getName());
