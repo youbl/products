@@ -114,12 +114,15 @@
                 <br>
                 <el-form :model="realnameIdentify" :rules="rulesRealnameIdentify" ref="realnameIdentifyForm">
                     <el-form-item label="真实姓名" label-width="200px" prop="realName">
-                        <el-input v-model="realnameIdentify.realName" placeholder="请输入真实姓名" maxlength="20"></el-input>
+                        <el-input v-model="realnameIdentify.realName" placeholder="请输入真实姓名" maxlength="20"
+                                  :readonly="isRealNameValidated"></el-input>
                     </el-form-item>
                     <el-form-item label="身份证号" label-width="200px" prop="identity">
-                        <el-input v-model="realnameIdentify.identity" placeholder="请输入身份证号" maxlength="20"></el-input>
+                        <el-input v-model="realnameIdentify.identity" placeholder="请输入身份证号" maxlength="20"
+                                  :readonly="isRealNameValidated"></el-input>
                     </el-form-item>
-                    <el-form-item label="图形验证码" label-width="200px" prop="imgCode" style="text-align: left">
+                    <el-form-item label="图形验证码" label-width="200px" prop="imgCode" style="text-align: left"
+                                  v-if="!isRealNameValidated">
                         <el-input v-model="realnameIdentify.imgCode" placeholder="请输入图形验证码" maxlength="6"
                                   style="width:50%"></el-input>
                         <img :src="imgSrc" style="cursor: pointer; height: 30px;" @click="getImgCode"/>
@@ -129,8 +132,8 @@
                     <el-button type="primary" @click="doRealNameIdentify('realnameIdentifyForm')"
                                v-if="!isRealNameValidated">申请认证
                     </el-button>
-                    <span v-if="isRealNameValidated">已认证</span>
-                    <span v-if="realNameValidateQrCode">请打开手机上的支付宝，扫描下面的二维码进行认证</span>
+                    <span v-if="isRealNameValidated" style="color:red;">已认证通过</span>
+                    <span v-if="realNameValidateQrCode">请打开手机支付宝，扫描二维码进行认证:</span>
                     <div>
                         <img :src="realNameValidateQrCode"/>
                     </div>
@@ -173,7 +176,6 @@
                 userIpPage: '',
                 adminIpPage: '',
                 adminUserPage: '',
-                isRealNameValidated: false,
                 realNameValidateQrCode: '',
 
                 changePwd: {
@@ -229,7 +231,10 @@
                 this.realnameIdentify.realName = this.user.realName;
                 this.realnameIdentify.identity = this.user.identity;
                 if (this.user.realName && this.user.identity) {
-                    this.isRealNameValidated = true;
+                    // 需要清除校验
+                    setTimeout(() => {
+                        vueApp.$refs['realnameIdentifyForm'].clearValidate();
+                    }, 1000);
                 }
             }).catch(error => this.ajaxError(error));
         },
@@ -244,7 +249,11 @@
             //     item.style.height = (Number(deviceHeight) - 120) + 'px'; //数字是页面布局高度差
             // }
         },
-        computed: {},
+        computed: {
+            isRealNameValidated: function () {
+                return this.user.realName && this.user.identity;
+            },
+        },
         methods: {
             switchTab: function (tab) {
                 this.showTab = tab;

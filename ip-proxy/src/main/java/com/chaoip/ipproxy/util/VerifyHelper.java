@@ -5,8 +5,10 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayUserCertifyOpenCertifyRequest;
 import com.alipay.api.request.AlipayUserCertifyOpenInitializeRequest;
+import com.alipay.api.request.AlipayUserCertifyOpenQueryRequest;
 import com.alipay.api.response.AlipayUserCertifyOpenCertifyResponse;
 import com.alipay.api.response.AlipayUserCertifyOpenInitializeResponse;
+import com.alipay.api.response.AlipayUserCertifyOpenQueryResponse;
 import com.chaoip.ipproxy.repository.entity.QrCode;
 import com.chaoip.ipproxy.util.config.VerifyConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +16,13 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
- * VerifyHelper
+ * 支付宝身份认证辅助类。
+ * 1、调用 getBizcode 方法获取一个id
+ * 2、调用 beginValidate 方法获取要跳转到的支付宝url，生成二维码，用手机支付宝扫码认证
+ * 3、调用 queryValidate 方法，验证是否认证成功
  *
  * @author youbl
  * @version 1.0
@@ -33,25 +39,25 @@ public class VerifyHelper {
     }
 
     /**
-     * 获取指定账号的实名认证短码地址
+     * 获取实名认证短码地址
      *
-     * @param name 账户
+     * @param orderNo 订单号
      * @return url
      */
-    public String getShortUrl(String name) {
-        return checkUrl(config.getShortUrl()) + name;
+    public String getShortUrl(String orderNo) {
+        return checkUrl(config.getShortUrl()) + orderNo;
     }
 
     /**
      * 获取回调地址
      *
-     * @param name 账户
+     * @param orderNo 订单号
      * @return url
      */
-    public String getCallback(String name) {
+    public String getCallback(String orderNo) {
         String callback = checkUrl(config.getCallback());
 
-        return callback + name;
+        return callback + orderNo;
     }
 
     private String checkUrl(String url) {
@@ -63,12 +69,21 @@ public class VerifyHelper {
         return url;
     }
 
+    /**
+     * 获取认证跳转地址，并返回QrCode实体对象
+     *
+     * @param account  账号
+     * @param realName 实名
+     * @param identity 身份证
+     * @return 对象
+     * @throws AlipayApiException 异常
+     */
     public QrCode getVerifyData(String account, String realName, String identity) throws AlipayApiException {
         String orderNo = getTransId();
-        String callbackUrl = getCallback(account);
+        String callbackUrl = getCallback(orderNo);
 
         String certId = getBizcode(realName, identity, orderNo, callbackUrl);
-        String url = beginValidate(certId);
+        String url = beginValidate(certId, account);
         QrCode ret = QrCode.builder()
                 .orderNo(orderNo)
                 .certId(certId)
@@ -107,16 +122,51 @@ public class VerifyHelper {
 
     // https://opendocs.alipay.com/apis/api_2/alipay.user.certify.open.certify
     // https://opendocs.alipay.com/open/01brh4#H5%20%E9%A1%B5%E9%9D%A2%E6%8E%A5%E5%85%A5 新的文档，按该文档说明，仅支持GET方式，然后要把返回的链接转成二维码
-    public String beginValidate(String certifyId) throws AlipayApiException {
+
+    /**
+     * 获取人脸认证地址
+     *
+     * @param certifyId getBizcode方法返回的支付宝认证唯一id
+     * @param account   仅用于日志，无其它作用
+     * @return 地址
+     * @throws AlipayApiException 异常
+     */
+    public String beginValidate(String certifyId, String account) throws AlipayApiException {
         AlipayUserCertifyOpenCertifyRequest request = new AlipayUserCertifyOpenCertifyRequest();
         request.setBizContent("{\"certify_id\":\"" + certifyId + "\"}");
         // 必须用get，会返回一个url，转成二维码，用支付宝扫码即可
         AlipayUserCertifyOpenCertifyResponse response = getClient().pageExecute(request, "GET");
         if (response.isSuccess()) {
-            log.info("beginValidate参数 {} 成功结果: {}", certifyId, response.getBody());
+            log.info("beginValidate账号:{} 参数:{} 成功结果:{}", account, certifyId, response.getBody());
             return response.getBody();
         }
-        log.error("beginValidate参数 {} 失败结果: {}", certifyId, response.getBody());
+        log.error("beginValidate账号:{} 参数 {} 失败结果: {}", account, certifyId, response.getBody());
+        throw new RuntimeException("实名认证失败");
+    }
+
+    /**
+     * https://opendocs.alipay.com/apis/api_2/alipay.user.certify.open.query/
+     *
+     * @throws AlipayApiException
+     */
+    /**
+     * 查询人脸认证结果
+     *
+     * @param certifyId getBizcode方法返回的支付宝认证唯一id
+     * @param account   仅用于日志，无其它作用
+     * @return 地址
+     * @throws AlipayApiException 异常
+     */
+    public boolean queryValidate(String certifyId, String account) throws AlipayApiException {
+        AlipayUserCertifyOpenQueryRequest request = new AlipayUserCertifyOpenQueryRequest();
+        request.setBizContent("{\"certify_id\":\"" + certifyId + "\"}");
+        AlipayUserCertifyOpenQueryResponse response = getClient().execute(request);
+        if (response.isSuccess()) {
+            // List<String> result = response.getPassed(); // 居然取不到值，要自行判断
+            log.info("beginValidate账号:{} 参数:{} 调用成功:{}", account, certifyId, response.getBody());
+            return response.getBody().indexOf("\"passed\":\"T\"") > 0;
+        }
+        log.error("beginValidate账号:{} 参数 {} 失败结果: {}", account, certifyId, response.getBody());
         throw new RuntimeException("实名认证失败");
     }
 

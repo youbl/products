@@ -35,6 +35,10 @@ public class QrCode {
 
     private String realName;
 
+    /**
+     * 订单号
+     */
+    @Indexed(unique = true)
     private String orderNo;
 
     private String identity;

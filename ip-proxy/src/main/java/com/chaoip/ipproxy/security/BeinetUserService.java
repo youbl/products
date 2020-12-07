@@ -160,11 +160,28 @@ public class BeinetUserService implements UserDetailsService {
         QrCode code = verifyHelper.getVerifyData(username, dto.getRealName(), dto.getIdentity());
         qrCodeService.addQrCode(code);
 
-        return verifyHelper.getShortUrl(username);
-//        user.setRealName(dto.getRealName());
-//        user.setIdentity(dto.getIdentity());
-//        userRepository.save(user);
-//        return true;
+        return verifyHelper.getShortUrl(code.getOrderNo());
+    }
+
+    /**
+     * 查询实名认证结果，通过时，要设置为已实名认证
+     *
+     * @param code 认证信息
+     * @return 是否通过
+     * @throws AlipayApiException 异常
+     */
+    public boolean realNameResultQuery(QrCode code) throws AlipayApiException {
+        boolean ret = verifyHelper.queryValidate(code.getCertId(), code.getName());
+        if (ret) {
+            BeinetUser user = userRepository.findByName(code.getName());
+            if (user == null) {
+                throw new RuntimeException("指定的账号不存在，实名认证有误？？" + code.getName());
+            }
+            user.setRealName(code.getRealName());
+            user.setIdentity(code.getIdentity());
+            userRepository.save(user);
+        }
+        return ret;
     }
 
     /**

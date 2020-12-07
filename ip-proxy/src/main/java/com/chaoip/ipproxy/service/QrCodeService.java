@@ -32,4 +32,8 @@ public class QrCodeService {
     public QrCode findByName(String name) {
         return qrCodeRepository.findTopByNameOrderByCreationTimeDesc(name);
     }
+
+    public QrCode findByOrder(String orderNo) {
+        return qrCodeRepository.findTopByOrderNo(orderNo);
+    }
 }

@@ -20,11 +20,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,47 +108,74 @@ public class UserController {
         return new QrcodeHelper().getQrcode(url);
     }
 
-    @GetMapping("qrcode/{name}")
-    public void shortUrl302(@PathVariable String name, HttpServletResponse response) throws IOException {
-        QrCode code = qrCodeService.findByName(name);
+    @GetMapping("qr/{orderNo}")
+    public void shortUrl302(@PathVariable String orderNo, HttpServletResponse response) throws IOException {
+        QrCode code = qrCodeService.findByOrder(orderNo);
         if (code == null || StringUtils.isEmpty(code.getAliUrl())) {
             throw new RuntimeException("实名认证地址不存在");
         }
         response.sendRedirect(code.getAliUrl());
     }
 
+//    @GetMapping("certinfo/{name}")
+//    public QrCode getCertInfo(@PathVariable String name) throws IOException {
+//        QrCode code = qrCodeService.findByName(name);
+//        if (code == null || StringUtils.isEmpty(code.getAliUrl())) {
+//            throw new RuntimeException("实名认证地址不存在");
+//        }
+//        code.setIdentity("");
+//        code.setRealName("");
+//        code.setResult("");
+//        return code;
+//    }
+
     /**
      * 回调接口，用于支付宝身份认证回调.
-     * 注：是在手机上的支付宝访问，不是PC上
+     * 注：是在手机上的支付宝访问，不是PC上.
+     * 另：无论成功失败，支付宝都会回调过来，而且不带任何额外的信息。
+     * 需要自己去调阿里接口进行确认
      *
-     * @param request 请求上下文
-     * @param name    回调用户
+     * @param orderNo 订单号
      * @return 无
      */
-    @GetMapping("callback/{name}")
-    public String callback(HttpServletRequest request, @PathVariable String name) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(request.getMethod()).append(" ").append(request.getRequestURI());
-        String strQuery = request.getQueryString();
-        if (!StringUtils.isEmpty(strQuery)) {
-            sb.append('?').append(strQuery);
+    @GetMapping("callback/{orderNo}")
+    public String callback(@PathVariable(required = false) String orderNo) throws AlipayApiException {
+        if (StringUtils.isEmpty(orderNo)) {
+            return phoneStr("订单号不能为空");
         }
-        sb.append("\n");
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames != null && headerNames.hasMoreElements()) {
-            String header = headerNames.nextElement();
-            Enumeration<String> values = request.getHeaders(header);
-            while (values != null && values.hasMoreElements()) {
-                String val = values.nextElement();
-                sb.append("  ").append(header).append(" : ").append(val).append("\n");
-            }
+        QrCode code = qrCodeService.findByOrder(orderNo);
+        if (code == null || StringUtils.isEmpty(code.getCertId())) {
+            return phoneStr("订单不存在: " + orderNo);
         }
-        String ret = sb.toString();
-        log.info(ret);
 
-        return "认证成功，请回到你的认证页面，进行刷新。\n回调信息：\n" + ret;
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(request.getMethod()).append(" ").append(request.getRequestURI());
+//        String strQuery = request.getQueryString();
+//        if (!StringUtils.isEmpty(strQuery)) {
+//            sb.append('?').append(strQuery);
+//        }
+//        sb.append("\n");
+//        Enumeration<String> headerNames = request.getHeaderNames();
+//        while (headerNames != null && headerNames.hasMoreElements()) {
+//            String header = headerNames.nextElement();
+//            Enumeration<String> values = request.getHeaders(header);
+//            while (values != null && values.hasMoreElements()) {
+//                String val = values.nextElement();
+//                sb.append("  ").append(header).append(" : ").append(val).append("\n");
+//            }
+//        }
+//        String ret = sb.toString();
+//        log.info(ret);
+
+        if (userService.realNameResultQuery(code)) {
+            return phoneStr(code.getRealName() + ", 您好，您已认证成功。<p>请回到认证页面，进行刷新。</p>");
+        }
+        return phoneStr("您好，您的认证信息有误，请确认: " + code.getRealName());
     }
 
+    private String phoneStr(String msg) {
+        return "<html><body style='font-size:50px;'>" + msg + "</body></html>";
+    }
 
     /**
      * 获取图形验证码和序号

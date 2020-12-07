@@ -11,4 +11,6 @@ import com.chaoip.ipproxy.repository.entity.QrCode;
  */
 public interface QrCodeRepository extends BaseRepository<QrCode, Long> {
     QrCode findTopByNameOrderByCreationTimeDesc(String name);
+
+    QrCode findTopByOrderNo(String orderNo);
 }
