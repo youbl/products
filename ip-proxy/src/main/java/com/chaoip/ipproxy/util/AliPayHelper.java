@@ -6,7 +6,10 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
+import com.chaoip.ipproxy.service.SiteConfigService;
+import com.chaoip.ipproxy.util.config.AliConfigBase;
 import com.chaoip.ipproxy.util.config.VerifyConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -26,22 +29,14 @@ import java.net.URLEncoder;
 @Slf4j
 public class AliPayHelper extends AliBase {
 
-    public AliPayHelper(VerifyConfig verifyConfig) {
-        super(verifyConfig);
+    public AliPayHelper(SiteConfigService configService) {
+        super(configService);
     }
 
-    /**
-     * 获取回调地址
-     *
-     * @param orderNo 订单号
-     * @return url
-     */
-    public String getCallback(String orderNo) {
-        String callback = checkUrl(config.getPayback());
-
-        return callback + orderNo;
+    @Override
+    protected AliConfigBase getConfig() throws JsonProcessingException {
+        return configService.getAliPayConfig();
     }
-
 
     /**
      * 调用支付宝支付接口.
@@ -52,7 +47,9 @@ public class AliPayHelper extends AliBase {
      * @return 支付宝支付url
      * @throws AlipayApiException 异常
      */
-    public PayOrder getPayUrl(String account, int moneyCent, String title, String description) throws AlipayApiException, UnsupportedEncodingException {
+    public PayOrder getPayUrl(String account, int moneyCent, String title, String description) throws AlipayApiException, UnsupportedEncodingException, JsonProcessingException {
+        this.config = getConfig();
+
         String orderNo = getTransId();
         String callbackUrl = getCallback(orderNo); // 回转地址
         if (StringUtils.isEmpty(title)) {

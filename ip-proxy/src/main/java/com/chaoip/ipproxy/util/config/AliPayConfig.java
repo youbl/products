@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 阿里实名认证配置
+ * 支付宝支付配置
  *
  * @author youbl
  * @version 1.0
@@ -12,6 +12,5 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class VerifyConfig extends AliConfigBase {
-    private String shortUrl;  // 实名认证短码二维码地址
+public class AliPayConfig extends AliConfigBase {
 }

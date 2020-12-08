@@ -6,7 +6,9 @@ import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import com.chaoip.ipproxy.service.SiteConfigService;
 import com.chaoip.ipproxy.util.config.SmsConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,12 +21,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public final class SmsHelper {
-    private final SmsConfig config;
+    private final SiteConfigService configService;
 
-    public SmsHelper(SmsConfig config) {
-        this.config = config;
+    public SmsHelper(SiteConfigService configService) {
+        this.configService = configService;
     }
-
 
     /**
      * 发送短信验证码，并返回结果
@@ -33,7 +34,9 @@ public final class SmsHelper {
      * @param code  验证码
      * @return 结果
      */
-    public String send(String phone, String code) {
+    public String send(String phone, String code) throws JsonProcessingException {
+        SmsConfig config = (configService.getSmsConfig());
+
         DefaultProfile profile = DefaultProfile.getProfile(config.getRegion(), config.getAk(), config.getSk());
         IAcsClient client = new DefaultAcsClient(profile);
 

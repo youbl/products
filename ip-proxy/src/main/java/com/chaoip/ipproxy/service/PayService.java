@@ -9,6 +9,7 @@ import com.chaoip.ipproxy.repository.entity.ValidCode;
 import com.chaoip.ipproxy.util.AliPayHelper;
 import com.chaoip.ipproxy.util.SmsHelper;
 import com.chaoip.ipproxy.util.StrHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -35,7 +36,7 @@ public class PayService {
      * @param name  账号
      * @return url
      */
-    public String getPayUrl(ChargeDto money, String name) throws UnsupportedEncodingException, AlipayApiException {
+    public String getPayUrl(ChargeDto money, String name) throws UnsupportedEncodingException, AlipayApiException, JsonProcessingException {
         PayOrder order = aliPayHelper.getPayUrl(name, money.getMoney(), money.getTitle(), money.getDescription());
         
         return order.getPayUrl();

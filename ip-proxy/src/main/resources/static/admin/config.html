@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>站点配置</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script src="/res/unpkg/elemeIndex.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+</head>
+
+<body>
+<div id="divApp">
+    <h1 style="text-align: center">
+        站点配置
+    </h1>
+    <div>
+        <template>
+            <el-tabs v-model="tab.activeTab" @tab-click="handleClick">
+                <el-tab-pane label="短信配置" name="first" style="width:500px;">
+                    <el-form :model="smsConfig" ref="smsConfigForm">
+                        <el-form-item label="服务域名" label-width="200px" prop="domain">
+                            <el-input v-model="smsConfig.domain" placeholder="请输入服务域名" maxlength="300"></el-input>
+                        </el-form-item>
+                        <el-form-item label="接口版本" label-width="200px" prop="version">
+                            <el-input v-model="smsConfig.version" placeholder="请输入接口版本" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="服务区域" label-width="200px" prop="region">
+                            <el-input v-model="smsConfig.region" placeholder="请输入服务区域" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="短信签名" label-width="200px" prop="sign">
+                            <el-input v-model="smsConfig.sign" placeholder="请输入短信签名" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="短信模板" label-width="200px" prop="template">
+                            <el-input v-model="smsConfig.template" placeholder="请输入短信模板" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="AK" label-width="200px" prop="ak">
+                            <el-input v-model="smsConfig.ak" placeholder="请输入AK密钥" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="SK" label-width="200px" prop="sk">
+                            <el-input v-model="smsConfig.sk" placeholder="请输入SK密钥" maxlength="30"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div style="text-align: center">
+                        <el-button type="primary" @click="saveSmsConfig('smsConfigForm')">保存配置</el-button>
+                    </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="实名认证配置" name="second" style="width:800px;">
+                    <el-form :model="verifyConfig" ref="verifyConfigForm">
+                        <el-form-item label="服务域名" label-width="200px" prop="url">
+                            <el-input v-model="verifyConfig.url" placeholder="请输入服务域名" maxlength="300"></el-input>
+                        </el-form-item>
+                        <el-form-item label="AppID" label-width="200px" prop="appId">
+                            <el-input v-model="verifyConfig.appId" placeholder="请输入AppID" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="用户私钥" label-width="200px" prop="privateKey">
+                            <el-input v-model="verifyConfig.privateKey" placeholder="请输入用户私钥"
+                                      maxlength="3000"></el-input>
+                        </el-form-item>
+                        <el-form-item label="阿里公钥" label-width="200px" prop="publicKey">
+                            <el-input v-model="verifyConfig.publicKey" placeholder="请输入阿里公钥" maxlength="3000"></el-input>
+                        </el-form-item>
+                        <el-form-item label="字符集" label-width="200px" prop="charset">
+                            <el-input v-model="verifyConfig.charset" placeholder="请输入字符集" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="签名类型" label-width="200px" prop="signType">
+                            <el-input v-model="verifyConfig.signType" placeholder="请输入签名类型" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="响应格式" label-width="200px" prop="format">
+                            <el-input v-model="verifyConfig.format" placeholder="请输入响应格式" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="回调地址" label-width="200px" prop="callback">
+                            <el-input v-model="verifyConfig.callback" placeholder="请输入回调地址" maxlength="300"></el-input>
+                        </el-form-item>
+                        <el-form-item label="二维码短码URL" label-width="200px" prop="shortUrl">
+                            <el-input v-model="verifyConfig.shortUrl" placeholder="请输入短码URL" maxlength="300"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div style="text-align: center">
+                        <el-button type="primary" @click="saveVerifyConfig('verifyConfigForm')">保存配置</el-button>
+                    </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="支付宝支付配置" name="third" style="width:800px;">
+                    <el-form :model="alipayConfig" ref="alipayConfigForm">
+                        <el-form-item label="服务域名" label-width="200px" prop="url">
+                            <el-input v-model="alipayConfig.url" placeholder="请输入服务域名" maxlength="300"></el-input>
+                        </el-form-item>
+                        <el-form-item label="AppID" label-width="200px" prop="appId">
+                            <el-input v-model="alipayConfig.appId" placeholder="请输入AppID" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="用户私钥" label-width="200px" prop="privateKey">
+                            <el-input v-model="alipayConfig.privateKey" placeholder="请输入用户私钥"
+                                      maxlength="3000"></el-input>
+                        </el-form-item>
+                        <el-form-item label="阿里公钥" label-width="200px" prop="publicKey">
+                            <el-input v-model="alipayConfig.publicKey" placeholder="请输入阿里公钥" maxlength="3000"></el-input>
+                        </el-form-item>
+                        <el-form-item label="字符集" label-width="200px" prop="charset">
+                            <el-input v-model="alipayConfig.charset" placeholder="请输入字符集" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="签名类型" label-width="200px" prop="signType">
+                            <el-input v-model="alipayConfig.signType" placeholder="请输入签名类型" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="响应格式" label-width="200px" prop="format">
+                            <el-input v-model="alipayConfig.format" placeholder="请输入响应格式" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="回调地址" label-width="200px" prop="callback">
+                            <el-input v-model="alipayConfig.callback" placeholder="请输入回调地址" maxlength="300"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div style="text-align: center">
+                        <el-button type="primary" @click="saveAliPayConfig('alipayConfigForm')">保存配置</el-button>
+                    </div>
+                </el-tab-pane>
+            </el-tabs>
+        </template>
+    </div>
+</div>
+<script>
+    var vueApp = new Vue({
+        el: '#divApp',
+        data: {
+            tab: {
+                activeTab: 'first',
+            },
+            smsConfig: {},
+            verifyConfig: {},
+            alipayConfig: {},
+        },
+        created: function () {
+            this.loadSmsConfig();
+            this.loadVerifyConfig();
+            this.loadAliPayConfig();
+        },
+        computed: {},
+        methods: {
+            handleClick: function (tab, event) {
+            },
+            loadSmsConfig: function () {
+                let url = '/manage/config/sms';
+                this.loadConfig(url, data => this.smsConfig = data);
+            },
+            loadVerifyConfig: function () {
+                let url = '/manage/config/verify';
+                this.loadConfig(url, data => this.verifyConfig = data);
+            },
+            loadAliPayConfig: function () {
+                let url = '/manage/config/alipay';
+                this.loadConfig(url, data => this.alipayConfig = data);
+            },
+            loadConfig: function (url, callback) {
+                axios.get(url).then(response => {
+                    if (!response || !response.data) {
+                        alert('获取配置失败失败');
+                        return;
+                    }
+                    callback(response.data);
+                }).catch(error => this.ajaxError(error));
+            },
+            saveSmsConfig: function () {
+                let url = '/manage/config/sms';
+                this.saveConfig(url, this.smsConfig);
+            },
+            saveVerifyConfig: function () {
+                let url = '/manage/config/verify';
+                this.saveConfig(url, this.verifyConfig);
+            },
+            saveAliPayConfig: function () {
+                let url = '/manage/config/alipay';
+                this.saveConfig(url, this.alipayConfig);
+            },
+            saveConfig: function (url, data) {
+                axios.post(url, data).then(response => {
+                    if (!response || !response.data) {
+                        alert('保存配置失败');
+                        return;
+                    }
+                    alert('保存配置成功');
+                }).catch(error => this.ajaxError(error));
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    let msg = error.response.data['Msg'];
+                    if (msg === 'Unauthorized') {
+                        location.href = '/login?r=%2Fadmin%23%2FserverStatus.html';
+                        return;
+                    }
+                    console.log(JSON.stringify(error.response.data));
+                    alert('出错了');
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+
+
+    /**
+     * 滚动到窗口底部
+     */
+    function toWindowBottom() {
+        window.scrollTo(0, getWindowHeight());
+    }
+
+    /**
+     * 获取窗口高度
+     * @return {number} 窗口高度值
+     */
+    function getWindowHeight() {
+        // body是chrome，documentElement是IE和Firefox
+        return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    }
+
+    /**
+     * 获取url里的变量值
+     * @param {string} name 变量名
+     * @return {string} 变量值
+     */
+    function getQueryString(name) {
+        if (typeof (name) !== 'string') {
+            return '';
+        }
+        name = name.trim();
+        if (name.length === 0) {
+            return '';
+        }
+        let localSearch = location.search.toLocaleLowerCase();
+        name = name.toLowerCase() + '=';
+        let tmpName = '?' + name;
+        let idx = localSearch.indexOf(tmpName);
+        if (idx < 0) {
+            tmpName = '&' + name;
+            idx = localSearch.indexOf(tmpName);
+            if (idx < 0) {
+                return '';
+            }
+        }
+        name = tmpName;
+        let tmp = location.search.substr(idx + name.length);
+        idx = tmp.indexOf('&');
+        if (idx === 0)
+            return '';
+        let ret;
+        if (idx < 0) {
+            ret = tmp;
+        } else {
+            ret = tmp.substr(0, idx);
+        }
+        return decodeURIComponent(ret.trim());
+    }
+</script>
+</body>
+
+</html>

@@ -9,6 +9,7 @@ import com.chaoip.ipproxy.repository.entity.BeinetUser;
 import com.chaoip.ipproxy.repository.entity.RealOrder;
 import com.chaoip.ipproxy.service.RealOrderService;
 import com.chaoip.ipproxy.util.VerifyHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -152,7 +153,7 @@ public class BeinetUserService implements UserDetailsService {
      * @param username 账号
      * @return 实名认证的短码地址
      */
-    public String realNameIdentify(IdentifyDto dto, String username) throws AlipayApiException {
+    public String realNameIdentify(IdentifyDto dto, String username) throws AlipayApiException, JsonProcessingException {
         BeinetUser user = userRepository.findByName(username);
         if (user == null) {
             throw new RuntimeException(noUserMsg + username);
@@ -170,7 +171,7 @@ public class BeinetUserService implements UserDetailsService {
      * @return 是否通过
      * @throws AlipayApiException 异常
      */
-    public boolean realNameResultQuery(RealOrder code) throws AlipayApiException {
+    public boolean realNameResultQuery(RealOrder code) throws AlipayApiException, JsonProcessingException {
         boolean ret = verifyHelper.queryValidate(code.getCertId(), code.getName());
         if (ret) {
             BeinetUser user = userRepository.findByName(code.getName());

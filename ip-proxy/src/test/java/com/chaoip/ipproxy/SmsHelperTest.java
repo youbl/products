@@ -1,6 +1,7 @@
 package com.chaoip.ipproxy;
 
 import com.chaoip.ipproxy.util.SmsHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class SmsHelperTest {
     private SmsHelper smsHelper;
 
     @Test
-    public void test_send() {
+    public void test_send() throws JsonProcessingException {
         String phone = "15980726586";
         String code = "zaxya1234";
         String ret = smsHelper.send(phone, code);

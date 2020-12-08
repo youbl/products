@@ -6,6 +6,11 @@ import com.chaoip.ipproxy.repository.entity.BeinetUser;
 import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.service.RouteService;
+import com.chaoip.ipproxy.service.SiteConfigService;
+import com.chaoip.ipproxy.util.config.AliPayConfig;
+import com.chaoip.ipproxy.util.config.SmsConfig;
+import com.chaoip.ipproxy.util.config.VerifyConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +30,14 @@ import java.util.List;
 public class ManageController {
     private final RouteService routeService;
     private final BeinetUserService userService;
+    private final SiteConfigService siteConfigService;
 
-    public ManageController(RouteService routeService, BeinetUserService userService) {
+    public ManageController(RouteService routeService,
+                            BeinetUserService userService,
+                            SiteConfigService siteConfigService) {
         this.routeService = routeService;
         this.userService = userService;
+        this.siteConfigService = siteConfigService;
     }
 
     @GetMapping("routes")
@@ -103,5 +112,41 @@ public class ManageController {
     @PostMapping("user/password/{id}")
     public boolean resetUserPassword(@PathVariable long id) {
         return userService.resetUserPassword(id);
+    }
+
+
+    // 以下为读写配置的方法
+    @GetMapping("config/sms")
+    public SmsConfig smsConfig() throws JsonProcessingException {
+        return siteConfigService.getSmsConfig();
+    }
+
+    @GetMapping("config/alipay")
+    public AliPayConfig aliPayConfig() throws JsonProcessingException {
+        return siteConfigService.getAliPayConfig();
+    }
+
+    @GetMapping("config/verify")
+    public VerifyConfig verifyConfig() throws JsonProcessingException {
+        return siteConfigService.getVerifyConfig();
+    }
+
+
+    @PostMapping("config/sms")
+    public boolean smsConfig(@RequestBody SmsConfig config) throws JsonProcessingException {
+        siteConfigService.savetSmsConfig(config);
+        return true;
+    }
+
+    @PostMapping("config/alipay")
+    public boolean aliPayConfig(@RequestBody AliPayConfig config) throws JsonProcessingException {
+        siteConfigService.savetAliPayConfig(config);
+        return true;
+    }
+
+    @PostMapping("config/verify")
+    public boolean verifyConfig(@RequestBody VerifyConfig config) throws JsonProcessingException {
+        siteConfigService.savetVerifyConfig(config);
+        return true;
     }
 }

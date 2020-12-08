@@ -1,18 +1,16 @@
 package com.chaoip.ipproxy.util.config;
 
 import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * SmsConfig
+ * 短信配置
  *
  * @author youbl
  * @version 1.0
  * @date 2020/12/3 9:04
  */
 @Component
-@ConfigurationProperties(prefix = "ali.sms")
 @Data
 public class SmsConfig {
     private String domain;

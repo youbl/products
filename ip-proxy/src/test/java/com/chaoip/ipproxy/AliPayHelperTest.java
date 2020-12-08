@@ -1,8 +1,10 @@
 package com.chaoip.ipproxy;
 
 import com.alipay.api.AlipayApiException;
+import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.util.AliPayHelper;
 import com.chaoip.ipproxy.util.VerifyHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +27,8 @@ public class AliPayHelperTest {
     private AliPayHelper aliPayHelper;
 
     @Test
-    public void test_verify() throws AlipayApiException, UnsupportedEncodingException {
-        String url = aliPayHelper.getPayUrl("", 1, "我在单元测试", "单元测试支付一下");
+    public void test_verify() throws AlipayApiException, UnsupportedEncodingException, JsonProcessingException {
+        PayOrder url = aliPayHelper.getPayUrl("", 1, "我在单元测试", "单元测试支付一下");
         System.out.println(url);
     }
 }

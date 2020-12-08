@@ -12,6 +12,7 @@ import com.chaoip.ipproxy.service.RealOrderService;
 import com.chaoip.ipproxy.service.ValidCodeService;
 import com.chaoip.ipproxy.util.ImgHelper;
 import com.chaoip.ipproxy.util.QrcodeHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.zxing.WriterException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -132,7 +133,7 @@ public class UserController {
      * @throws AlipayApiException 异常
      */
     @GetMapping("callback/{orderNo}")
-    public String callback(@PathVariable(required = false) String orderNo) throws AlipayApiException {
+    public String callback(@PathVariable(required = false) String orderNo) throws AlipayApiException, JsonProcessingException {
         if (StringUtils.isEmpty(orderNo)) {
             return phoneStr("订单号不能为空");
         }
@@ -174,7 +175,7 @@ public class UserController {
      * @return url
      */
     @PostMapping("pay")
-    public String pay(@RequestBody ChargeDto money, AuthDetails details) throws UnsupportedEncodingException, AlipayApiException {
+    public String pay(@RequestBody ChargeDto money, AuthDetails details) throws UnsupportedEncodingException, AlipayApiException, JsonProcessingException {
         if (details == null) {
             throw new IllegalArgumentException("获取登录信息失败");
         }
@@ -227,7 +228,7 @@ public class UserController {
      * @return 序号
      */
     @PostMapping("sms")
-    public Map<String, String> smsCode(@RequestBody SmsDto dto) {
+    public Map<String, String> smsCode(@RequestBody SmsDto dto) throws JsonProcessingException {
         if (!codeService.validByCodeAndSn(dto.getCode(), dto.getSn())) {
             throw new IllegalArgumentException("图形验证码错误");
         }

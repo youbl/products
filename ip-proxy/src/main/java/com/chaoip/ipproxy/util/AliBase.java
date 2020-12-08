@@ -2,7 +2,9 @@ package com.chaoip.ipproxy.util;
 
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
-import com.chaoip.ipproxy.util.config.VerifyConfig;
+import com.chaoip.ipproxy.service.SiteConfigService;
+import com.chaoip.ipproxy.util.config.AliConfigBase;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,13 +17,19 @@ import java.time.format.DateTimeFormatter;
  * @date 2020/12/7 22:31
  */
 public abstract class AliBase {
-    protected final VerifyConfig config;
+    protected final SiteConfigService configService;
+    protected AliConfigBase config;
 
-    public AliBase(VerifyConfig verifyConfig) {
-        this.config = verifyConfig;
+    public AliBase(SiteConfigService configService) {
+        this.configService = configService;
     }
 
-    protected AlipayClient getClient() {
+    protected abstract AliConfigBase getConfig() throws JsonProcessingException;
+
+    protected AlipayClient getClient() throws JsonProcessingException {
+        if (this.config == null) {
+            this.config = getConfig();
+        }
         return new DefaultAlipayClient(config.getUrl(), config.getAppId(), config.getPrivateKey(),
                 config.getFormat(), config.getCharset(), config.getPublicKey(), config.getSignType());
     }
@@ -35,6 +43,18 @@ public abstract class AliBase {
         String ret = "CHDL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
         ret += StrHelper.getRndStr(4, 1);
         return ret;
+    }
+
+    /**
+     * 获取回调地址
+     *
+     * @param orderNo 订单号
+     * @return url
+     */
+    public String getCallback(String orderNo) {
+        String callback = checkUrl(config.getCallback());
+
+        return callback + orderNo;
     }
 
     /**

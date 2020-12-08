@@ -8,7 +8,10 @@ import com.alipay.api.response.AlipayUserCertifyOpenCertifyResponse;
 import com.alipay.api.response.AlipayUserCertifyOpenInitializeResponse;
 import com.alipay.api.response.AlipayUserCertifyOpenQueryResponse;
 import com.chaoip.ipproxy.repository.entity.RealOrder;
+import com.chaoip.ipproxy.service.SiteConfigService;
+import com.chaoip.ipproxy.util.config.AliConfigBase;
 import com.chaoip.ipproxy.util.config.VerifyConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +29,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class VerifyHelper extends AliBase {
 
-    public VerifyHelper(VerifyConfig verifyConfig) {
-        super(verifyConfig);
+    public VerifyHelper(SiteConfigService configService) {
+        super(configService);
+    }
+
+    @Override
+    protected AliConfigBase getConfig() throws JsonProcessingException {
+        return configService.getVerifyConfig();
     }
 
     /**
@@ -37,19 +45,7 @@ public class VerifyHelper extends AliBase {
      * @return url
      */
     public String getShortUrl(String orderNo) {
-        return checkUrl(config.getShortUrl()) + orderNo;
-    }
-
-    /**
-     * 获取回调地址
-     *
-     * @param orderNo 订单号
-     * @return url
-     */
-    public String getCallback(String orderNo) {
-        String callback = checkUrl(config.getCallback());
-
-        return callback + orderNo;
+        return checkUrl(((VerifyConfig) config).getShortUrl()) + orderNo;
     }
 
     /**
@@ -61,7 +57,9 @@ public class VerifyHelper extends AliBase {
      * @return 对象
      * @throws AlipayApiException 异常
      */
-    public RealOrder getVerifyData(String account, String realName, String identity) throws AlipayApiException {
+    public RealOrder getVerifyData(String account, String realName, String identity) throws AlipayApiException, JsonProcessingException {
+        this.config = getConfig();
+
         String orderNo = getTransId();
         String callbackUrl = getCallback(orderNo);
 
@@ -82,7 +80,7 @@ public class VerifyHelper extends AliBase {
 
     // https://opendocs.alipay.com/apis/api_2/alipay.user.certify.open.initialize
     // 原始文档是有问题的，参考： https://opensupport.alipay.com/support/helpcenter/172/201602489641
-    public String getBizcode(String name, String identity, String orderNo, String callbackUrl) throws AlipayApiException {
+    public String getBizcode(String name, String identity, String orderNo, String callbackUrl) throws AlipayApiException, JsonProcessingException {
 
         AlipayUserCertifyOpenInitializeRequest request = new AlipayUserCertifyOpenInitializeRequest();
         request.setBizContent("{" +
@@ -114,7 +112,7 @@ public class VerifyHelper extends AliBase {
      * @return 地址
      * @throws AlipayApiException 异常
      */
-    public String beginValidate(String certifyId, String account) throws AlipayApiException {
+    public String beginValidate(String certifyId, String account) throws AlipayApiException, JsonProcessingException {
         AlipayUserCertifyOpenCertifyRequest request = new AlipayUserCertifyOpenCertifyRequest();
         request.setBizContent("{\"certify_id\":\"" + certifyId + "\"}");
         // 必须用get，会返回一个url，转成二维码，用支付宝扫码即可
@@ -137,7 +135,7 @@ public class VerifyHelper extends AliBase {
      * @return 地址
      * @throws AlipayApiException 异常
      */
-    public boolean queryValidate(String certifyId, String account) throws AlipayApiException {
+    public boolean queryValidate(String certifyId, String account) throws AlipayApiException, JsonProcessingException {
         AlipayUserCertifyOpenQueryRequest request = new AlipayUserCertifyOpenQueryRequest();
         request.setBizContent("{\"certify_id\":\"" + certifyId + "\"}");
         AlipayUserCertifyOpenQueryResponse response = getClient().execute(request);

@@ -11,22 +11,6 @@ spring:
     mongodb:
       auto-index-creation: true # 是否允许自动创建索引
 
-ali:
-  sms:
-    domain: dysmsapi.aliyuncs.com
-    version: 2017-05-25
-    region: cn-hangzhou
-    ak: aaa
-    sk: sss
-    sign: 阿里云计算
-    template: SMS_202001232
-  verify:
-    signType: RSA2
-    charset: UTF-8
-    format: json
-    callback: http://beinet.cn/user/callback # 实名认证回调地址
-    shortUrl: http://beinet.cn/user/qrcode # 实名认证回调地址
-
 logging:
   level:
     org.springframework.data.mongodb.core: debug
@@ -46,13 +30,6 @@ spring:
   profiles: unittest # 单元测试，通过注解 ActiveProfiles 使用这一段
   # 注：连接信息直接写在test代码里，这里就不用配置了。
 
-ali:
-  verify:
-    url: https://openapi.alipaydev.com/gateway.do
-    appId: 1111111
-    privateKey: "MIIEvQIBasdfasd"
-    publicKey: "asdfasdf"
-
 ---
 spring:
   profiles: dev # 开发使用这一段
@@ -63,12 +40,6 @@ spring:
       username: beinet
       password: beinet123
       database: firstdemo
-ali:
-  verify:
-    url: https://openapi.alipaydev.com/gateway.do
-    appId: 1111111
-    privateKey: "MIIEvQIBasdfasd"
-    publicKey: "asdfasdf"
 
 ---
 spring:
@@ -80,11 +51,5 @@ spring:
       username: beinet
       password: beinet123
       database: ipproxy
-ali:
-  verify:
-    url: https://openapi.alipay.com/gateway.do
-    appId: 1111111
-    privateKey: "MIIEvQIBasdfasd"
-    publicKey: "asdfasdf"
 
 ---

@@ -2,6 +2,7 @@ package com.chaoip.ipproxy;
 
 import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.util.VerifyHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class VerifyHelperTest {
     private VerifyHelper verifyHelper;
 
     @Test
-    public void test_verify() throws AlipayApiException {
+    public void test_verify() throws AlipayApiException, JsonProcessingException {
         // verifyHelper.getBizcode("张三", "100000199901010011");
 
         // 验证通过的，返回值：
