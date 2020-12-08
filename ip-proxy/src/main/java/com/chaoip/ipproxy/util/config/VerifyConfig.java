@@ -23,6 +23,7 @@ public class VerifyConfig {
     private String signType;
     private String format;
 
-    private String callback;
-    private String shortUrl;  // 短码二维码地址
+    private String callback;  // 实名认证回调地址
+    private String shortUrl;  // 实名认证短码二维码地址
+    private String payback;   // 支付回调地址
 }

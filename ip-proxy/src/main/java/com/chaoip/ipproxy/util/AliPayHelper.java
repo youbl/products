@@ -5,9 +5,14 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
+import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.util.config.VerifyConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * 支付宝支付类
@@ -25,25 +30,77 @@ public class AliPayHelper extends AliBase {
         super(verifyConfig);
     }
 
-    public void xxx() throws AlipayApiException {
+    /**
+     * 获取回调地址
+     *
+     * @param orderNo 订单号
+     * @return url
+     */
+    public String getCallback(String orderNo) {
+        String callback = checkUrl(config.getPayback());
+
+        return callback + orderNo;
+    }
+
+
+    /**
+     * 调用支付宝支付接口.
+     * 注意：金额单位为分
+     *
+     * @param account   支付人账号
+     * @param moneyCent 支付金额，单位分
+     * @return 支付宝支付url
+     * @throws AlipayApiException 异常
+     */
+    public PayOrder getPayUrl(String account, int moneyCent, String title, String description) throws AlipayApiException, UnsupportedEncodingException {
+        String orderNo = getTransId();
+        String callbackUrl = getCallback(orderNo); // 回转地址
+        if (StringUtils.isEmpty(title)) {
+            title = "支付";
+        } else {
+            title = URLEncoder.encode(title, "UTF-8");
+        }
+        if (StringUtils.isEmpty(description)) {
+            description = "支付金额(分): " + moneyCent;
+        } else {
+            description = URLEncoder.encode(description, "UTF-8");
+        }
         AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest(); //创建API对应的request
-        alipayRequest.setReturnUrl("http://domain.com/CallBack/return_url.jsp");
-        alipayRequest.setNotifyUrl("http://domain.com/CallBack/notify_url.jsp"); //在公共参数中设置回跳和通知地址
+        alipayRequest.setReturnUrl(callbackUrl);
+        alipayRequest.setNotifyUrl(""); // 异步回调的通知地址
         alipayRequest.setBizContent("{" +
-                "    \"out_trade_no\":\"20150320010101001\"," +
-                "    \"product_code\":\"FAST_INSTANT_TRADE_PAY\"," +
-                "    \"total_amount\":88.88," +
-                "    \"subject\":\"Iphone6 16G\"," +
-                "    \"body\":\"Iphone6 16G\"," +
-                "    \"passback_params\":\"merchantBizType%3d3C%26merchantBizNo%3d2016010101111\"," +
-                "    \"extend_params\":{" +
-                "    \"sys_service_provider_id\":\"2088511833207846\"" +
-                "    }" +
-                "  }"); //填充业务参数
+                "\"out_trade_no\":\"" + orderNo + "\"," +
+                "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"," +
+                "\"total_amount\":" + transMoneyToYuan(moneyCent) + "," +
+                "\"subject\":\"" + title + "\"," +
+                "\"body\":\"" + description + "\"" +
+                //"    \"passback_params\":\"merchantBizType%3d3C%26merchantBizNo%3d2016010101111\"," +
+                //"    \"extend_params\":{\"sys_service_provider_id\":\"2088511833207846\"}" +
+                "}"); //填充业务参数
 
         AlipayTradePagePayResponse response = getClient().pageExecute(alipayRequest, "GET");
-        //获取需提交的form表单
-        String submitFormData = response.getBody();
-        //客户端拿到submitFormData做表单提交
+        if (response.isSuccess()) {
+            String payUrl = response.getBody();
+            log.info("getPayUrl账号:{} 参数:{} 成功结果:{}", account, moneyCent, payUrl);
+            PayOrder ret = PayOrder.builder()
+                    .orderNo(orderNo)
+                    .name(account)
+                    .money(moneyCent)
+                    .payUrl(payUrl)
+                    .build();
+            return ret;
+        }
+        log.error("getPayUrl账号:{} 参数 {} 失败结果: {}", account, moneyCent, response.getBody());
+        throw new RuntimeException("请求支付宝支付失败");
+    }
+
+    /**
+     * 把分的单位转换为元，并保留2位小数
+     *
+     * @param moneyCent 金额，单位分
+     * @return 单位:元的字符串
+     */
+    private static String transMoneyToYuan(int moneyCent) {
+        return String.format("%.2f", moneyCent / 100F);
     }
 }

@@ -1,15 +1,13 @@
 package com.chaoip.ipproxy.controller;
 
 import com.alipay.api.AlipayApiException;
-import com.chaoip.ipproxy.controller.dto.IdentifyDto;
-import com.chaoip.ipproxy.controller.dto.PasswordDto;
-import com.chaoip.ipproxy.controller.dto.SmsDto;
-import com.chaoip.ipproxy.controller.dto.UserDto;
+import com.chaoip.ipproxy.controller.dto.*;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
 import com.chaoip.ipproxy.repository.entity.RealOrder;
 import com.chaoip.ipproxy.repository.entity.ValidCode;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
+import com.chaoip.ipproxy.service.PayService;
 import com.chaoip.ipproxy.service.RealOrderService;
 import com.chaoip.ipproxy.service.ValidCodeService;
 import com.chaoip.ipproxy.util.ImgHelper;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,11 +39,16 @@ public class UserController {
     private final BeinetUserService userService;
     private final ValidCodeService codeService;
     private final RealOrderService realOrderService;
+    private final PayService payService;
 
-    public UserController(BeinetUserService userService, ValidCodeService codeService, RealOrderService realOrderService) {
+    public UserController(BeinetUserService userService,
+                          ValidCodeService codeService,
+                          RealOrderService realOrderService,
+                          PayService payService) {
         this.userService = userService;
         this.codeService = codeService;
         this.realOrderService = realOrderService;
+        this.payService = payService;
     }
 
     @GetMapping("")
@@ -160,6 +164,21 @@ public class UserController {
             return phoneStr(code.getRealName() + ", 您好，您已认证成功。<p>请回到认证页面，进行刷新。</p>");
         }
         return phoneStr("您好，您的认证信息有误，请确认: " + code.getRealName());
+    }
+
+
+    /**
+     * 申请支付，返回支付宝支付url
+     *
+     * @param money 支持金额，单位分
+     * @return url
+     */
+    @PostMapping("pay")
+    public String pay(@RequestBody ChargeDto money, AuthDetails details) throws UnsupportedEncodingException, AlipayApiException {
+        if (details == null) {
+            throw new IllegalArgumentException("获取登录信息失败");
+        }
+        return payService.getPayUrl(money, details.getUserName());
     }
 
     /**

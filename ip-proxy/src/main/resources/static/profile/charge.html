@@ -13,73 +13,52 @@
 
 <body style="height: 900px;">
 <div id="divApp" style="height: 100%;">
-    我是充值页面
+    <el-main v-show="showTab===13" style="width: 500px;">
+        <div style="text-align:center;font-weight:bold;">用户充值</div>
+        <br>
+        <el-form :model="userCharge" :rules="rulesUserCharge" ref="userChargeForm">
+            <el-form-item label="充值金额" label-width="200px" prop="money">
+                <el-input v-model="userCharge.money" placeholder="请输入充值金额" maxlength="20"></el-input>
+            </el-form-item>
+            <el-form-item label="充值说明" label-width="200px" prop="title">
+                <el-input v-model="userCharge.title" placeholder="请输入充值说明" maxlength="20"></el-input>
+            </el-form-item>
+            <el-form-item label="充值备注" label-width="200px" prop="description">
+                <el-input v-model="userCharge.description" placeholder="请输入充值备注" maxlength="20"></el-input>
+            </el-form-item>
+        </el-form>
+        <div style="text-align: center">
+            <el-button type="primary" @click="doCharge('userChargeForm')"
+                       v-if="isRealNameValidated">去支付
+            </el-button>
+            <span v-if="!isRealNameValidated" style="color:red;">您的实名认证尚未通过，无法充值</span>
+        </div>
+    </el-main>
 </div>
 
 <script>
     var vueApp = new Vue({
         el: '#divApp',
         data: function () {
-            let validatePass = (rule, value, callback) => {
-                if (this.changePwd.password != this.changePwd.passwordConfirm)
-                    return callback(new Error('两次密码输入不一致.'));
-                return callback();
-            };
-
             return {
                 showTab: 11,
                 user: {},
                 imgSrc: '/favicon.ico',
 
-                chargePage: '',  // 充值页面
-                userIpPage: '',  // 用户ip列表页
-                adminIpPage: '', // 管理ip列表页
-                adminUserPage: '',// 管理用户列表页
-                realNameValidateQrCode: '',
-
-                changePwd: {
-                    passwordOld: '',
-                    password: '',
-                    passwordConfirm: '',
+                userCharge: {
+                    money: 1000,
+                    title: '充值',
+                    description: '充值',
                 },
-                rulesChangePwd: {
-                    passwordOld: [
-                        {required: true, message: '旧密码必填', trigger: 'blur'},
-                    ],
-                    password: [
-                        {required: true, message: '新密码必填', trigger: 'blur'},
-                        {min: 6, max: 30, message: '新密码长度为6~30个字符', trigger: 'blur'},
-                    ],
-                    passwordConfirm: [
-                        {required: true, message: '密码必填', trigger: 'blur'},
-                        {min: 6, max: 30, message: '密码长度为6~30个字符', trigger: 'blur'},
-                        {validator: validatePass, trigger: 'blur'},
-                    ],
-                },
-
-                realnameIdentify: {
-                    realName: '',
-                    identity: '',
-                    imgSn: '',
-                    imgCode: '',
-                },
-                rulesRealnameIdentify: {
-                    realName: [
-                        {required: true, message: '真实姓名必填', trigger: 'blur'},
-                    ],
-                    identity: [
-                        {required: true, message: '身份证号必填', trigger: 'blur'},
-                        {pattern: /^\d{17}[\dXx]$/, message: '身份证号格式有误'}
+                rulesUserCharge: {
+                    rulesUserCharge: [
+                        {required: true, message: '金额必填', trigger: 'blur'},
+                        {pattern: /^\d+(\.\d{1,2})?$/, message: '金额格式有误'}
                     ],
                 },
             }
         },
         created: function () {
-            // 这3个值在created才赋值，是避免iframe加载2次html
-            this.userIpPage = '/list.html';
-            this.adminIpPage = '/admin/list.html';
-            this.adminUserPage = '/admin/user.html';
-
             let url = '/user';
             axios.get(url).then(response => {
                 if (!response || !response.data) {
@@ -87,26 +66,7 @@
                     return;
                 }
                 this.user = response.data;
-                this.realnameIdentify.realName = this.user.realName;
-                this.realnameIdentify.identity = this.user.identity;
-                if (this.user.realName && this.user.identity) {
-                    // 需要清除校验
-                    setTimeout(() => {
-                        vueApp.$refs['realnameIdentifyForm'].clearValidate();
-                    }, 1000);
-                }
             }).catch(error => this.ajaxError(error));
-        },
-        mounted: function () {
-            // //* iframe-宽高自适应显示
-            // let frames = document.getElementsByTagName('IFRAME');
-            // let deviceWidth = document.documentElement.clientWidth;
-            // let deviceHeight = document.documentElement.clientHeight;
-            // for (let i = 0, j = frames.length; i < j; i++) {
-            //     let item = frames[i];
-            //     item.style.width = (Number(deviceWidth) - 220) + 'px'; //数字是页面布局宽度差值
-            //     item.style.height = (Number(deviceHeight) - 120) + 'px'; //数字是页面布局高度差
-            // }
         },
         computed: {
             isRealNameValidated: function () {
@@ -114,20 +74,7 @@
             },
         },
         methods: {
-            switchTab: function (tab) {
-                this.showTab = tab;
-                if (tab === 13) {
-                    this.getImgCode();
-                }
-            },
-            goProfile: function () {
-                location.href = '/profile/user.html';
-            },
-            doLogout: function () {
-                let url = '/logout';
-                location.href = url;
-            },
-            doChangePwd: function (form) {
+            doCharge: function (form) {
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
