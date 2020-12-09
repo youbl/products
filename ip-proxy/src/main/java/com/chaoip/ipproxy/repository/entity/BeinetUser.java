@@ -42,6 +42,10 @@ public class BeinetUser implements UserDetails {
     private String roles = "USER";
     private LocalDateTime creationTime;
     private int status;
+    /**
+     * 用户余额，单位分，新字段，因此要用 Integer
+     */
+    private Integer money;
 
     /**
      * 给用户计算一个密钥，后续作为api使用

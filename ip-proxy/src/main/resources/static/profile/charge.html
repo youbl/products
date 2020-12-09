@@ -18,8 +18,8 @@
         <br>
         <el-form :model="userCharge" :rules="rulesUserCharge" ref="userChargeForm">
             <el-form-item label="充值金额" label-width="200px" prop="money">
-                <el-input v-model="userCharge.money" placeholder="请输入充值金额" maxlength="20"></el-input>
-                <span>金额单位：元</span>
+                <el-input v-model="userCharge.money" placeholder="请输入充值金额" maxlength="20" style="width:50%;"></el-input>
+                <span>&nbsp;&nbsp;单位：元</span>
             </el-form-item>
             <el-form-item label="充值说明" label-width="200px" prop="title">
                 <el-input v-model="userCharge.title" placeholder="请输入充值说明" maxlength="20"></el-input>
@@ -90,7 +90,7 @@
                             return;
                         }
                         // 返回充值地址，跳转过去付钱
-                        top.href = response.data;
+                        top.location.href = response.data;
                     }).catch(error => this.ajaxError(error));
                 });
             },

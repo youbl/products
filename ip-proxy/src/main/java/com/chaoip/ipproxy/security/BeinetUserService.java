@@ -294,4 +294,7 @@ public class BeinetUserService implements UserDetailsService {
         return opnUser.get();
     }
 
+    public BeinetUser save(BeinetUser user) {
+        return userRepository.save(user);
+    }
 }
