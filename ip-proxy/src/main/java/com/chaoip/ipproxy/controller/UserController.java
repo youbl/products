@@ -3,6 +3,7 @@ package com.chaoip.ipproxy.controller;
 import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.*;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
+import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.repository.entity.RealOrder;
 import com.chaoip.ipproxy.repository.entity.ValidCode;
 import com.chaoip.ipproxy.security.AuthDetails;
@@ -179,7 +180,8 @@ public class UserController {
         if (details == null) {
             throw new IllegalArgumentException("获取登录信息失败");
         }
-        return payService.getPayUrl(money, details.getUserName());
+        PayOrder order = payService.addOrder(money, details.getUserName());
+        return order.getPayUrl();
     }
 
     /**
@@ -190,19 +192,23 @@ public class UserController {
      * @throws AlipayApiException 异常
      */
     @GetMapping("payback/{orderNo}")
-    public String payback(@PathVariable(required = false) String orderNo) throws AlipayApiException {
+    public String payback(@PathVariable(required = false) String orderNo) throws AlipayApiException, JsonProcessingException {
         if (StringUtils.isEmpty(orderNo)) {
             return phoneStr("订单号不能为空");
         }
-        RealOrder code = realOrderService.findByOrder(orderNo);
-        if (code == null || StringUtils.isEmpty(code.getCertId())) {
-            return phoneStr("订单不存在: " + orderNo);
+        if (payService.queryOrderStatus(orderNo)) {
+            return jumpBack(); // 充值是在pc，可以直接jump跳回去
+            // return phoneStr("您的充值已完成成功。<p>请回到充值页面，进行刷新。</p>");
         }
-        return "OK";
+        return phoneStr("您的充值过程中出现问题，请稍候重试，如果已支付成功，请稍候刷新页面");
     }
 
     private String phoneStr(String msg) {
         return "<html><body style='font-size:50px;'>" + msg + "</body></html>";
+    }
+
+    private String jumpBack() {
+        return "<html><body style='font-size:50px;'><script>location.href='/profile/user.html';</script></body></html>";
     }
 
     /**

@@ -13,12 +13,13 @@
 
 <body style="height: 900px;">
 <div id="divApp" style="height: 100%;">
-    <el-main v-show="showTab===13" style="width: 500px;">
+    <el-main style="width: 500px;">
         <div style="text-align:center;font-weight:bold;">用户充值</div>
         <br>
         <el-form :model="userCharge" :rules="rulesUserCharge" ref="userChargeForm">
             <el-form-item label="充值金额" label-width="200px" prop="money">
                 <el-input v-model="userCharge.money" placeholder="请输入充值金额" maxlength="20"></el-input>
+                <span>金额单位：元</span>
             </el-form-item>
             <el-form-item label="充值说明" label-width="200px" prop="title">
                 <el-input v-model="userCharge.title" placeholder="请输入充值说明" maxlength="20"></el-input>
@@ -37,11 +38,10 @@
 </div>
 
 <script>
-    var vueApp = new Vue({
+    const vueApp = new Vue({
         el: '#divApp',
         data: function () {
             return {
-                showTab: 11,
                 user: {},
                 imgSrc: '/favicon.ico',
 
@@ -51,7 +51,7 @@
                     description: '充值',
                 },
                 rulesUserCharge: {
-                    rulesUserCharge: [
+                    money: [
                         {required: true, message: '金额必填', trigger: 'blur'},
                         {pattern: /^\d+(\.\d{1,2})?$/, message: '金额格式有误'}
                     ],
@@ -78,55 +78,21 @@
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
-                    let url = '/user/pwd';
-                    axios.post(url, this.changePwd).then(response => {
+                    let url = '/user/pay';
+                    let args = {
+                        money: this.userCharge.money * 100, // 接口单位是分
+                        title: this.userCharge.title,
+                        description: this.userCharge.description
+                    };
+                    axios.post(url, args).then(response => {
                         if (!response || !response.data) {
-                            alert('修改失败');
+                            alert('充值失败');
                             return;
                         }
-                        alert('修改成功');
+                        // 返回充值地址，跳转过去付钱
+                        top.href = response.data;
                     }).catch(error => this.ajaxError(error));
                 });
-            },
-            getImgCode: function () {
-                let url = '/user/img';
-                axios.get(url).then(response => {
-                    if (!response || !response.data || !response.data.sn) {
-                        return alert('获取图形验证码失败');
-                    }
-                    this.imgSrc = "data:image/jpg;base64," + response.data.img;
-                    this.realnameIdentify.imgSn = response.data.sn;
-                }).catch(error => this.ajaxError(error));
-            },
-            doRealNameIdentify: function (form) {
-                this.$refs[form].validate(valid => {
-                    if (!valid)
-                        return false;
-                    let url = '/user/identify';
-                    axios.post(url, this.realnameIdentify).then(response => {
-                        if (!response || !response.data) {
-                            this.getImgCode();
-                            alert('认证失败');
-                            return;
-                        }
-                        this.realNameValidateQrCode = "data:image/jpg;base64," + response.data;
-                        // this.openAliVerify(response.data);
-                    }).catch(error => {
-                        this.getImgCode();
-                        this.ajaxError(error);
-                    });
-                });
-            },
-
-            openAliVerify: function (html) {
-                html = html.replace("<form", "<form target=\"_blank\"");// .replace(/&quot;/g, "'");
-                let frame = document.getElementsByName("frameRealName")[0];
-                frame.contentWindow.document.write(html);
-                setTimeout(function () {
-                    frame.contentWindow.document.close();// 避免认证失败，再次提交不了
-                }, 1000);
-                // let newWin = window.open('');
-                // newWin.document.write(html);
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {
@@ -142,61 +108,6 @@
             },
         },
     });
-
-
-    /**
-     * 滚动到窗口底部
-     */
-    function toWindowBottom() {
-        window.scrollTo(0, getWindowHeight());
-    }
-
-    /**
-     * 获取窗口高度
-     * @return {number} 窗口高度值
-     */
-    function getWindowHeight() {
-        // body是chrome，documentElement是IE和Firefox
-        return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    }
-
-    /**
-     * 获取url里的变量值
-     * @param {string} name 变量名
-     * @return {string} 变量值
-     */
-    function getQueryString(name) {
-        if (typeof (name) !== 'string') {
-            return '';
-        }
-        name = name.trim();
-        if (name.length === 0) {
-            return '';
-        }
-        let localSearch = location.search.toLocaleLowerCase();
-        name = name.toLowerCase() + '=';
-        let tmpName = '?' + name;
-        let idx = localSearch.indexOf(tmpName);
-        if (idx < 0) {
-            tmpName = '&' + name;
-            idx = localSearch.indexOf(tmpName);
-            if (idx < 0) {
-                return '';
-            }
-        }
-        name = tmpName;
-        let tmp = location.search.substr(idx + name.length);
-        idx = tmp.indexOf('&');
-        if (idx === 0)
-            return '';
-        let ret;
-        if (idx < 0) {
-            ret = tmp;
-        } else {
-            ret = tmp.substr(0, idx);
-        }
-        return decodeURIComponent(ret.trim());
-    }
 </script>
 </body>
 </html>

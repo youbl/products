@@ -6,10 +6,10 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import sun.misc.BASE64Encoder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,8 +58,8 @@ public class QrcodeHelper {
             MatrixToImageWriter.writeToStream(img, "png", stream);
             bytes = stream.toByteArray();
         }
-        BASE64Encoder encoder = new BASE64Encoder();
-        String png_base64 = encoder.encodeBuffer(bytes).trim();//转换成base64串
-        return png_base64.replaceAll("[\\r\\n]", "");
+
+        String base64 = Base64.getEncoder().encodeToString(bytes).trim();//转换成base64串
+        return base64.replaceAll("[\\r\\n]", "");
     }
 }

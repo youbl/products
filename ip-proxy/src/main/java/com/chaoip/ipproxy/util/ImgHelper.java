@@ -1,12 +1,11 @@
 package com.chaoip.ipproxy.util;
 
-import sun.misc.BASE64Encoder;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Random;
 
 public class ImgHelper {
@@ -52,9 +51,8 @@ public class ImgHelper {
             ImageIO.write(img, "JPEG", stream);
             bytes = stream.toByteArray();
         }
-        BASE64Encoder encoder = new BASE64Encoder();
-        String png_base64 = encoder.encodeBuffer(bytes).trim();//转换成base64串
-        return png_base64.replaceAll("[\\r\\n]", "");
+        String base64 = Base64.getEncoder().encodeToString(bytes).trim();//转换成base64串
+        return base64.replaceAll("[\\r\\n]", "");
     }
 
 
