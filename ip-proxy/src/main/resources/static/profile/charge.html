@@ -69,10 +69,14 @@
                             label="备注"
                             width="300">
                     </el-table-column>
-                    <el-table-column
-                            prop="statusName"
-                            label="状态"
-                            width="70">
+                    <el-table-column label="状态">
+                        <template slot-scope="scope">
+                            <el-button v-if="scope.row.status=='NO_PAY'"
+                                       size="mini"
+                                       @click="goPay(scope.$index, scope.row)">去支付
+                            </el-button>
+                            <span v-if="scope.row.status!='NO_PAY'">{{scope.row.statusName}}</span>
+                        </template>
                     </el-table-column>
                     <el-table-column
                             prop="payTime"
@@ -131,6 +135,9 @@
             },
         },
         methods: {
+            goPay: function (idx, row) {
+                top.location.href = row.payUrl;
+            },
             loadChargsDatas: function () {
                 let url = '/user/charges';
                 axios.get(url).then(response => {
