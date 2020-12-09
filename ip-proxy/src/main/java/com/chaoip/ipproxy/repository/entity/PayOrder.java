@@ -38,6 +38,8 @@ public class PayOrder {
     @Indexed(unique = true)
     private String orderNo;
 
+    private String title;
+    private String description;
     /**
      * 支付宝支付地址
      */

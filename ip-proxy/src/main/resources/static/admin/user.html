@@ -21,6 +21,8 @@
             <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
             <el-button @click="getAfterPage" :disabled="isLastPage">下一页</el-button>
             <span>&nbsp;当前第 {{page+1}} 页，总记录数 {{userTotalNum}} 条</span>
+
+            <button onclick="location.reload()">刷新</button>
         </div>
         <div style="float: right">
             <el-link type="warning" href="/logout">退出登录</el-link>
@@ -63,6 +65,11 @@
                         prop="creationTime"
                         label="注册时间"
                         width="230">
+                </el-table-column>
+                <el-table-column
+                        prop="money"
+                        label="余额"
+                        width="120">
                 </el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
@@ -116,6 +123,10 @@
                         this.isLastPage = true;
                         alert('无数据');
                         return;
+                    }
+                    for (let i = 0, j = response.data.content.length; i < j; i++) {
+                        let item = response.data.content[i];
+                        item.money = item.money / 100;
                     }
                     this.userData = response.data.content;
                     this.userTotalNum = response.data.totalElements;

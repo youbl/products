@@ -1,10 +1,16 @@
 package com.chaoip.ipproxy.controller;
 
+import com.alipay.api.AlipayApiException;
+import com.chaoip.ipproxy.controller.dto.ChargeDto;
 import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
+import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.repository.entity.Route;
+import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
+import com.chaoip.ipproxy.service.ManagerService;
+import com.chaoip.ipproxy.service.PayService;
 import com.chaoip.ipproxy.service.RouteService;
 import com.chaoip.ipproxy.service.SiteConfigService;
 import com.chaoip.ipproxy.util.config.AliPayConfig;
@@ -15,6 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,13 +40,16 @@ public class ManageController {
     private final RouteService routeService;
     private final BeinetUserService userService;
     private final SiteConfigService siteConfigService;
+    private final ManagerService managerService;
 
     public ManageController(RouteService routeService,
                             BeinetUserService userService,
-                            SiteConfigService siteConfigService) {
+                            SiteConfigService siteConfigService,
+                            ManagerService managerService) {
         this.routeService = routeService;
         this.userService = userService;
         this.siteConfigService = siteConfigService;
+        this.managerService = managerService;
     }
 
     @GetMapping("routes")
@@ -148,5 +160,31 @@ public class ManageController {
     public boolean verifyConfig(@RequestBody VerifyConfig config) throws JsonProcessingException {
         siteConfigService.savetVerifyConfig(config);
         return true;
+    }
+
+
+    /**
+     * 管理员充值
+     *
+     * @param money 支持金额，单位分
+     * @return 成功失败
+     */
+    @PostMapping("pay")
+    public BeinetUser pay(@RequestBody ChargeDto money, AuthDetails details) {
+        if (details == null) {
+            throw new IllegalArgumentException("获取登录信息失败");
+        }
+        money.setDescription(details.getUserName() + ":" + money.getDescription());
+        return managerService.chargeUser(money);
+    }
+
+    /**
+     * 返回所有用户的充值记录
+     *
+     * @return 记录
+     */
+    @GetMapping("charges")
+    public List<PayOrder> getCharges() {
+        return managerService.findCharges();
     }
 }

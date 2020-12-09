@@ -96,12 +96,13 @@ public class BeinetUserService implements UserDetailsService {
      * 根据登录账号查找用户
      *
      * @param name 账号
+     * @param hide 是否隐藏重要属性
      * @return 对象
      */
-    public BeinetUser findByName(String name) {
+    public BeinetUser findByName(String name, boolean hide) {
         BeinetUser user = userRepository.findByName(name);
 
-        if (user != null) {
+        if (hide && user != null) {
             String replace = "$1****$2";
             // 隐藏密码
             user.setPassword("");

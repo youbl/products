@@ -21,4 +21,6 @@ public interface PayOrderRepository extends BaseRepository<PayOrder, Long> {
     PayOrder findByOrderNo(String orderNo);
 
     List<PayOrder> findByNameOrderByCreationTimeDesc(String name);
+
+    List<PayOrder> findByOrderByCreationTimeDesc();
 }

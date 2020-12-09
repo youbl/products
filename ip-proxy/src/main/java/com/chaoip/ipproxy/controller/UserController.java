@@ -58,7 +58,7 @@ public class UserController {
     public BeinetUser userName(AuthDetails details) {
         if (details == null)
             return null;
-        return userService.findByName(details.getUserName());
+        return userService.findByName(details.getUserName(), true);
     }
 
     /**
@@ -212,6 +212,12 @@ public class UserController {
         return "<html><body style='font-size:50px;'><script>location.href='/profile/user.html';</script></body></html>";
     }
 
+    /**
+     * 返回当前登录用户的充值记录
+     *
+     * @param details 登录人
+     * @return 记录
+     */
     @GetMapping("charges")
     public List<PayOrder> getCharges(AuthDetails details) {
         return payService.findOrder(details.getUserName());

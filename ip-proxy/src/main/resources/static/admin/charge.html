@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>充值页面</title>
+    <title>管理充值页面</title>
     <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
     <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
     <script src="/res/unpkg/elemeIndex.js"></script>
@@ -13,32 +13,11 @@
 
 <body style="height: 900px;">
 <div id="divApp" style="height: 100%;">
+    <button onclick="location.reload()">刷新</button>
     <template>
         <el-tabs v-model="tab.activeTab">
-            <el-tab-pane label="用户充值" name="first" style="width:500px;">
-                <el-form :model="userCharge" :rules="rulesUserCharge" ref="userChargeForm">
-                    <el-form-item label="充值金额" label-width="200px" prop="money">
-                        <el-input v-model="userCharge.money" placeholder="请输入充值金额" maxlength="20"
-                                  style="width:50%;"></el-input>
-                        <span>&nbsp;&nbsp;单位：元</span>
-                    </el-form-item>
-                    <el-form-item label="充值说明" label-width="200px" prop="title">
-                        <el-input v-model="userCharge.title" placeholder="请输入充值说明" maxlength="20"></el-input>
-                    </el-form-item>
-                    <el-form-item label="充值备注" label-width="200px" prop="description">
-                        <el-input v-model="userCharge.description" placeholder="请输入充值备注" maxlength="20"></el-input>
-                    </el-form-item>
-                </el-form>
-                <div style="text-align: center">
-                    <el-button type="primary" @click="doCharge('userChargeForm')"
-                               v-if="isRealNameValidated">去支付
-                    </el-button>
-                    <span v-if="!isRealNameValidated" style="color:red;">您的实名认证尚未通过，无法充值</span>
-                </div>
-            </el-tab-pane>
 
-
-            <el-tab-pane label="充值记录" name="second">
+            <el-tab-pane label="充值记录" name="first">
                 <el-table
                         :data="chargeData"
                         stripe
@@ -53,6 +32,11 @@
                             prop="orderNo"
                             label="订单号"
                             width="200">
+                    </el-table-column>
+                    <el-table-column
+                            prop="name"
+                            label="充值用户"
+                            width="100">
                     </el-table-column>
                     <el-table-column
                             prop="money"
@@ -86,6 +70,29 @@
                     </el-table-column>
                 </el-table>
             </el-tab-pane>
+
+            <el-tab-pane label="为指定用户充值" name="second" style="width:500px;">
+                <el-form :model="userCharge" :rules="rulesUserCharge" ref="userChargeForm">
+                    <el-form-item label="充值账号" label-width="200px" prop="name">
+                        <el-input v-model="userCharge.name" placeholder="请输入充值账号" maxlength="20"></el-input>
+                    </el-form-item>
+                    <el-form-item label="充值金额" label-width="200px" prop="money">
+                        <el-input v-model="userCharge.money" placeholder="请输入充值金额" maxlength="20"
+                                  style="width:50%;"></el-input>
+                        <span>&nbsp;&nbsp;单位：元</span>
+                    </el-form-item>
+                    <el-form-item label="充值说明" label-width="200px" prop="title">
+                        <el-input v-model="userCharge.title" placeholder="请输入充值说明" maxlength="20"></el-input>
+                    </el-form-item>
+                    <el-form-item label="充值备注" label-width="200px" prop="description">
+                        <el-input v-model="userCharge.description" placeholder="请输入充值备注" maxlength="20"></el-input>
+                    </el-form-item>
+                </el-form>
+                <div style="text-align: center">
+                    <el-button type="primary" @click="doCharge('userChargeForm')">充值</el-button>
+                </div>
+            </el-tab-pane>
+
         </el-tabs>
     </template>
 </div>
@@ -102,11 +109,15 @@
                 chargeData: [],
 
                 userCharge: {
+                    name: '',
                     money: 1000,
-                    title: '充值',
-                    description: '充值',
+                    title: '管理员充值',
+                    description: '管理员充值',
                 },
                 rulesUserCharge: {
+                    name: [
+                        {required: true, message: '账号必填', trigger: 'blur'}
+                    ],
                     money: [
                         {required: true, message: '金额必填', trigger: 'blur'},
                         {pattern: /^\d+(\.\d{1,2})?$/, message: '金额格式有误'}
@@ -115,6 +126,8 @@
             }
         },
         created: function () {
+            this.showReload();
+
             let url = '/user';
             axios.get(url).then(response => {
                 if (!response || !response.data) {
@@ -125,14 +138,19 @@
                 this.loadChargsDatas();
             }).catch(error => this.ajaxError(error));
         },
-        computed: {
-            isRealNameValidated: function () {
-                return this.user.realName && this.user.identity;
-            },
-        },
         methods: {
+            showReload: function () {
+                // this.$notify({
+                //     width: '600px',
+                //     title: '',
+                //     duration: 0,
+                //     dangerouslyUseHTMLString: true,
+                //     message: '<button onclick="location.reload()">刷新</button>',
+                //     showClose: false,
+                // });
+            },
             loadChargsDatas: function () {
-                let url = '/user/charges';
+                let url = '/manage/charges';
                 axios.get(url).then(response => {
                     if (!response || !response.data) {
                         alert('获取失败');
@@ -163,8 +181,9 @@
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
-                    let url = '/user/pay';
+                    let url = '/manage/pay';
                     let args = {
+                        name: this.userCharge.name,
                         money: this.userCharge.money * 100, // 接口单位是分
                         title: this.userCharge.title,
                         description: this.userCharge.description
@@ -174,8 +193,7 @@
                             alert('充值失败');
                             return;
                         }
-                        // 返回充值地址，跳转过去付钱
-                        top.location.href = response.data;
+                        alert('充值成功，用户当前余额：' + (response.data.money / 100));
                     }).catch(error => this.ajaxError(error));
                 });
             },

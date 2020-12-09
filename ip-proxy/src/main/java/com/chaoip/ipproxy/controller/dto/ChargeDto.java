@@ -15,7 +15,7 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 public class ChargeDto {
-
+    private String name;
     @Min(value = 100, message = "金额最少1元")
     @Max(value = 100000000, message = "金额最多100万元")
     private int money;

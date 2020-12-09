@@ -81,6 +81,8 @@ public class AliPayHelper extends AliBase {
                     .name(account)
                     .money(moneyCent)
                     .payUrl(payUrl)
+                    .title(title)
+                    .description(description)
                     .status(PayOrder.PayStatus.NO_PAY)
                     .build();
         }

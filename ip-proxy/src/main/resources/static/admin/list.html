@@ -23,6 +23,8 @@
             <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
             <el-button @click="getAfterPage" :disabled="isLastPage">下一页</el-button>
             <span>&nbsp;当前第 {{page+1}} 页，总记录数 {{ipTotalNum}} 条</span>
+
+            <button onclick="location.reload()">刷新</button>
         </div>
         <div style="float: right">
             <el-link type="warning" href="/logout">退出登录</el-link>

@@ -47,6 +47,13 @@ public class BeinetUser implements UserDetails {
      */
     private Integer money;
 
+    public int getMoney() {
+        if (money == null) {
+            return 0;
+        }
+        return money;
+    }
+
     /**
      * 给用户计算一个密钥，后续作为api使用
      *
