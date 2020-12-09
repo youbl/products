@@ -2,6 +2,8 @@ package com.chaoip.ipproxy.repository;
 
 import com.chaoip.ipproxy.repository.entity.PayOrder;
 
+import java.util.List;
+
 /**
  * 站点配置仓储
  *
@@ -17,4 +19,6 @@ public interface PayOrderRepository extends BaseRepository<PayOrder, Long> {
      * @return 订单记录
      */
     PayOrder findByOrderNo(String orderNo);
+
+    List<PayOrder> findByNameOrderByCreationTimeDesc(String name);
 }

@@ -25,6 +25,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -209,6 +210,11 @@ public class UserController {
 
     private String jumpBack() {
         return "<html><body style='font-size:50px;'><script>location.href='/profile/user.html';</script></body></html>";
+    }
+
+    @GetMapping("charges")
+    public List<PayOrder> getCharges(AuthDetails details) {
+        return payService.findOrder(details.getUserName());
     }
 
     /**

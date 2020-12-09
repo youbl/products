@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 支付服务类
@@ -42,6 +43,14 @@ public class PayService {
     public PayOrder addOrder(ChargeDto money, String name) throws AlipayApiException, JsonProcessingException {
         PayOrder order = aliPayHelper.getPayUrl(name, money.getMoney(), money.getTitle(), money.getDescription());
         return payOrderRepository.save(order);
+    }
+
+    public List<PayOrder> findOrder(String name) {
+        List<PayOrder> ret = payOrderRepository.findByNameOrderByCreationTimeDesc(name);
+        ret.stream().forEach(item -> {
+            item.setPayUrl(""); // 不返回支付地址
+        });
+        return ret;
     }
 
     /**
