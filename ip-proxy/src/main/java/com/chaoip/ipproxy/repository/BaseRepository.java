@@ -1,9 +1,6 @@
 package com.chaoip.ipproxy.repository;
 
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -22,12 +19,15 @@ public interface BaseRepository<T, ID> extends MongoRepository<T, ID> {
      * @param example  查找条件
      * @param pageNum  第几页，从0开始
      * @param pageSize 每页几条
+     * @param sort     排序字段
+     * @param isDesc   是否倒序
      * @return 分页对象
      */
-    default Page<T> pageSearch(Example<T> example, int pageNum, int pageSize) {
+    default Page<T> pageSearch(Example<T> example, int pageNum, int pageSize, String sort, boolean isDesc) {
         pageNum = Math.max(pageNum, 0);
         pageSize = pageSize > 0 && pageSize < 100 ? pageSize : 20;
-        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Sort.Direction direction = isDesc ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(pageNum, pageSize, direction, sort);
         // getContent是记录，getTotalElements是总记录数，用于前端分页
         return findAll(example, pageable);
     }

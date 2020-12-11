@@ -234,7 +234,7 @@ public class BeinetUserService implements UserDetailsService {
         matcher = matcher.withIgnorePaths("creationTime");
 //        }
         Example<BeinetUser> example = Example.of(condition, matcher);
-        return userRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize());
+        return userRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize(), "creationTime", true);
     }
 
 

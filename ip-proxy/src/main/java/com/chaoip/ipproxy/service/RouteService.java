@@ -31,6 +31,10 @@ public class RouteService {
         return dtos.size();
     }
 
+    public List<Route> getTop() {
+        return routeRepository.findTopRoute(PageRequest.of(0, 8));//, Sort.Direction.DESC, "creationTime"));
+    }
+
     public Page<Route> getAll(RouteDto dto) {
         // 不使用的属性，必须要用 withIgnorePaths 忽略，否则会列入条件
         ExampleMatcher matcher = ExampleMatcher.matching()
@@ -61,6 +65,6 @@ public class RouteService {
             matcher = matcher.withIgnorePaths("protocal");
         }
         Example<Route> example = Example.of(dto.mapTo(), matcher);
-        return routeRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize());
+        return routeRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize(), "creationTime", true);
     }
 }
