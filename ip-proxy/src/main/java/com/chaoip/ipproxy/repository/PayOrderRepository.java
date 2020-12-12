@@ -5,7 +5,7 @@ import com.chaoip.ipproxy.repository.entity.PayOrder;
 import java.util.List;
 
 /**
- * 站点配置仓储
+ * 支付订单仓储
  *
  * @author youbl
  * @version 1.0

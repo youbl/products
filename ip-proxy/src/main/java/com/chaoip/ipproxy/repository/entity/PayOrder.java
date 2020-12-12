@@ -53,7 +53,7 @@ public class PayOrder {
     /**
      * 充值状态
      */
-    private PayStatus status;
+    private OrderStatus status;
     /**
      * 支付成功时间
      */
@@ -65,18 +65,4 @@ public class PayOrder {
     @CreatedDate
     private LocalDateTime creationTime;
 
-    public enum PayStatus {
-        /**
-         * 未支付
-         */
-        NO_PAY,
-        /**
-         * 支付失败
-         */
-        FAIL,
-        /**
-         * 支付成功
-         */
-        SUCCESS
-    }
 }

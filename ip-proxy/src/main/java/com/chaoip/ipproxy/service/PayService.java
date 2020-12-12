@@ -4,6 +4,7 @@ import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.ChargeDto;
 import com.chaoip.ipproxy.repository.PayOrderRepository;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
+import com.chaoip.ipproxy.repository.entity.OrderStatus;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.util.AliPayHelper;
@@ -85,17 +86,17 @@ public class PayService {
         if (order.getMoney() <= 0) {
             throw new RuntimeException(orderNo + " 订单金额有误：" + order.getMoney());
         }
-        if (order.getStatus() != PayOrder.PayStatus.NO_PAY) {
+        if (order.getStatus() != OrderStatus.NO_PAY) {
             throw new RuntimeException("您的订单已处理完毕: " + orderNo);
         }
 
         boolean ret = aliPayHelper.queryPayResult(order);
         order.setPayTime(LocalDateTime.now());
         if (ret) {
-            order.setStatus(PayOrder.PayStatus.SUCCESS);
+            order.setStatus(OrderStatus.SUCCESS);
             addMoney(order.getName(), order.getMoney());
         } else {
-            order.setStatus(PayOrder.PayStatus.FAIL);
+            order.setStatus(OrderStatus.FAIL);
         }
         payOrderRepository.save(order);
         return ret;
@@ -120,7 +121,7 @@ public class PayService {
                 .payUrl("")
                 .title(money.getTitle())
                 .description(money.getDescription())
-                .status(PayOrder.PayStatus.SUCCESS)
+                .status(OrderStatus.SUCCESS)
                 .build();
         save(order);
         return user;

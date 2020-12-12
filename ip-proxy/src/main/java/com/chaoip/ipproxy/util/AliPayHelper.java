@@ -5,6 +5,7 @@ import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.chaoip.ipproxy.repository.entity.OrderStatus;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.service.SiteConfigService;
 import com.chaoip.ipproxy.util.config.AliConfigBase;
@@ -83,7 +84,7 @@ public class AliPayHelper extends AliBase {
                     .payUrl(payUrl)
                     .title(title)
                     .description(description)
-                    .status(PayOrder.PayStatus.NO_PAY)
+                    .status(OrderStatus.NO_PAY)
                     .build();
         }
         log.error("getPayUrl账号:{} 参数 {} 失败结果: {}", account, moneyCent, response.getBody());
