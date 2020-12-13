@@ -20,7 +20,7 @@
                     <el-form-item label="充值金额" label-width="200px" prop="money">
                         <el-input v-model="userCharge.money" placeholder="请输入充值金额" maxlength="20"
                                   style="width:50%;"></el-input>
-                        <span>&nbsp;&nbsp;单位：元</span>
+                        <span>&nbsp;&nbsp;当前余额：{{(user.money/100)}} 元</span>
                     </el-form-item>
                     <el-form-item label="充值说明" label-width="200px" prop="title">
                         <el-input v-model="userCharge.title" placeholder="请输入充值说明" maxlength="20"></el-input>
@@ -131,7 +131,7 @@
         },
         computed: {
             isRealNameValidated: function () {
-                return this.user.realName && this.user.identity;
+                return this.user.realName && this.user.identity ? true : false;
             },
         },
         methods: {

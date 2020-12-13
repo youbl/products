@@ -43,7 +43,7 @@
                 <el-submenu index="2">
                     <template slot="title"><i class="el-icon-menu"></i>代理相关</template>
                     <el-menu-item-group>
-                        <el-menu-item index="2-1" @click.native="switchTab(21)">IP列表</el-menu-item>
+                        <el-menu-item index="2-1" @click.native="switchTab(21)">代理购买</el-menu-item>
                         <el-menu-item index="2-2" @click.native="switchTab(22)"
                                       v-if="isAdmin">用户维护
                         </el-menu-item>
@@ -241,7 +241,7 @@
         },
         created: function () {
             // 这3个值在created才赋值，是避免iframe加载2次html
-            this.userIpPage = '/list.html';
+            this.userIpPage = '/profile/product.html';
             this.adminIpPage = '/admin/list.html';
             this.adminUserPage = '/admin/user.html';
             this.chargePage = '/profile/charge.html';
@@ -278,7 +278,7 @@
         },
         computed: {
             isRealNameValidated: function () {
-                return this.user.realName && this.user.identity;
+                return this.user.realName && this.user.identity ? true : false;
             },
             isAdmin: function () {
                 return this.user && this.user.roles && this.user.roles.indexOf('ADMIN') >= 0;

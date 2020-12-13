@@ -62,6 +62,11 @@ public class ProductOrder {
     private int money;
 
     /**
+     * 在线支付时
+     */
+    private long payOrderId;
+
+    /**
      * 支付成功时间
      */
     private LocalDateTime payTime;

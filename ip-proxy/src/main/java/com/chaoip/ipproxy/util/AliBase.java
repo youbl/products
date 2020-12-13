@@ -39,8 +39,8 @@ public abstract class AliBase {
      *
      * @return 订单号
      */
-    protected static String getTransId() {
-        String ret = "CHDL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
+    public static String getTransId() {
+        String ret = "CDL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
         ret += StrHelper.getRndStr(4, 1);
         return ret;
     }

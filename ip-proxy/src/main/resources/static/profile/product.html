@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>代理购买页面</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script src="/res/unpkg/elemeIndex.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+</head>
+
+<body style="height: 900px;">
+<div id="divApp" style="height: 100%;">
+    <template>
+        <el-tabs v-model="tab.activeTab" @tab-click="handleTabClick">
+            <el-tab-pane v-for="item in products" :label="item.name" :name="item.name" style="width:500px;">
+                <el-form :model="productBuyInfo" :rules="rulesProductBuyInfo" ref="productBuyInfoForm">
+                    <el-form-item label="购买时长" label-width="200px" prop="month">
+                        <el-select v-model="productBuyInfo.month" filterable placeholder="请选择购买月数">
+                            <el-option
+                                    v-for="index of 36"
+                                    :label="index + '个月'"
+                                    :value="index">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="每天IP量" label-width="200px" prop="numPerDay">
+                        <el-input v-model="productBuyInfo.numPerDay" placeholder="请输入每天IP量" maxlength="20"
+                                  readonly></el-input>
+                    </el-form-item>
+                    <el-form-item label="代理用途" label-width="200px" prop="using">
+                        <el-select v-model="productBuyInfo.using" filterable placeholder="请选择代理用途">
+                            <el-option
+                                    v-for="item in usingArr"
+                                    :label="item.name"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="用途补充说明" label-width="200px" prop="description">
+                        <el-input v-model="productBuyInfo.description" placeholder="请输入补充说明"
+                                  maxlength="20"></el-input>
+                    </el-form-item>
+                    <el-form-item label="购买价格" label-width="200px">
+                        <el-input v-model="payMoney" readonly maxlength="20"></el-input>
+                    </el-form-item>
+                </el-form>
+                <div style="text-align: center">
+                    <el-button type="primary" @click="doBuy('productBuyInfoForm')"
+                               v-if="isRealNameValidated">去支付
+                    </el-button>
+                    <span v-if="!isRealNameValidated" style="color:red;">您的实名认证尚未通过，无法购买</span>
+                </div>
+            </el-tab-pane>
+
+
+        </el-tabs>
+    </template>
+</div>
+
+<script>
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                tab: {
+                    activeTab: '',
+                },
+                user: {},
+                product: {},
+                products: [],
+
+                productBuyInfo: {
+                    month: 12,
+                    numPerDay: 1000,
+                    using: '',
+                    description: '',
+                },
+                rulesProductBuyInfo: {
+                    numPerDay: [
+                        {required: true, message: '每天IP量必填', trigger: 'blur'},
+                        {pattern: /^\d+$/, message: '每天IP量格式有误'}
+                    ],
+                },
+                usingArr: [
+                    {'name': '爬虫', 'value': 'CRAWLER'},
+                    {'name': '浏览器代理', 'value': 'BROWSER'},
+                    {'name': '网购、秒杀', 'value': 'BUYER'},
+                    {'name': '视频播放', 'value': 'VIDEO'},
+                    {'name': '软件用', 'value': 'SOFT'},
+                    {'name': '刷票', 'value': 'VOTE'},
+                    {'name': '发帖', 'value': 'BBS'},
+                    {'name': '游戏', 'value': 'GAME'},
+                    {'name': '注册', 'value': 'REGISTER'},
+                    {'name': 'QQ', 'value': 'QQ'},
+                    {'name': 'YY', 'value': 'YY'},
+                    {'name': '其它', 'value': 'OTHER'}
+                ],
+            }
+        },
+        created: function () {
+            let url = '/user';
+            axios.get(url).then(response => {
+                if (!response || !response.data) {
+                    alert('未取得登录信息');
+                    return;
+                }
+                this.user = response.data;
+                this.loadProductDatas();
+            }).catch(error => this.ajaxError(error));
+        },
+        computed: {
+            isRealNameValidated: function () {
+                return this.user.realName && this.user.identity ? true : false;
+            },
+            payMoney: function () {
+                return (this.product.moneyPerUnit * this.productBuyInfo.month / 100) + '元';
+            },
+        },
+        methods: {
+            handleTabClick: function (tab, event) {
+                this.product = this.products[tab.index]; // 切换tab页
+            },
+            loadProductDatas: function () {
+                let url = '/product/all';
+                axios.get(url).then(response => {
+                    if (!response || !response.data) {
+                        alert('获取失败');
+                        return;
+                    }
+                    this.products = (response.data);
+                    if (this.products.length > 0) {
+                        this.product = this.products[0];
+
+                        this.tab.activeTab = this.product.name;
+                        this.productBuyInfo.numPerDay = this.product.numPerDay;
+                        this.productBuyInfo.using = this.usingArr[0].value;
+                        this.productBuyInfo.description = '用于' + this.usingArr[0].name;
+                    }
+                }).catch(error => this.ajaxError(error));
+            },
+            doCharge: function (form) {
+                this.$refs[form].validate(valid => {
+                    if (!valid)
+                        return false;
+                    let url = '/user/pay';
+                    let args = {
+                        money: this.userCharge.money * 100, // 接口单位是分
+                        title: this.userCharge.title,
+                        description: this.userCharge.description
+                    };
+                    axios.post(url, args).then(response => {
+                        if (!response || !response.data) {
+                            alert('充值失败');
+                            return;
+                        }
+                        // 返回充值地址，跳转过去付钱
+                        top.location.href = response.data;
+                    }).catch(error => this.ajaxError(error));
+                });
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (!msg)
+                        msg = '出错了';
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>
