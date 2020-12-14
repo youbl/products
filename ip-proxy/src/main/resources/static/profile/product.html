@@ -9,6 +9,11 @@
     <script src="/res/unpkg/elemeIndex.js"></script>
 
     <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .noborder input {
+            border: none;
+        }
+    </style>
 </head>
 
 <body style="height: 900px;">
@@ -26,10 +31,6 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="每天IP量" label-width="200px">
-                        <el-input v-model="product.numPerDay" placeholder="请输入每天IP量" maxlength="20"
-                                  readonly></el-input>
-                    </el-form-item>
                     <el-form-item label="代理用途" label-width="200px" prop="using">
                         <el-select v-model="productBuyInfo.using" filterable placeholder="请选择代理用途">
                             <el-option
@@ -43,11 +44,15 @@
                         <el-input v-model="productBuyInfo.description" placeholder="请输入补充说明"
                                   maxlength="20"></el-input>
                     </el-form-item>
+                    <el-form-item label="每天IP量" label-width="200px">
+                        <el-input v-model="product.numPerDay" placeholder="请输入每天IP量" maxlength="20"
+                                  readonly class="noborder"></el-input>
+                    </el-form-item>
                     <el-form-item label="购买价格" label-width="200px">
-                        <el-input v-model="payMoney" readonly maxlength="20"></el-input>
+                        <el-input v-model="payMoneyChinese" readonly maxlength="20" class="noborder"></el-input>
                     </el-form-item>
                     <el-form-item label-width="200px">
-                        <el-radio-group v-model="radio">
+                        <el-radio-group v-model="productBuyInfo.payType">
                             <el-radio :label="0" :disabled="!isUserMoneyCanPay">余额支付</el-radio>
                             <el-radio :label="1">支付宝</el-radio>
                             <el-radio :label="2">微信</el-radio>
@@ -74,6 +79,7 @@
             return {
                 tab: {
                     activeTab: '',
+                    tabIndex: 0,
                 },
                 user: {},
                 product: {},
@@ -85,7 +91,11 @@
                     description: '',
                     payType: 1,
                 },
-                rulesProductBuyInfo: {},
+                rulesProductBuyInfo: {
+                    description: [
+                        {required: true, message: '用途必填', trigger: 'blur'},
+                    ],
+                },
                 usingArr: [
                     {'name': '爬虫', 'value': 'CRAWLER'},
                     {'name': '浏览器代理', 'value': 'BROWSER'},
@@ -118,15 +128,23 @@
                 return this.user.realName && this.user.identity ? true : false;
             },
             isUserMoneyCanPay: function () {
-                return this.user.money > this.payMoney();
+                let ret = this.user.money > this.payMoney * 100;
+                if (!ret && this.productBuyInfo.payType === 0) {
+                    this.productBuyInfo.payType = 1;
+                }
+                return ret;
             },
             payMoney: function () {
-                return (this.product.moneyPerUnit * this.productBuyInfo.buyNum / 100) + '元';
+                return (this.product.moneyPerUnit * this.productBuyInfo.buyNum / 100);
+            },
+            payMoneyChinese: function () {
+                return this.payMoney + '元';
             },
         },
         methods: {
             handleTabClick: function (tab, event) {
                 this.product = this.products[tab.index]; // 切换tab页
+                this.tab.tabIndex = tab.index;
             },
             loadProductDatas: function () {
                 let url = '/product/all';
@@ -146,14 +164,14 @@
                 }).catch(error => this.ajaxError(error));
             },
             doBuy: function (form) {
-                this.$refs[form].validate(valid => {
+                this.$refs[form][this.tab.tabIndex].validate(valid => {
                     if (!valid)
                         return false;
                     let url = '/order';
                     // 深克隆
                     let args = JSON.parse(JSON.stringify(this.productBuyInfo));
                     args.productId = this.product.id;
-                    args.payMoney = this.payMoney() * 100; // 接口单位是分
+                    args.payMoney = this.payMoney * 100; // 接口单位是分
 
                     axios.post(url, args).then(response => {
                         if (!response || !response.data) {
@@ -162,6 +180,7 @@
                         }
                         if (response.data === 'ok') {
                             alert('购买成功');
+                            location.reload();
                             return;
                         }
                         // 返回充值地址，跳转过去付钱

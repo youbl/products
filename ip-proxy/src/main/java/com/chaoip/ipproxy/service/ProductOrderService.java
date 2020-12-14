@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -35,6 +36,14 @@ public class ProductOrderService {
         this.productOrderRepository = productOrderRepository;
         this.userService = userService;
         this.payService = payService;
+    }
+
+    public List<ProductOrder> findAll() {
+        return productOrderRepository.findByOrderByCreationTimeDesc();
+    }
+
+    public List<ProductOrder> findByUser(String userName) {
+        return productOrderRepository.findByNameOrderByCreationTimeDesc(userName);
     }
 
     /**
@@ -75,11 +84,12 @@ public class ProductOrderService {
         String ret = "";
         if (dto.getPayType() == 0) {
             if (user.getMoney() < money) {
-                throw new RuntimeException("用户余额不足，请先充值：" + money);
+                throw new RuntimeException("用户余额不足，请先充值");
             }
             // 余额支付，进行扣款
             payService.addMoney(username, -money);
             order.setPayOrderId(0);
+            order.setPayTime(LocalDateTime.now());
         } else {
             ChargeDto chargeDto = new ChargeDto();
             chargeDto.setMoney(money);

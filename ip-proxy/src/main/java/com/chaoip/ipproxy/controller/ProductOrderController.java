@@ -2,6 +2,7 @@ package com.chaoip.ipproxy.controller;
 
 import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.ProductOrderDto;
+import com.chaoip.ipproxy.repository.entity.ProductOrder;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.service.PayService;
 import com.chaoip.ipproxy.service.ProductOrderService;
@@ -9,12 +10,10 @@ import com.chaoip.ipproxy.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 产品购买控制器类
@@ -48,4 +47,8 @@ public class ProductOrderController {
         return ret;
     }
 
+    @GetMapping("")
+    public List<ProductOrder> getOrders(AuthDetails details) {
+        return productOrderService.findByUser(details.getUserName());
+    }
 }

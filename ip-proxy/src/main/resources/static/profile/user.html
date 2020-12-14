@@ -44,16 +44,17 @@
                     <template slot="title"><i class="el-icon-menu"></i>代理相关</template>
                     <el-menu-item-group>
                         <el-menu-item index="2-1" @click.native="switchTab(21)">代理购买</el-menu-item>
-                        <el-menu-item index="2-2" @click.native="switchTab(22)"
+                        <el-menu-item index="2-2" @click.native="switchTab(22)">历史订单</el-menu-item>
+                        <el-menu-item index="2-6" @click.native="switchTab(26)"
                                       v-if="isAdmin">用户维护
                         </el-menu-item>
-                        <el-menu-item index="2-3" @click.native="switchTab(23)"
+                        <el-menu-item index="2-7" @click.native="switchTab(27)"
                                       v-if="isAdmin">IP维护
                         </el-menu-item>
-                        <el-menu-item index="2-5" @click.native="switchTab(25)"
+                        <el-menu-item index="2-8" @click.native="switchTab(28)"
                                       v-if="isAdmin">用户充值记录
                         </el-menu-item>
-                        <el-menu-item index="2-4" @click.native="switchTab(24)"
+                        <el-menu-item index="2-9" @click.native="switchTab(29)"
                                       v-if="isAdmin">站点配置
                         </el-menu-item>
                     </el-menu-item-group>
@@ -158,19 +159,22 @@
                 <iframe :src="userIpPage" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
             </el-main>
 
-            <el-main v-show="showTab===22" v-if="isAdmin">
+            <el-main v-show="showTab===22">
+                <iframe :src="userOrderPage" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
+            </el-main>
+            <el-main v-show="showTab===26" v-if="isAdmin">
                 <iframe :src="adminUserPage" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
             </el-main>
 
-            <el-main v-show="showTab===23" v-if="isAdmin">
+            <el-main v-show="showTab===27" v-if="isAdmin">
                 <iframe :src="adminIpPage" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
             </el-main>
 
-            <el-main v-show="showTab===25" v-if="isAdmin">
+            <el-main v-show="showTab===28" v-if="isAdmin">
                 <iframe :src="adminChargePage" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
             </el-main>
 
-            <el-main v-show="showTab===24" v-if="isAdmin">
+            <el-main v-show="showTab===29" v-if="isAdmin">
                 <iframe :src="siteConfigPage" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
             </el-main>
         </el-container>
@@ -197,6 +201,7 @@
 
                 chargePage: '',  // 充值页面
                 userIpPage: '',  // 用户ip列表页
+                userOrderPage: '',// 用户购买订单页
                 adminIpPage: '', // 管理ip列表页
                 adminUserPage: '',// 管理用户列表页
                 siteConfigPage: '',// 站点配置页面
@@ -242,6 +247,7 @@
         created: function () {
             // 这3个值在created才赋值，是避免iframe加载2次html
             this.userIpPage = '/profile/product.html';
+            this.userOrderPage = '/profile/buylist.html';
             this.adminIpPage = '/admin/list.html';
             this.adminUserPage = '/admin/user.html';
             this.chargePage = '/profile/charge.html';
