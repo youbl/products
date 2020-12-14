@@ -40,5 +40,10 @@ public class ProductOrderDto {
     /**
      * 页面计算的价格，仅用于后端对比
      */
-    private int buyMoney;
+    private int payMoney;
+
+    /**
+     * 支付通道, 0余额，1支付宝，2微信
+     */
+    private int payType;
 }

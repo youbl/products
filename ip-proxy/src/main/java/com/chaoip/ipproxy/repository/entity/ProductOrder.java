@@ -57,12 +57,17 @@ public class ProductOrder {
      */
     private String description;
     /**
-     * 支付金额
+     * 待支付金额
      */
     private int money;
 
     /**
-     * 在线支付时
+     * 支付通道, 0余额，1支付宝，2微信
+     */
+    private int payType;
+
+    /**
+     * 在线支付时生成的支付订单id
      */
     private long payOrderId;
 

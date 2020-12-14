@@ -61,7 +61,7 @@ public class AutoInitData {
         log.info("准备创建产品记录");
         Product product = Product.builder()
                 .name(PRODUCT_NAME)
-                .type(Product.PayType.MONTH)
+                .type(Product.PackageType.MONTH)
                 .numPerDay(1000)
                 .numPerTime(100)
                 .moneyPerUnit(12000)

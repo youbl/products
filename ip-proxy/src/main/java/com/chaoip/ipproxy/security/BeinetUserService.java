@@ -100,6 +100,9 @@ public class BeinetUserService implements UserDetailsService {
      * @return 对象
      */
     public BeinetUser findByName(String name, boolean hide) {
+        if (StringUtils.isEmpty(name)) {
+            return null;
+        }
         BeinetUser user = userRepository.findByName(name);
 
         if (hide && user != null) {

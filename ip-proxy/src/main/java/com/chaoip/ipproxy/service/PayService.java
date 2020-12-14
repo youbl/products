@@ -103,7 +103,7 @@ public class PayService {
     }
 
     /**
-     * 管理员给用户充值
+     * 管理员给用户加订单并充值
      *
      * @param money 金额
      * @return 用户
@@ -133,7 +133,7 @@ public class PayService {
      * @param name  账户
      * @param money 增加金额，可为负数
      */
-    private BeinetUser addMoney(String name, int money) {
+    public BeinetUser addMoney(String name, int money) {
         BeinetUser user = beinetUserService.findByName(name, false);
         if (user == null) {
             throw new RuntimeException("充值失败：用户未找到:" + name);

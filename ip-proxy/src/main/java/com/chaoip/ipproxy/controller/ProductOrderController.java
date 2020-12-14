@@ -1,11 +1,14 @@
 package com.chaoip.ipproxy.controller;
 
+import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.ProductOrderDto;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.service.PayService;
 import com.chaoip.ipproxy.service.ProductOrderService;
 import com.chaoip.ipproxy.service.ProductService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,8 +40,12 @@ public class ProductOrderController {
     }
 
     @PostMapping("")
-    public String buy(@Valid @RequestBody ProductOrderDto dto, AuthDetails details) {
-        return productOrderService.buy(dto, details.getUserName());
+    public String buy(@Valid @RequestBody ProductOrderDto dto, AuthDetails details) throws JsonProcessingException, AlipayApiException {
+        String ret = productOrderService.buy(dto, details.getUserName());
+        if (StringUtils.isEmpty(ret)) {
+            ret = "ok";
+        }
+        return ret;
     }
 
 }

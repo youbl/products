@@ -34,7 +34,7 @@ public class Product {
     /**
      * 支付类型，包月、包季度、包年等
      */
-    private PayType type;
+    private PackageType type;
 
     /**
      * 每天提取数量
@@ -61,7 +61,10 @@ public class Product {
      */
     private LocalDateTime creationTime;
 
-    public enum PayType {
+    /**
+     * 产品类型，是包月，包年等
+     */
+    public enum PackageType {
         MONTH,
         QUARTER,
         YEAR,
