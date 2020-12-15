@@ -22,14 +22,9 @@
                         show-summary
                         style="width: 100%">
                     <el-table-column
-                            prop="id"
-                            label="ID"
-                            width="50">
-                    </el-table-column>
-                    <el-table-column
                             prop="orderNo"
                             label="订单号"
-                            width="200">
+                            width="250">
                     </el-table-column>
                     <el-table-column
                             prop="buyNum"
@@ -66,10 +61,31 @@
                             label="创建时间"
                             width="230">
                     </el-table-column>
+                    <el-table-column label="">
+                        <template slot-scope="scope">
+                            <el-button v-if="scope.row.status=='SUCCESS'"
+                                       size="mini"
+                                       @click="getIP(scope.$index, scope.row)">提取代理
+                            </el-button>
+                        </template>
+                    </el-table-column>
                 </el-table>
             </el-tab-pane>
         </el-tabs>
     </template>
+
+
+    <el-dialog title="提取代理" :visible.sync="showGetIPDailogFlg" width="40%">
+        <el-form :model="ipOrder" :rules="rulesIpOrder" ref="ipOrderForm">
+            <el-form-item label="订单号" label-width="200px" prop="name">
+                <el-input v-model="ipOrder.orderNo" placeholder="请输入用户名" maxlength="30" readonly></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="doGetIP('ipOrderForm')">注 册</el-button>
+            <el-button @click="hideGetIPDailog">取 消</el-button>
+        </div>
+    </el-dialog>
 </div>
 
 <script>
@@ -82,6 +98,9 @@
                 },
                 user: {},
                 orderData: [],
+
+                showGetIPDailogFlg: false,
+                ipOrder: {},
             }
         },
         created: function () {
@@ -96,6 +115,21 @@
             }).catch(error => this.ajaxError(error));
         },
         methods: {
+            showGetIPDailog: function (idx, row) {
+                this.ipOrder = row;
+                this.showGetIPDailogFlg = true;
+            },
+            hideGetIPDailog: function () {
+                this.ipOrder = {};
+                this.showGetIPDailogFlg = false;
+            },
+            doGetIP: function (form) {
+                this.$refs[form].validate(valid => {
+                    if (!valid)
+                        return false;
+                    alert(1111);
+                });
+            },
             loadOrderDatas: function () {
                 let url = '/order';
                 axios.get(url).then(response => {
