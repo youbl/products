@@ -16,4 +16,8 @@ public interface ProductOrderRepository extends BaseRepository<ProductOrder, Lon
     List<ProductOrder> findByOrderByCreationTimeDesc();
 
     List<ProductOrder> findByNameOrderByCreationTimeDesc(String userName);
+
+    ProductOrder findByOrderNo(String orderNo);
+
+    ProductOrder findByPayOrderId(long payOrderNo);
 }

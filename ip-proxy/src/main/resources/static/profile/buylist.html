@@ -42,18 +42,19 @@
                             width="100">
                     </el-table-column>
                     <el-table-column
+                            prop="payTypeName"
+                            label="渠道"
+                            width="100">
+                    </el-table-column>
+                    <el-table-column
+                            prop="statusName"
+                            label="状态"
+                            width="100">
+                    </el-table-column>
+                    <el-table-column
                             prop="description"
                             label="说明"
                             width="300">
-                    </el-table-column>
-                    <el-table-column label="状态">
-                        <template slot-scope="scope">
-                            <el-button v-if="scope.row.status=='NO_PAY'"
-                                       size="mini"
-                                       @click="goPay(scope.$index, scope.row)">去支付
-                            </el-button>
-                            <span v-if="scope.row.status!='NO_PAY'">{{scope.row.statusName}}</span>
-                        </template>
                     </el-table-column>
                     <el-table-column
                             prop="payTime"
@@ -118,6 +119,20 @@
                             break;
                         default:
                             item.statusName = '支付失败';
+                            break;
+                    }
+                    switch (item.payType) {
+                        case 0:
+                            item.payTypeName = '余额支付';
+                            break;
+                        case 1:
+                            item.payTypeName = '支付宝';
+                            break;
+                        case 2:
+                            item.payTypeName = '微信';
+                            break;
+                        default:
+                            item.payTypeName = '未知';
                             break;
                     }
                 }

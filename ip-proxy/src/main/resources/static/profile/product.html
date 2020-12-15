@@ -63,13 +63,21 @@
                     <el-button type="primary" @click="doBuy('productBuyInfoForm')"
                                v-if="isRealNameValidated">去支付
                     </el-button>
+                    <el-button @click="top.location.href = '/profile/user.html?page=22'">去订单页</el-button>
                     <span v-if="!isRealNameValidated" style="color:red;">您的实名认证尚未通过，无法购买</span>
                 </div>
             </el-tab-pane>
 
-
         </el-tabs>
     </template>
+
+    <el-dialog title="支付成功？" :visible.sync="openPayConfirm" width="400px">
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="doPayConfirm">确认已支付</el-button>
+            <el-button @click="openPayConfirm=false">取消支付</el-button>
+            <el-button @click="location.reload()">刷新</el-button>
+        </div>
+    </el-dialog>
 </div>
 
 <script>
@@ -110,6 +118,9 @@
                     {'name': 'YY', 'value': 'YY'},
                     {'name': '其它', 'value': 'OTHER'}
                 ],
+
+                openPayConfirm: false,  // 是否弹窗显示支付成功的对话框
+                payConfirmOrderNo: '',  // 点击确认时，用于确认的订单号
             }
         },
         created: function () {
@@ -125,7 +136,7 @@
         },
         computed: {
             isRealNameValidated: function () {
-                return this.user.realName && this.user.identity ? true : false;
+                return !!(this.user.realName && this.user.identity);
             },
             isUserMoneyCanPay: function () {
                 let ret = this.user.money > this.payMoney * 100;
@@ -138,7 +149,7 @@
                 return (this.product.moneyPerUnit * this.productBuyInfo.buyNum / 100);
             },
             payMoneyChinese: function () {
-                return this.payMoney + '元';
+                return this.payMoney + '元     【您的账户余额:' + this.user.money / 100 + '元】';
             },
         },
         methods: {
@@ -167,26 +178,59 @@
                 this.$refs[form][this.tab.tabIndex].validate(valid => {
                     if (!valid)
                         return false;
+
                     let url = '/order';
                     // 深克隆
                     let args = JSON.parse(JSON.stringify(this.productBuyInfo));
                     args.productId = this.product.id;
                     args.payMoney = this.payMoney * 100; // 接口单位是分
 
+                    // 默认情况下Chrome会阻止ajax弹窗，用这个方法解决
+                    let newWindown = args.payType === 0 ? null : window.open('about:blank', '_blank');
+
                     axios.post(url, args).then(response => {
-                        if (!response || !response.data) {
+                        if (!response) {
+                            if (newWindown)
+                                newWindown.close();
                             alert('购买失败');
                             return;
                         }
-                        if (response.data === 'ok') {
+                        if (response.data === null || response.data === '') {
                             alert('购买成功');
                             location.reload();
                             return;
                         }
+
                         // 返回充值地址，跳转过去付钱
-                        top.location.href = response.data;
-                    }).catch(error => this.ajaxError(error));
+                        if (newWindown) {
+                            newWindown.location.href = response.data.payUrl;
+                            this.showConfirmDialog(response.data.orderNo);
+                        }
+                    }).catch(error => {
+                        if (newWindown)
+                            newWindown.close();
+                        this.ajaxError(error);
+                    });
                 });
+            },
+            // 弹窗跳转到支付宝后，本页面弹出是否支付成功的对话框，以便用户点击查询支付结果
+            showConfirmDialog: function (orderNo) {
+                if (!orderNo) {
+                    alert('订单号为空，出啥错了？');
+                    return;
+                }
+                this.payConfirmOrderNo = orderNo;
+                this.openPayConfirm = true;
+            },
+            doPayConfirm: function () {
+                let url = '/user/payback/' + this.payConfirmOrderNo;
+                axios.get(url).then(response => {
+                    if (!response || !response.data) {
+                        alert('获取支付结果失败，请重试');
+                        return;
+                    }
+                    alert(response.data);
+                }).catch(error => this.ajaxError(error));
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {

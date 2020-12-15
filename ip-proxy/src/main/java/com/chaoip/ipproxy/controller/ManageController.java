@@ -175,7 +175,8 @@ public class ManageController {
             throw new IllegalArgumentException("获取登录信息失败");
         }
         money.setDescription(details.getUserName() + ":" + money.getDescription());
-        return managerService.chargeUser(money);
+        managerService.chargeUser(money);
+        return userService.findByName(details.getUserName(), false);
     }
 
     /**

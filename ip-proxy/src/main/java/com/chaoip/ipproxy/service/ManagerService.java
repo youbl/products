@@ -31,10 +31,9 @@ public class ManagerService {
      * 为指定用户充值
      *
      * @param money 金额
-     * @return 用户
      */
-    public BeinetUser chargeUser(ChargeDto money) {
-        return payService.addMoneyAndOrder(money);
+    public void chargeUser(ChargeDto money) {
+        payService.addMoneyAndOrder(money);
     }
 
     public List<PayOrder> findCharges() {

@@ -20,10 +20,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,13 +135,13 @@ public class UserController {
      * @throws AlipayApiException 异常
      */
     @GetMapping("callback/{orderNo}")
-    public String callback(@PathVariable(required = false) String orderNo) throws AlipayApiException, JsonProcessingException {
+    public String callback(@PathVariable(required = false) String orderNo, HttpServletRequest request) throws AlipayApiException, JsonProcessingException {
         if (StringUtils.isEmpty(orderNo)) {
-            return phoneStr("订单号不能为空");
+            return phoneStr("订单号不能为空", request);
         }
         RealOrder code = realOrderService.findByOrder(orderNo);
         if (code == null || StringUtils.isEmpty(code.getCertId())) {
-            return phoneStr("订单不存在: " + orderNo);
+            return phoneStr("订单不存在: " + orderNo, request);
         }
 
 //        StringBuilder sb = new StringBuilder();
@@ -164,9 +164,9 @@ public class UserController {
 //        log.info(ret);
 
         if (userService.realNameResultQuery(code)) {
-            return phoneStr(code.getRealName() + ", 您好，您已认证成功。<p>请回到认证页面，进行刷新。</p>");
+            return phoneStr(code.getRealName() + ", 您好，您已认证成功。<p>请回到认证页面，进行刷新。</p>", request);
         }
-        return phoneStr("您好，您的认证信息有误，请确认: " + code.getRealName());
+        return phoneStr("您好，您的认证信息有误，请确认: " + code.getRealName(), request);
     }
 
 
@@ -177,12 +177,11 @@ public class UserController {
      * @return url
      */
     @PostMapping("pay")
-    public String pay(@RequestBody ChargeDto money, AuthDetails details) throws UnsupportedEncodingException, AlipayApiException, JsonProcessingException {
+    public PayOrder pay(@RequestBody ChargeDto money, AuthDetails details) throws AlipayApiException, JsonProcessingException {
         if (details == null) {
             throw new IllegalArgumentException("获取登录信息失败");
         }
-        PayOrder order = payService.addOrder(money, details.getUserName());
-        return order.getPayUrl();
+        return payService.addOrder(money, details.getUserName());
     }
 
     /**
@@ -193,23 +192,31 @@ public class UserController {
      * @throws AlipayApiException 异常
      */
     @GetMapping("payback/{orderNo}")
-    public String payback(@PathVariable(required = false) String orderNo) throws AlipayApiException, JsonProcessingException {
+    public String payback(@PathVariable(required = false) String orderNo, HttpServletRequest request) throws AlipayApiException, JsonProcessingException {
         if (StringUtils.isEmpty(orderNo)) {
-            return phoneStr("订单号不能为空");
+            return phoneStr("订单号不能为空", request);
         }
         if (payService.queryOrderStatus(orderNo)) {
-            return jumpBack(); // 充值是在pc，可以直接jump跳回去
+            return jumpBack(request); // 充值是在pc，可以直接jump跳回去
             // return phoneStr("您的充值已完成成功。<p>请回到充值页面，进行刷新。</p>");
         }
-        return phoneStr("您的充值过程中出现问题，请稍候重试，如果已支付成功，请稍候刷新页面");
+        return phoneStr("您的充值过程中出现问题，请稍候重试，如果已支付成功，请稍候刷新页面", request);
     }
 
-    private String phoneStr(String msg) {
+    private String phoneStr(String msg, HttpServletRequest request) {
+        if (isAjax(request))
+            return msg;
         return "<html><body style='font-size:50px;'>" + msg + "</body></html>";
     }
 
-    private String jumpBack() {
+    private String jumpBack(HttpServletRequest request) {
+        if (isAjax(request))
+            return "充值成功，请刷新页面";
         return "<html><body style='font-size:50px;'><script>location.href='/profile/user.html';</script></body></html>";
+    }
+
+    private boolean isAjax(HttpServletRequest request) {
+        return request.getHeader("accept").contains("application/json");
     }
 
     /**

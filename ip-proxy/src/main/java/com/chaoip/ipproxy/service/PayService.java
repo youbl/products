@@ -11,6 +11,7 @@ import com.chaoip.ipproxy.util.AliPayHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -27,14 +28,15 @@ import java.util.List;
 public class PayService {
     private final AliPayHelper aliPayHelper;
     private final PayOrderRepository payOrderRepository;
-    private final BeinetUserService beinetUserService;   // 用于加减余额
+    private final ApplicationEventPublisher eventPublisher; // 发送支付事件用
 
     public PayService(AliPayHelper aliPayHelper,
                       PayOrderRepository payOrderRepository,
-                      BeinetUserService beinetUserService) {
+                      BeinetUserService beinetUserService,
+                      ApplicationEventPublisher eventPublisher) {
         this.aliPayHelper = aliPayHelper;
         this.payOrderRepository = payOrderRepository;
-        this.beinetUserService = beinetUserService;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -94,11 +96,14 @@ public class PayService {
         order.setPayTime(LocalDateTime.now());
         if (ret) {
             order.setStatus(OrderStatus.SUCCESS);
-            addMoney(order.getName(), order.getMoney());
         } else {
             order.setStatus(OrderStatus.FAIL);
         }
-        payOrderRepository.save(order);
+        order = payOrderRepository.save(order);
+        if (order.getStatus() == OrderStatus.SUCCESS) {
+            // 发送成功事件，要保存后，有id
+            eventPublisher.publishEvent(order);
+        }
         return ret;
     }
 
@@ -106,12 +111,8 @@ public class PayService {
      * 管理员给用户加订单并充值
      *
      * @param money 金额
-     * @return 用户
      */
-    @Transactional
-    public BeinetUser addMoneyAndOrder(ChargeDto money) {
-        BeinetUser user = addMoney(money.getName(), money.getMoney());
-
+    public void addMoneyAndOrder(ChargeDto money) {
         // 加订单流水
         String orderNo = money.getName() + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
         PayOrder order = PayOrder.builder()
@@ -123,23 +124,8 @@ public class PayService {
                 .description(money.getDescription())
                 .status(OrderStatus.SUCCESS)
                 .build();
-        save(order);
-        return user;
+        save(order);// 发送事件
+        eventPublisher.publishEvent(order);
     }
 
-    /**
-     * 给指定 的账户添加金额
-     *
-     * @param name  账户
-     * @param money 增加金额，可为负数
-     */
-    public BeinetUser addMoney(String name, int money) {
-        BeinetUser user = beinetUserService.findByName(name, false);
-        if (user == null) {
-            throw new RuntimeException("充值失败：用户未找到:" + name);
-        }
-        user.setMoney(user.getMoney() + money);
-
-        return beinetUserService.save(user);
-    }
 }

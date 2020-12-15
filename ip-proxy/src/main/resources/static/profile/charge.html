@@ -33,6 +33,7 @@
                     <el-button type="primary" @click="doCharge('userChargeForm')"
                                v-if="isRealNameValidated">去支付
                     </el-button>
+                    <el-button @click="location.reload()">刷新</el-button>
                     <span v-if="!isRealNameValidated" style="color:red;">您的实名认证尚未通过，无法充值</span>
                 </div>
             </el-tab-pane>
@@ -92,6 +93,15 @@
             </el-tab-pane>
         </el-tabs>
     </template>
+
+
+    <el-dialog title="支付成功？" :visible.sync="openPayConfirm" width="400px">
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="doPayConfirm">确认已支付</el-button>
+            <el-button @click="openPayConfirm=false">取消支付</el-button>
+            <el-button @click="location.reload()">刷新</el-button>
+        </div>
+    </el-dialog>
 </div>
 
 <script>
@@ -116,6 +126,8 @@
                         {pattern: /^\d+(\.\d{1,2})?$/, message: '金额格式有误'}
                     ],
                 },
+                openPayConfirm: false,  // 是否弹窗显示支付成功的对话框
+                payConfirmOrderNo: '',  // 点击确认时，用于确认的订单号
             }
         },
         created: function () {
@@ -131,12 +143,13 @@
         },
         computed: {
             isRealNameValidated: function () {
-                return this.user.realName && this.user.identity ? true : false;
+                return !!(this.user.realName && this.user.identity);
             },
         },
         methods: {
             goPay: function (idx, row) {
-                top.location.href = row.payUrl;
+                window.open(row.payUrl, '_blank');
+                this.showConfirmDialog(row.orderNo);
             },
             loadChargsDatas: function () {
                 let url = '/user/charges';
@@ -176,15 +189,41 @@
                         title: this.userCharge.title,
                         description: this.userCharge.description
                     };
+                    // 默认情况下Chrome会阻止ajax弹窗，用这个方法解决
+                    let newWindown = window.open('about:blank', '_blank');
                     axios.post(url, args).then(response => {
                         if (!response || !response.data) {
+                            newWindown.close();
                             alert('充值失败');
                             return;
                         }
                         // 返回充值地址，跳转过去付钱
-                        top.location.href = response.data;
-                    }).catch(error => this.ajaxError(error));
+                        newWindown.location.href = response.data.payUrl;
+                        this.showConfirmDialog(response.data.orderNo);
+                    }).catch(error => {
+                        newWindown.close();
+                        this.ajaxError(error);
+                    });
                 });
+            },
+            // 弹窗跳转到支付宝后，本页面弹出是否支付成功的对话框，以便用户点击查询支付结果
+            showConfirmDialog: function (orderNo) {
+                if (!orderNo) {
+                    alert('订单号为空，出啥错了？');
+                    return;
+                }
+                this.payConfirmOrderNo = orderNo;
+                this.openPayConfirm = true;
+            },
+            doPayConfirm: function () {
+                let url = '/user/payback/' + this.payConfirmOrderNo;
+                axios.get(url).then(response => {
+                    if (!response || !response.data) {
+                        alert('获取支付结果失败，请重试');
+                        return;
+                    }
+                    alert(response.data);
+                }).catch(error => this.ajaxError(error));
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {

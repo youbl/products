@@ -10,6 +10,7 @@ import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.util.AliBase;
 import com.chaoip.ipproxy.util.StrHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,23 +28,63 @@ public class ProductOrderService {
     private final ProductOrderRepository productOrderRepository;
     private final BeinetUserService userService;
     private final PayService payService;
+    private final UserMoneyService userMoneyService;
 
     public ProductOrderService(ProductService productService,
                                ProductOrderRepository productOrderRepository,
                                BeinetUserService userService,
-                               PayService payService) {
+                               PayService payService,
+                               UserMoneyService userMoneyService) {
         this.productService = productService;
         this.productOrderRepository = productOrderRepository;
         this.userService = userService;
         this.payService = payService;
+        this.userMoneyService = userMoneyService;
     }
 
     public List<ProductOrder> findAll() {
         return productOrderRepository.findByOrderByCreationTimeDesc();
     }
 
+    /**
+     * 根据用户名查找所有购买订单
+     *
+     * @param userName 用户名
+     * @return 订单
+     */
     public List<ProductOrder> findByUser(String userName) {
         return productOrderRepository.findByNameOrderByCreationTimeDesc(userName);
+    }
+
+    /**
+     * 根据订单号查找购买订单
+     *
+     * @param orderNo 订单号
+     * @return 订单
+     */
+    public ProductOrder findByOrderNo(String orderNo) {
+        return productOrderRepository.findByOrderNo(orderNo);
+    }
+
+    /**
+     * 根据支付订单id查找购买订单
+     *
+     * @param payOrderId 支付订单id
+     * @return 订单
+     */
+    public ProductOrder findByPayOrderId(long payOrderId) {
+        return productOrderRepository.findByPayOrderId(payOrderId);
+    }
+
+    /**
+     * 设置订单成功
+     *
+     * @param productOrder 产品订单
+     */
+    public void setOrderSuccess(ProductOrder productOrder) {
+        productOrder.setStatus(OrderStatus.SUCCESS);
+        productOrder.setPayTime(LocalDateTime.now());
+        productOrderRepository.save(productOrder);
     }
 
     /**
@@ -53,10 +94,11 @@ public class ProductOrderService {
      *
      * @param dto      条件
      * @param username 用户
-     * @return 支付url
+     * @return 支付订单，为空时表示余额支付成功
      */
+    @Synchronized
     @Transactional
-    public String buy(ProductOrderDto dto, String username) throws JsonProcessingException, AlipayApiException {
+    public PayOrder buy(ProductOrderDto dto, String username) throws JsonProcessingException, AlipayApiException {
         BeinetUser user = userService.findByName(username, false);
         if (user == null) {
             throw new RuntimeException("用户未找到：" + username);
@@ -79,16 +121,18 @@ public class ProductOrderService {
                 .money(money)
                 .status(OrderStatus.NO_PAY)
                 .orderNo(AliBase.getTransId())
+                .payType(dto.getPayType())
                 .build();
 
-        String ret = "";
+        PayOrder payOrder = null;
         if (dto.getPayType() == 0) {
             if (user.getMoney() < money) {
                 throw new RuntimeException("用户余额不足，请先充值");
             }
             // 余额支付，进行扣款
-            payService.addMoney(username, -money);
+            userMoneyService.addMoney(username, -money);
             order.setPayOrderId(0);
+            order.setStatus(OrderStatus.SUCCESS);
             order.setPayTime(LocalDateTime.now());
         } else {
             ChargeDto chargeDto = new ChargeDto();
@@ -96,13 +140,11 @@ public class ProductOrderService {
             String desc = "购买:" + product.getName() + " 充值:" + money;
             chargeDto.setTitle(desc);
             chargeDto.setDescription(desc);
-            PayOrder payOrder = payService.addOrder(chargeDto, username);
+            payOrder = payService.addOrder(chargeDto, username);
             order.setPayOrderId(payOrder.getId());
-
-            ret = payOrder.getPayUrl();
         }
 
         productOrderRepository.save(order);
-        return ret;
+        return payOrder;
     }
 }

@@ -2,6 +2,7 @@ package com.chaoip.ipproxy.controller;
 
 import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.ProductOrderDto;
+import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.repository.entity.ProductOrder;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.service.PayService;
@@ -39,12 +40,8 @@ public class ProductOrderController {
     }
 
     @PostMapping("")
-    public String buy(@Valid @RequestBody ProductOrderDto dto, AuthDetails details) throws JsonProcessingException, AlipayApiException {
-        String ret = productOrderService.buy(dto, details.getUserName());
-        if (StringUtils.isEmpty(ret)) {
-            ret = "ok";
-        }
-        return ret;
+    public PayOrder buy(@Valid @RequestBody ProductOrderDto dto, AuthDetails details) throws JsonProcessingException, AlipayApiException {
+        return productOrderService.buy(dto, details.getUserName());
     }
 
     @GetMapping("")
