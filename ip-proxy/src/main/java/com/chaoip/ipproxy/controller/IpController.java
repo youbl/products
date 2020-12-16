@@ -4,6 +4,7 @@ import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.service.RouteService;
+import com.chaoip.ipproxy.util.CityHelper;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * IpController
@@ -29,11 +31,16 @@ public class IpController {
     }
 
     @GetMapping("search")
-    public List<Route> search(AuthDetails details) {
+    public List<Route> search(RouteDto condition, AuthDetails details) {
         if (details == null || StringUtils.isEmpty(details.getUserName())) {
             throw new IllegalArgumentException("获取登录信息失败");
         }
 
         return routeService.getTop();
+    }
+
+    @GetMapping("citys")
+    public Map<String, String[]> getCitys() {
+        return CityHelper.getCitys();
     }
 }

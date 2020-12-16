@@ -54,13 +54,18 @@ public class RouteDto {
     /**
      * 服务运营商
      */
-    @Pattern(regexp = "^(unicom|mobile|telecom)$", message = "运营商只支持 unicom,mobile,telecom")
+    @Pattern(regexp = "^(unicom|中国联通|mobile|中国移动|telecom|中国电信)$", message = "运营商只支持 unicom,mobile,telecom")
     private String operators;
     /**
      * 过期时间，单位秒
      */
     @Min(value = 10, message = "过期时间不能小于10")
     private int expireTime;
+
+    /**
+     * 产品订单编号，用于提取ip
+     */
+    private String orderNo;
 
     /**
      * 第几页
@@ -77,12 +82,15 @@ public class RouteDto {
         if (getOperators() != null) {
             switch (getOperators()) {
                 case "unicom":
+                case "中国联通":
                     operatorName = "中国联通";
                     break;
                 case "mobile":
+                case "中国移动":
                     operatorName = "中国移动";
                     break;
                 case "telecom":
+                case "中国电信":
                     operatorName = "中国电信";
                     break;
                 default:

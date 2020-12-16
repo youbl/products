@@ -47,7 +47,6 @@ public class ProductOrder {
      * 购买时长，如果是包月，就是几个月；如果是包年，就是几年。
      */
     private int buyNum;
-
     /**
      * 购买用途
      */

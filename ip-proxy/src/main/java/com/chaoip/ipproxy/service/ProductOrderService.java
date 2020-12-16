@@ -113,15 +113,15 @@ public class ProductOrderService {
         }
 
         ProductOrder order = ProductOrder.builder()
-                .buyNum(dto.getBuyNum())
-                .description(dto.getDescription())
-                .using(dto.getUsing())
-                .productId(dto.getProductId())
                 .name(username)
-                .money(money)
-                .status(OrderStatus.NO_PAY)
                 .orderNo(AliBase.getTransId())
+                .productId(dto.getProductId())
+                .buyNum(dto.getBuyNum())
+                .using(dto.getUsing())
+                .description(dto.getDescription())
+                .money(money)
                 .payType(dto.getPayType())
+                .status(OrderStatus.NO_PAY)
                 .build();
 
         PayOrder payOrder = null;

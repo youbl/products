@@ -39,11 +39,26 @@ public class ProductOrderController {
         this.productService = productService;
     }
 
+    /**
+     * 创建产品购买订单
+     *
+     * @param dto     订单数据
+     * @param details 登录用户信息
+     * @return 支付订单（不是产品订单），如果使用余额支付时，返回空
+     * @throws JsonProcessingException 异常
+     * @throws AlipayApiException      异常
+     */
     @PostMapping("")
     public PayOrder buy(@Valid @RequestBody ProductOrderDto dto, AuthDetails details) throws JsonProcessingException, AlipayApiException {
         return productOrderService.buy(dto, details.getUserName());
     }
 
+    /**
+     * 获取当前登录用户的所有产品订单
+     *
+     * @param details 登录用户信息
+     * @return 产品订单
+     */
     @GetMapping("")
     public List<ProductOrder> getOrders(AuthDetails details) {
         return productOrderService.findByUser(details.getUserName());
