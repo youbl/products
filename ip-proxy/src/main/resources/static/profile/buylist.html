@@ -92,7 +92,7 @@
                 <el-select v-model="getIpCondition.protocal" filterable placeholder="请选择代理协议">
                     <el-option label="不限" value=""></el-option>
                     <el-option label="http" value="http"></el-option>
-                    <el-option label="socket" value="socket"></el-option>
+                    <el-option label="socks" value="socks"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="过期时间" label-width="200px" prop="expireTime">
@@ -112,9 +112,9 @@
                     </el-option>
                 </el-select>
                 <el-select v-model="getIpCondition.area" filterable placeholder="请选择代理所属区域" width="100px">
-                    <el-option v-for="item in searchProvince(province).citys"
+                    <el-option v-for="item in provinceSelected.citys"
                                :label="item.text"
-                               :value="item.code">
+                               :value="item.text">
                     </el-option>
                 </el-select>
             </el-form-item>
@@ -152,6 +152,7 @@
                 user: {},
                 orderData: [],
                 province: '',
+                provinceSelected: {},
                 provinceList: [{id: '', text: '不限', citys: [{code: '', text: '不限'}]}],
 
                 showGetIPDailogFlg: false,
@@ -200,7 +201,7 @@
                     let cityName = objCitys[cityCode][0];
                     let provinceItem = this.searchProvince(provinceName);
                     if (provinceItem === null) {
-                        provinceItem = {id: provinceName, text: provinceName, citys: [{code: '', text: '不限'}]};
+                        provinceItem = {id: provinceName, text: provinceName, citys: []};
                         this.provinceList.push(provinceItem);
                     }
                     provinceItem.citys.push({code: cityCode, text: cityName});
@@ -216,6 +217,8 @@
                 return null;
             },
             changeProvince: function () {
+                this.provinceSelected = this.searchProvince(this.province);
+                this.getIpCondition.area = this.provinceSelected.citys[0].text;
             },
             showGetIPDailog: function (idx, row) {
                 this.loadCitys();//.then((citys) => {

@@ -197,7 +197,7 @@
                     //if (!goUrl)
                     let goUrl = '/profile/user.html';
 
-                    location.href = goUrl;
+                    top.location.href = goUrl;
                 }).catch(error => this.ajaxError(error));
             },
             ajaxError: function (error) {

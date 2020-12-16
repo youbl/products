@@ -36,7 +36,7 @@ public class IpController {
             throw new IllegalArgumentException("获取登录信息失败");
         }
 
-        return routeService.getTop();
+        return routeService.find(condition);
     }
 
     @GetMapping("citys")

@@ -4,9 +4,13 @@ import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.repository.RouteRepository;
 import com.chaoip.ipproxy.repository.entity.Route;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -18,10 +22,13 @@ import java.util.List;
  */
 @Service
 public class RouteService {
+    private final MongoTemplate mongoTemplate;
     private final RouteRepository routeRepository;
 
-    public RouteService(RouteRepository routeRepository) {
+    public RouteService(RouteRepository routeRepository,
+                        MongoTemplate mongoTemplate) {
         this.routeRepository = routeRepository;
+        this.mongoTemplate = mongoTemplate;
     }
 
     public int saveMultiRoute(List<RouteDto> dtos) {
@@ -33,6 +40,30 @@ public class RouteService {
 
     public List<Route> getTop() {
         return routeRepository.findTopRoute(PageRequest.of(0, 8));//, Sort.Direction.DESC, "creationTime"));
+    }
+
+    /**
+     * 自定义动态条件查询
+     *
+     * @param dto 条件
+     * @return 结果
+     */
+    public List<Route> find(RouteDto dto) {
+        Criteria condition = Criteria.where("id").gt(0); // id大于0，只是为了生成一个条件
+        if (!StringUtils.isEmpty(dto.getProtocal())) {
+            condition = condition.and("protocal").is(dto.getProtocal());
+        }
+        if (dto.getExpireTime() > 0) {
+            condition = condition.and("expireTime").gte(LocalDateTime.now().plusSeconds(dto.getExpireTime()));
+        }
+        if (!StringUtils.isEmpty(dto.getArea())) {
+            condition = condition.and("area").is(dto.getArea());
+        }
+        if (!StringUtils.isEmpty(dto.getOperators())) {
+            condition = condition.and("operators").is(dto.getOperators());
+        }
+        Query query = Query.query(condition).limit(dto.getPageNum()).with(Sort.by(Sort.Direction.ASC, "id"));
+        return mongoTemplate.find(query, Route.class);
     }
 
     public Page<Route> getAll(RouteDto dto) {
