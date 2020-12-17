@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -74,6 +75,11 @@ public class ProductOrder {
      * 支付成功时间
      */
     private LocalDateTime payTime;
+
+    /**
+     * 订单到期时间
+     */
+    private LocalDateTime endTime;
 
     /**
      * 支付状态

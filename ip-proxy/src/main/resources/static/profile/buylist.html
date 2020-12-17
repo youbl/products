@@ -62,8 +62,8 @@
                             width="230">
                     </el-table-column>
                     <el-table-column
-                            prop="creationTime"
-                            label="创建时间"
+                            prop="endTime"
+                            label="过期时间"
                             width="230">
                     </el-table-column>
                     <el-table-column label="">
@@ -80,7 +80,7 @@
     </template>
 
 
-    <el-dialog title="提取代理" :visible.sync="showGetIPDailogFlg" width="40%">
+    <el-dialog title="提取代理" :visible.sync="showGetIPDailogFlg">
         <el-form :model="getIpCondition" :rules="rulesGetIpCondition" ref="ipOrderForm">
             <el-form-item label="订单号" label-width="200px" prop="orderNo" class="noborder">
                 <el-input v-model="getIpCondition.orderNo" maxlength="30" readonly></el-input>
@@ -126,10 +126,18 @@
                     <el-option label="中国电信" value="中国电信"></el-option>
                 </el-select>
             </el-form-item>
+            <el-form-item label="响应格式" label-width="200px" prop="outputType">
+                <el-radio v-model="getIpCondition.outputType" label="text">多行文本</el-radio>
+                <el-radio v-model="getIpCondition.outputType" label="json">json</el-radio>
+            </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="doGetIP('ipOrderForm')">获取提取链接</el-button>
+            <el-button type="primary" @click="doGetIPURL('ipOrderForm')">获取提取链接</el-button>
             <el-button @click="hideGetIPDailog">取 消</el-button>
+            <div>
+                链接：
+                <el-input v-model="getIpConditionURL" maxlength="30" width="80%"></el-input>
+            </div>
         </div>
     </el-dialog>
 </div>
@@ -163,6 +171,7 @@
                     operators: '',
                     protocal: '',
                     expireTime: 0,
+                    outputType: 'text',
                 },
                 rulesGetIpCondition: {
                     ipNumPerTime: [
@@ -170,6 +179,8 @@
                         {min: 1, max: 30, message: '提取个数有误', trigger: 'blur'},
                     ],
                 },
+
+                getIpConditionURL: '', // 生成的结果链接
             }
         },
         created: function () {
@@ -230,18 +241,22 @@
                 this.getIpCondition.orderNo = '';
                 this.showGetIPDailogFlg = false;
             },
-            doGetIP: function (form) {
+            doGetIPURL: function (form) {
+                this.getIpConditionURL = '';
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
-                    axios.get('/ip/search', {params: this.getIpCondition}).then(response => {
+                    axios.get('/ip/url', {params: this.getIpCondition}).then(response => {
                         if (!response || !response.data) {
-                            alert('未取得代理信息');
+                            alert('未取得代理链接信息');
                             return;
                         }
-                        alert(111)
+                        this.getIpConditionURL = this.getUrlPrefix() + response.data;
                     }).catch(error => this.ajaxError(error));
                 });
+            },
+            getUrlPrefix: function () {
+                return location.protocol + '//' + location.host;
             },
             loadOrderDatas: function () {
                 let url = '/order';

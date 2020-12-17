@@ -86,6 +86,7 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 .antMatchers("/res/**", "/error/**").permitAll()     // res根路径及子目录请求，不限制访问
                 .antMatchers("/favicon.ico").permitAll()     // ico不限制访问
                 .antMatchers("/user/**").permitAll()    // user控制器请求，不限制访问
+                .antMatchers("/ip/search/**").permitAll()    // 提取IP请求，不限制访问
                 .antMatchers("/login/**").permitAll()   // login相关页面请求，不限制访问
                 .antMatchers("/admin/**").hasRole("ADMIN") // 管理页面请求，要求ADMIN角色才能访问
                 .antMatchers("/manage/**").hasRole("ADMIN")// 管理页面请求，要求ADMIN角色才能访问

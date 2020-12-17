@@ -83,7 +83,9 @@ public class ProductOrderService {
      */
     public void setOrderSuccess(ProductOrder productOrder) {
         productOrder.setStatus(OrderStatus.SUCCESS);
-        productOrder.setPayTime(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        productOrder.setPayTime(now); // 支付时间
+        productOrder.setEndTime(now.plusMonths(productOrder.getBuyNum())); // 订单到期时间
         productOrderRepository.save(productOrder);
     }
 
@@ -132,8 +134,7 @@ public class ProductOrderService {
             // 余额支付，进行扣款
             userMoneyService.addMoney(username, -money);
             order.setPayOrderId(0);
-            order.setStatus(OrderStatus.SUCCESS);
-            order.setPayTime(LocalDateTime.now());
+            setOrderSuccess(order);
         } else {
             ChargeDto chargeDto = new ChargeDto();
             chargeDto.setMoney(money);
@@ -142,9 +143,9 @@ public class ProductOrderService {
             chargeDto.setDescription(desc);
             payOrder = payService.addOrder(chargeDto, username);
             order.setPayOrderId(payOrder.getId());
+            productOrderRepository.save(order);
         }
 
-        productOrderRepository.save(order);
         return payOrder;
     }
 }

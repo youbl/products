@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.repository.entity;
 
+import com.chaoip.ipproxy.util.SecurityHelper;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -63,8 +64,7 @@ public class BeinetUser implements UserDetails {
      * @return
      */
     public static String countSecurity(String name, String password, LocalDateTime time) {
-        String sign = String.format("%s-%s-%s", name, password, time);
-        return DigestUtils.md5DigestAsHex(sign.getBytes());
+        return SecurityHelper.md5(name, password, time);
     }
 
     @Override

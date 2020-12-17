@@ -62,10 +62,19 @@ public class RouteDto {
     @Min(value = 10, message = "过期时间不能小于10")
     private int expireTime;
 
+
+    /**
+     * 提取ip用的签名
+     */
+    private String sign;
     /**
      * 产品订单编号，用于提取ip
      */
     private String orderNo;
+    /**
+     * 提取输出格式，text json
+     */
+    private String outputType;
 
     /**
      * 第几页
