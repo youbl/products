@@ -38,7 +38,7 @@ public class ProductOrderDetail {
     private LocalDateTime creationTime;
 
     // 以下为代理信息备份
-    
+
     /**
      * 代理表id
      */

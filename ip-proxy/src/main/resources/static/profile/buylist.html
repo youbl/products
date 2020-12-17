@@ -134,10 +134,7 @@
         <div slot="footer" class="dialog-footer">
             <el-button type="primary" @click="doGetIPURL('ipOrderForm')">获取提取链接</el-button>
             <el-button @click="hideGetIPDailog">取 消</el-button>
-            <div>
-                链接：
-                <el-input v-model="getIpConditionURL" maxlength="30" width="80%"></el-input>
-            </div>
+            <el-input v-model="getIpConditionURL" maxlength="30"></el-input>
         </div>
     </el-dialog>
 </div>
@@ -259,6 +256,7 @@
                             return;
                         }
                         this.getIpConditionURL = this.getUrlPrefix() + response.data;
+                        alert('获取成功，请复制下面的链接使用');
                     }).catch(error => this.ajaxError(error));
                 });
             },

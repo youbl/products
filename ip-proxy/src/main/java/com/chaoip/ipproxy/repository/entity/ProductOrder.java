@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.repository.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -19,8 +20,13 @@ import java.time.LocalDateTime;
  */
 @Data
 @Builder
+@AllArgsConstructor
 @Document
 public class ProductOrder {
+    public ProductOrder() {
+
+    }
+
     /**
      * 主键
      */
