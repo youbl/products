@@ -70,6 +70,16 @@ public class ProductOrder {
      * 在线支付时生成的支付订单id
      */
     private long payOrderId;
+    /**
+     * 每天可提取IP数
+     */
+    private int ipNumPerDay;
+
+    /**
+     * 今天已提取IP数，不属于数据库字段
+     */
+    @Transient
+    private int ipNumToday;
 
     /**
      * 支付成功时间

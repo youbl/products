@@ -68,7 +68,7 @@
                     </el-table-column>
                     <el-table-column label="">
                         <template slot-scope="scope">
-                            <el-button v-if="scope.row.status=='SUCCESS'"
+                            <el-button v-if="canGetIP(scope.row)"
                                        size="mini"
                                        @click="showGetIPDailog(scope.$index, scope.row)">提取代理
                             </el-button>
@@ -195,6 +195,13 @@
             }).catch(error => this.ajaxError(error));
         },
         methods: {
+            // 订单是否有效
+            canGetIP: function (order) {
+                if (order.status !== 'SUCCESS') {
+                    return false;
+                }
+                return new Date(order.endTime) >= new Date();
+            },
             loadCitys: function () {
                 if (this.provinceList.length <= 1) {
                     axios.get('/ip/citys').then(response => {

@@ -3,12 +3,11 @@ package com.chaoip.ipproxy.service;
 import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.ChargeDto;
 import com.chaoip.ipproxy.controller.dto.ProductOrderDto;
+import com.chaoip.ipproxy.repository.ProductOrderDetailRepository;
 import com.chaoip.ipproxy.repository.ProductOrderRepository;
-import com.chaoip.ipproxy.repository.ProductRepository;
 import com.chaoip.ipproxy.repository.entity.*;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.util.AliBase;
-import com.chaoip.ipproxy.util.StrHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -29,17 +28,20 @@ public class ProductOrderService {
     private final BeinetUserService userService;
     private final PayService payService;
     private final UserMoneyService userMoneyService;
+    private final ProductOrderDetailRepository productOrderDetailRepository;
 
     public ProductOrderService(ProductService productService,
                                ProductOrderRepository productOrderRepository,
                                BeinetUserService userService,
                                PayService payService,
-                               UserMoneyService userMoneyService) {
+                               UserMoneyService userMoneyService,
+                               ProductOrderDetailRepository productOrderDetailRepository) {
         this.productService = productService;
         this.productOrderRepository = productOrderRepository;
         this.userService = userService;
         this.payService = payService;
         this.userMoneyService = userMoneyService;
+        this.productOrderDetailRepository = productOrderDetailRepository;
     }
 
     public List<ProductOrder> findAll() {
@@ -62,8 +64,56 @@ public class ProductOrderService {
      * @param orderNo 订单号
      * @return 订单
      */
-    public ProductOrder findByOrderNo(String orderNo) {
-        return productOrderRepository.findByOrderNo(orderNo);
+    public ProductOrder findValidOrder(String orderNo) {
+        ProductOrder order = productOrderRepository.findByOrderNo(orderNo);
+        if (order == null) {
+            throw new IllegalArgumentException("订单号不存在:" + orderNo);
+        }
+        // isAfter 表示 now > endTime
+        if (LocalDateTime.now().isAfter(order.getEndTime())) {
+            throw new IllegalArgumentException("订单号不存在:" + orderNo);
+        }
+        order.setIpNumToday(getIpGetToday(orderNo));
+        if (order.getIpNumToday() >= order.getIpNumPerDay()) {
+            throw new RuntimeException("今天IP提取总数已达限制:" + order.getIpNumToday());
+        }
+
+        return order;
+    }
+
+    /**
+     * 获取指定订单，今天的IP提取总数
+     *
+     * @param orderNo 订单号
+     * @return 数量
+     */
+    private int getIpGetToday(String orderNo) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime beign = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 0, 0, 0);
+        LocalDateTime end = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 23, 59, 59, 999);
+        return productOrderDetailRepository.countByOrderNoAndCreationTimeBetween(orderNo, beign, end);
+    }
+
+    /**
+     * 添加ip提取记录
+     *
+     * @param orderNo 订单
+     * @param ips     提取的ip
+     */
+    public void addIpGetRecord(String orderNo, List<Route> ips) {
+        for (Route item : ips) {
+            ProductOrderDetail detail = ProductOrderDetail.builder()
+                    .orderNo(orderNo)
+                    .routeId(item.getId())
+                    .area(item.getArea())
+                    .expireTime(item.getExpireTime())
+                    .ip(item.getIp())
+                    .port(item.getPort())
+                    .operators(item.getOperators())
+                    .protocal(item.getProtocal())
+                    .build();
+            productOrderDetailRepository.save(detail);
+        }
     }
 
     /**
@@ -117,7 +167,8 @@ public class ProductOrderService {
         ProductOrder order = ProductOrder.builder()
                 .name(username)
                 .orderNo(AliBase.getTransId())
-                .productId(dto.getProductId())
+                .productId(product.getId())
+                .ipNumPerDay(product.getNumPerDay())
                 .buyNum(dto.getBuyNum())
                 .using(dto.getUsing())
                 .description(dto.getDescription())

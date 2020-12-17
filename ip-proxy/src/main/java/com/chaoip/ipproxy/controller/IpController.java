@@ -9,8 +9,6 @@ import com.chaoip.ipproxy.service.ProductOrderService;
 import com.chaoip.ipproxy.service.RouteService;
 import com.chaoip.ipproxy.util.CityHelper;
 import com.chaoip.ipproxy.util.SecurityHelper;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,19 +56,26 @@ public class IpController {
         if (StringUtils.isEmpty(condition.getSign()) || StringUtils.isEmpty(condition.getOrderNo())) {
             throw new IllegalArgumentException("签名或订单号不能为空");
         }
-        ProductOrder order = productOrderService.findByOrderNo(condition.getOrderNo());
+        ProductOrder order = productOrderService.findValidOrder(condition.getOrderNo());
         if (order == null) {
-            throw new IllegalArgumentException("订单号不存在:" + condition.getOrderNo());
-        }
-        // isAfter 表示 now > endTime
-        if (LocalDateTime.now().isAfter(order.getEndTime())) {
             throw new IllegalArgumentException("订单号不存在:" + condition.getOrderNo());
         }
         String sign = getSign(order.getName(), order.getOrderNo());
         if (!sign.equals(condition.getSign())) {
             throw new IllegalArgumentException("签名错误:" + condition.getSign());
         }
+
+        int leftNum = (order.getIpNumPerDay() - order.getIpNumToday());// 剩余可提取个数
+        int limitNum = leftNum > condition.getPageNum() ? condition.getPageNum() : leftNum;
+        condition.setPageNum(limitNum);
+
         List<Route> ret = routeService.find(condition);
+        if (ret == null || ret.isEmpty()) {
+            return null;
+        }
+
+        productOrderService.addIpGetRecord(order.getOrderNo(), ret);
+
         if (condition.getOutputType().equalsIgnoreCase("json")) {
             return ret;
         }
