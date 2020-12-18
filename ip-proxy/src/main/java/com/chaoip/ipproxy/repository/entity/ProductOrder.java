@@ -103,6 +103,11 @@ public class ProductOrder {
     private OrderStatus status;
 
     /**
+     * 订单是否禁用，0启用，1禁用
+     */
+    private int disabled;
+
+    /**
      * 入库时间
      */
     @CreatedDate

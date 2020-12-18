@@ -48,6 +48,15 @@ public class ProductOrderService {
         return productOrderRepository.findByOrderByCreationTimeDesc();
     }
 
+    public ProductOrder close(long id) {
+        ProductOrder order = productOrderRepository.findById(id).orElse(null);
+        if (order == null) {
+            throw new RuntimeException("指定的订单id不存在：" + id);
+        }
+        order.setDisabled(1);
+        return productOrderRepository.save(order);
+    }
+
     /**
      * 根据用户名查找所有购买订单
      *
@@ -69,9 +78,15 @@ public class ProductOrderService {
         if (order == null) {
             throw new IllegalArgumentException("订单号不存在:" + orderNo);
         }
+        if (order.getStatus() != OrderStatus.SUCCESS) {
+            throw new IllegalArgumentException("订单未支付成功:" + orderNo);
+        }
+        if (order.getDisabled() == 1) {
+            throw new IllegalArgumentException("订单已关闭:" + orderNo);
+        }
         // isAfter 表示 now > endTime
         if (LocalDateTime.now().isAfter(order.getEndTime())) {
-            throw new IllegalArgumentException("订单号不存在:" + orderNo);
+            throw new IllegalArgumentException("订单已过期:" + orderNo);
         }
         order.setIpNumToday(getIpGetToday(orderNo));
         if (order.getIpNumToday() >= order.getIpNumPerDay()) {

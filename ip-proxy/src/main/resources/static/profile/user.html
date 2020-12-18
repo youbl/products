@@ -46,16 +46,19 @@
                         <el-menu-item index="2-1" @click.native="switchTab(21)">代理购买</el-menu-item>
                         <el-menu-item index="2-2" @click.native="switchTab(22)">历史订单</el-menu-item>
                         <el-menu-item index="2-6" @click.native="switchTab(26)"
-                                      v-if="isAdmin">用户维护
+                                      v-if="isAdmin">用户管理
                         </el-menu-item>
                         <el-menu-item index="2-7" @click.native="switchTab(27)"
-                                      v-if="isAdmin">IP维护
+                                      v-if="isAdmin">代理管理
                         </el-menu-item>
                         <el-menu-item index="2-8" @click.native="switchTab(28)"
-                                      v-if="isAdmin">用户充值记录
+                                      v-if="isAdmin">用户充值管理
+                        </el-menu-item>
+                        <el-menu-item index="2-5" @click.native="switchTab(25)"
+                                      v-if="isAdmin">用户订单管理
                         </el-menu-item>
                         <el-menu-item index="2-9" @click.native="switchTab(29)"
-                                      v-if="isAdmin">站点配置
+                                      v-if="isAdmin">站点配置管理
                         </el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
@@ -151,31 +154,52 @@
                 </div>
             </el-main>
 
+            <!-- 用户充值 -->
             <el-main v-show="showTab===14">
-                <iframe v-if="showTab===14" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
+                <iframe v-if="showTab===14" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
+                        frameborder="0"></iframe>
             </el-main>
 
+            <!-- 购买代理 -->
             <el-main v-show="showTab===21">
-                <iframe v-if="showTab===21" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
+                <iframe v-if="showTab===21" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
+                        frameborder="0"></iframe>
             </el-main>
 
+            <!-- 用户订单 -->
             <el-main v-show="showTab===22">
-                <iframe v-if="showTab===22" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
+                <iframe v-if="showTab===22" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
+                        frameborder="0"></iframe>
             </el-main>
+
+            <!-- 用户管理 -->
             <el-main v-show="showTab===26" v-if="isAdmin">
-                <iframe v-if="showTab===26" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
+                <iframe v-if="showTab===26" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
+                        frameborder="0"></iframe>
             </el-main>
 
+            <!-- 代理管理 -->
             <el-main v-show="showTab===27" v-if="isAdmin">
-                <iframe v-if="showTab===27" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
+                <iframe v-if="showTab===27" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
+                        frameborder="0"></iframe>
             </el-main>
 
+            <!-- 用户充值管理 -->
             <el-main v-show="showTab===28" v-if="isAdmin">
-                <iframe v-if="showTab===28" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
+                <iframe v-if="showTab===28" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
+                        frameborder="0"></iframe>
             </el-main>
 
+            <!-- 用户订单管理 -->
+            <el-main v-show="showTab===25" v-if="isAdmin">
+                <iframe v-if="showTab===25" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
+                        frameborder="0"></iframe>
+            </el-main>
+
+            <!-- 站点配置管理 -->
             <el-main v-show="showTab===29" v-if="isAdmin">
-                <iframe v-if="showTab===29" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto" frameborder="0"></iframe>
+                <iframe v-if="showTab===29" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
+                        frameborder="0"></iframe>
             </el-main>
         </el-container>
     </el-container>
@@ -204,8 +228,9 @@
                     22: '/profile/buylist.html', // 用户已购订单页
                     26: '/admin/user.html',     // 管理用户列表页
                     27: '/admin/list.html',       // 管理ip列表页
-                    29: '/admin/config.html',  // 站点配置页面
                     28: '/admin/charge.html', // 管理员查看充值页面
+                    25: '/admin/buylist.html',     // 管理用户订单列表页
+                    29: '/admin/config.html',  // 站点配置页面
                 },
                 realNameValidateQrCode: '',
 

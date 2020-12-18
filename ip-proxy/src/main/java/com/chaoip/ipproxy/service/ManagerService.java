@@ -33,6 +33,9 @@ public class ManagerService {
      * @param money 金额
      */
     public void chargeUser(ChargeDto money) {
+        if (userService.findByName(money.getName(), false) == null) {
+            throw new IllegalArgumentException("要充值的用户不存在: " + money.getName());
+        }
         payService.addMoneyAndOrder(money);
     }
 

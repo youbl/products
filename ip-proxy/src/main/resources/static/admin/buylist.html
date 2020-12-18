@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>用户订单管理</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script src="/res/unpkg/elemeIndex.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .noborder input {
+            border: none;
+        }
+    </style>
+</head>
+
+<body style="height: 900px;">
+<div id="divApp" style="height: 100%;">
+    <el-tabs v-model="tab.activeTab">
+        <el-tab-pane label="历史订单" name="first">
+            <el-table
+                    :data="orderData"
+                    stripe
+                    show-summary
+                    style="width: 100%">
+                <el-table-column
+                        prop="name"
+                        label="用户名"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="orderNo"
+                        label="订单号"
+                        width="250">
+                </el-table-column>
+                <el-table-column
+                        prop="buyNum"
+                        label="购买月数"
+                        width="60">
+                </el-table-column>
+                <el-table-column
+                        prop="money"
+                        label="支付金额"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="payTypeName"
+                        label="渠道"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="statusName"
+                        label="状态"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="using"
+                        label="用途"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="description"
+                        label="说明"
+                        width="300">
+                </el-table-column>
+                <el-table-column
+                        prop="payTime"
+                        label="支付时间"
+                        width="230">
+                </el-table-column>
+                <el-table-column
+                        prop="endTime"
+                        label="过期时间"
+                        width="230">
+                </el-table-column>
+                <el-table-column
+                        prop="disabled"
+                        label="失效"
+                        width="40">
+                </el-table-column>
+                <el-table-column label="">
+                    <template slot-scope="scope">
+                        <el-button v-show="scope.row.disabled !== 1" size="mini"
+                                   @click="closeOrder(scope.$index, scope.row)">关闭订单
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-tab-pane>
+    </el-tabs>
+</div>
+
+<script>
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                tab: {
+                    activeTab: 'first',
+                },
+                user: {},
+                orderData: [],
+            }
+        },
+        created: function () {
+            let url = '/user';
+            axios.get(url).then(response => {
+                if (!response || !response.data) {
+                    alert('未取得登录信息');
+                    return;
+                }
+                this.user = response.data;
+                this.loadOrderDatas();
+            }).catch(error => this.ajaxError(error));
+        },
+        methods: {
+            closeOrder: function (idx, item) {
+                if (!confirm('确认要关闭订单吗？此操作不可恢复')) {
+                    return;
+                }
+                let url = '/manage/order?id=' + item.id;
+                axios.post(url, {params: this.getIpCondition}).then(response => {
+                    if (!response || !response.data) {
+                        alert('禁用失败');
+                        return;
+                    }
+                    alert('禁用成功');
+                    item.disabled = 1;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadOrderDatas: function () {
+                let url = '/manage/order';
+                axios.get(url).then(response => {
+                    if (!response || !response.data) {
+                        alert('获取失败');
+                        return;
+                    }
+                    this.orderData = this.processData(response.data);
+                }).catch(error => this.ajaxError(error));
+            },
+            processData: function (data) {
+                for (let i = 0, j = data.length; i < j; i++) {
+                    let item = data[i];
+                    item.money = item.money / 100;
+                    switch (item.status) {
+                        case 'NO_PAY':
+                            item.statusName = '未支付';
+                            break;
+                        case 'SUCCESS':
+                            item.statusName = '成功';
+                            break;
+                        default:
+                            item.statusName = '支付失败';
+                            break;
+                    }
+                    switch (item.payType) {
+                        case 0:
+                            item.payTypeName = '余额支付';
+                            break;
+                        case 1:
+                            item.payTypeName = '支付宝';
+                            break;
+                        case 2:
+                            item.payTypeName = '微信';
+                            break;
+                        default:
+                            item.payTypeName = '未知';
+                            break;
+                    }
+                }
+                return data;
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (!msg)
+                        msg = '出错了';
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>

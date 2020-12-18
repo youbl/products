@@ -6,13 +6,11 @@ import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
+import com.chaoip.ipproxy.repository.entity.ProductOrder;
 import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
-import com.chaoip.ipproxy.service.ManagerService;
-import com.chaoip.ipproxy.service.PayService;
-import com.chaoip.ipproxy.service.RouteService;
-import com.chaoip.ipproxy.service.SiteConfigService;
+import com.chaoip.ipproxy.service.*;
 import com.chaoip.ipproxy.util.config.AliPayConfig;
 import com.chaoip.ipproxy.util.config.SmsConfig;
 import com.chaoip.ipproxy.util.config.VerifyConfig;
@@ -41,15 +39,18 @@ public class ManageController {
     private final BeinetUserService userService;
     private final SiteConfigService siteConfigService;
     private final ManagerService managerService;
+    private final ProductOrderService productOrderService;
 
     public ManageController(RouteService routeService,
                             BeinetUserService userService,
                             SiteConfigService siteConfigService,
-                            ManagerService managerService) {
+                            ManagerService managerService,
+                            ProductOrderService productOrderService) {
         this.routeService = routeService;
         this.userService = userService;
         this.siteConfigService = siteConfigService;
         this.managerService = managerService;
+        this.productOrderService = productOrderService;
     }
 
     @GetMapping("routes")
@@ -187,5 +188,24 @@ public class ManageController {
     @GetMapping("charges")
     public List<PayOrder> getCharges() {
         return managerService.findCharges();
+    }
+
+
+    /**
+     * 获取所有购买订单
+     *
+     * @param page 第几页
+     * @param size 每页几条
+     * @return 产品订单
+     */
+    @GetMapping("order")
+    public List<ProductOrder> getOrders(@RequestParam(required = false, defaultValue = "0") int page,
+                                        @RequestParam(required = false, defaultValue = "20") int size) {
+        return productOrderService.findAll();
+    }
+
+    @PostMapping("order")
+    public ProductOrder closeOrders(int id) {
+        return productOrderService.close(id);
     }
 }
