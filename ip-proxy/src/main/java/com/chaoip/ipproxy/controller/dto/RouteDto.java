@@ -44,6 +44,9 @@ public class RouteDto {
      */
     @Pattern(regexp = "^(http|socks)$", message = "协议只支持 http,socks")
     private String protocal;
+
+    private String province;
+
     /**
      * 代理服务所在地域
      */
@@ -94,11 +97,13 @@ public class RouteDto {
                     throw new IllegalArgumentException("无效的运营商: " + getOperators());
             }
         }
+        String province = "";
         if (getArea() != null) {
-            String cityName = CityHelper.getByAreaCode(getArea());
-            if (StringUtils.isEmpty(cityName)) {
+            String[] cityNames = CityHelper.getArrByAreaCode(getArea());
+            if (cityNames == null) {
                 throw new IllegalArgumentException("无效的城市区号: " + getArea());
             }
+            province = cityNames[1];
         }
         return Route.builder()
                 .id(getId())
@@ -106,6 +111,7 @@ public class RouteDto {
                 .port(getPort())
                 .protocal(getProtocal())
                 .area(getArea())
+                .province(province)
                 .operators(getOperators())
                 .expireTime(LocalDateTime.now().plusSeconds(getExpireTime()))
                 .build();

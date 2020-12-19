@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
+import com.chaoip.ipproxy.util.CityHelper;
+
 /**
  * Route
  *
@@ -40,9 +42,18 @@ public class Route {
      */
     private String protocal;
     /**
+     * 代理所在省
+     */
+    private String province;
+    /**
      * 代理服务所在地域
      */
     private String area;
+
+    public String getAreaName() {
+        return CityHelper.getByAreaCode(getArea());
+    }
+
     /**
      * 运营商
      */

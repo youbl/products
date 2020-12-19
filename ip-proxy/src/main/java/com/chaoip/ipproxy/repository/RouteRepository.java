@@ -27,4 +27,8 @@ public interface RouteRepository extends BaseRepository<Route, Long> {
      */
     @Query(value = "{}", sort = "{'creationTime':-1}")
     List<Route> findTopRoute(Pageable pageable);
+
+    // MongoRepository 并不支持Distinct，要自己写MongoTemplate
+    // @Query(value = "{}", fields = "{'area':1}")
+    // List<String> findDistinctArea();
 }

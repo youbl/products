@@ -3,6 +3,8 @@ package com.chaoip.ipproxy.service;
 import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.repository.RouteRepository;
 import com.chaoip.ipproxy.repository.entity.Route;
+import com.chaoip.ipproxy.util.CityHelper;
+import com.mongodb.client.DistinctIterable;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * RouteService
@@ -56,20 +60,23 @@ public class RouteService {
         if (dto.getExpireTime() > 0) {
             condition = condition.and("expireTime").gte(LocalDateTime.now().plusSeconds(dto.getExpireTime()));
         }
+        if (!StringUtils.isEmpty(dto.getProvince())) {
+            condition = condition.and("province").is(dto.getProvince());
+        }
         if (!StringUtils.isEmpty(dto.getArea())) {
             condition = condition.and("area").is(dto.getArea());
         }
         if (!StringUtils.isEmpty(dto.getOperators())) {
             condition = condition.and("operators").is(dto.getOperators());
         }
-        Query query = Query.query(condition).limit(dto.getPageNum()).with(Sort.by(Sort.Direction.ASC, "id"));
+        Query query = Query.query(condition).limit(dto.getPageSize()).with(Sort.by(Sort.Direction.ASC, "id"));
         return mongoTemplate.find(query, Route.class);
     }
 
     public Page<Route> getAll(RouteDto dto) {
         // 不使用的属性，必须要用 withIgnorePaths 忽略，否则会列入条件
         ExampleMatcher matcher = ExampleMatcher.matching()
-                .withIgnorePaths("id", "expireTime");
+                .withIgnorePaths("id", "expireTime", "province");
         if (!StringUtils.isEmpty(dto.getArea())) {
             matcher = matcher.withMatcher("area", ExampleMatcher.GenericPropertyMatchers.exact());
         } else {
@@ -97,5 +104,19 @@ public class RouteService {
         }
         Example<Route> example = Example.of(dto.mapTo(), matcher);
         return routeRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize(), "creationTime", true);
+    }
+
+    public Map<String, String[]> getAllUsingCity() {
+        // 所有已有的城市code列表
+        DistinctIterable<String> usingCitys = mongoTemplate.getCollection("routes").distinct("area", String.class);
+        Map<String, String[]> ret = new HashMap<>();
+
+        for (String code : usingCitys) {
+            String[] cityArr = CityHelper.getArrByAreaCode(code);
+            if (cityArr != null) {
+                ret.put(code, cityArr);
+            }
+        }
+        return ret;
     }
 }

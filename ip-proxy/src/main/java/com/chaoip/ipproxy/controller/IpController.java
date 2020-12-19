@@ -66,9 +66,13 @@ public class IpController {
         }
 
         int leftNum = (order.getIpNumPerDay() - order.getIpNumToday());// 剩余可提取个数
-        int limitNum = leftNum > condition.getPageNum() ? condition.getPageNum() : leftNum;
-        condition.setPageNum(limitNum);
+        int limitNum = leftNum > condition.getPageSize() ? condition.getPageSize() : leftNum;
+        if (limitNum <= 0) {
+            limitNum = 10;
+        }
+        condition.setPageSize(limitNum);
 
+        // 查路由数据
         List<Route> ret = routeService.find(condition);
         if (ret == null || ret.isEmpty()) {
             return null;
@@ -92,7 +96,7 @@ public class IpController {
 
     @GetMapping("citys")
     public Map<String, String[]> getCitys() {
-        return CityHelper.getCitys();
+        return routeService.getAllUsingCity();
     }
 
     private String getSign(String username, String orderNo) {

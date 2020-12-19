@@ -110,7 +110,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="代理所属区域" label-width="200px">
-                <el-select v-model="province" filterable placeholder="请选择省" @change="changeProvince"
+                <el-select v-model="getIpCondition.province" filterable placeholder="请选择省" @change="changeProvince"
                            style="width:150px">
                     <el-option v-for="item in provinceList"
                                :label="item.text"
@@ -120,7 +120,7 @@
                 <el-select v-model="getIpCondition.area" filterable placeholder="代理所属区域" style="width:150px">
                     <el-option v-for="item in provinceSelected.citys"
                                :label="item.text"
-                               :value="item.text">
+                               :value="item.code">
                     </el-option>
                 </el-select>
             </el-form-item>
@@ -162,7 +162,6 @@
                 },
                 user: {},
                 orderData: [],
-                province: '',
                 provinceSelected: {},
                 provinceList: [{id: '', text: '不限', citys: [{code: '', text: '不限'}]}],
 
@@ -170,6 +169,7 @@
                 getIpCondition: {
                     orderNo: '',
                     pageSize: 50,
+                    province: '',
                     area: '',
                     operators: '',
                     protocal: '',
@@ -238,8 +238,8 @@
                 return null;
             },
             changeProvince: function () {
-                this.provinceSelected = this.searchProvince(this.province);
-                this.getIpCondition.area = this.provinceSelected.citys[0].text;
+                this.provinceSelected = this.searchProvince(this.getIpCondition.province);
+                this.getIpCondition.area = this.provinceSelected.citys[0].code;
             },
             showGetIPDailog: function (idx, row) {
                 this.loadCitys();//.then((citys) => {

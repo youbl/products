@@ -360,11 +360,20 @@ public final class CityHelper {
      * @return 城市或未知
      */
     public static String getByAreaCode(String code) {
-        if (StringUtils.isEmpty(code)) {
-            return "";
-        }
-        String[] city = citys.getOrDefault(code, null);
+        String[] city = getArrByAreaCode(code);
         return city == null ? "" : city[0];
     }
 
+    /**
+     * 根据区号找省市名
+     *
+     * @param code 区号
+     * @return 0为城市 1为省份
+     */
+    public static String[] getArrByAreaCode(String code) {
+        if (StringUtils.isEmpty(code)) {
+            return null;
+        }
+        return citys.getOrDefault(code, null);
+    }
 }

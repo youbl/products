@@ -66,12 +66,17 @@
                 <el-table-column
                         prop="operators"
                         label="运营商"
-                        width="200">
+                        width="100">
                 </el-table-column>
                 <el-table-column
                         prop="area"
+                        label="区号"
+                        width="80">
+                </el-table-column>
+                <el-table-column
+                        prop="areaName"
                         label="地域"
-                        width="200">
+                        width="120">
                 </el-table-column>
                 <el-table-column
                         prop="modifyTime"
@@ -86,8 +91,8 @@
         <el-form>
             <el-form-item label="协议" label-width="200px">
                 <el-select v-model="newRecord.protocal" placeholder="请选择协议">
-                    <el-option label="http" value="http"></el-option>
-                    <el-option label="socks" value="socks"></el-option>
+                    <el-option label="http/https" value="http"></el-option>
+                    <el-option label="socks4/socks5" value="socks"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="IP" label-width="200px">
