@@ -91,17 +91,17 @@
                 <el-input v-model="getIpCondition.orderNo" maxlength="30" readonly></el-input>
             </el-form-item>
             <el-form-item label="每次提取个数" label-width="200px" prop="pageSize">
-                <el-input v-model="getIpCondition.pageSize" maxlength="30" width="150px"></el-input>
+                <el-input v-model="getIpCondition.pageSize" maxlength="30" style="width:150px"></el-input>
             </el-form-item>
             <el-form-item label="代理协议" label-width="200px" prop="protocal">
-                <el-select v-model="getIpCondition.protocal" filterable placeholder="请选择代理协议">
+                <el-select v-model="getIpCondition.protocal" filterable placeholder="请选择代理协议" style="width:150px">
                     <el-option label="不限" value=""></el-option>
-                    <el-option label="http" value="http"></el-option>
-                    <el-option label="socks" value="socks"></el-option>
+                    <el-option label="http/https" value="http"></el-option>
+                    <el-option label="socks4/socks5" value="socks"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="过期时间" label-width="200px" prop="expireTime">
-                <el-select v-model="getIpCondition.expireTime" filterable placeholder="请选择过期时间">
+                <el-select v-model="getIpCondition.expireTime" filterable placeholder="请选择过期时间" style="width:150px">
                     <el-option label="不限" value="0"></el-option>
                     <el-option label="3分钟" value="180"></el-option>
                     <el-option label="10分钟" value="600"></el-option>
@@ -110,13 +110,14 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="代理所属区域" label-width="200px">
-                <el-select v-model="province" filterable placeholder="请选择省" @change="changeProvince" width="100px">
+                <el-select v-model="province" filterable placeholder="请选择省" @change="changeProvince"
+                           style="width:150px">
                     <el-option v-for="item in provinceList"
                                :label="item.text"
                                :value="item.id">
                     </el-option>
                 </el-select>
-                <el-select v-model="getIpCondition.area" filterable placeholder="请选择代理所属区域" width="100px">
+                <el-select v-model="getIpCondition.area" filterable placeholder="代理所属区域" style="width:150px">
                     <el-option v-for="item in provinceSelected.citys"
                                :label="item.text"
                                :value="item.text">
@@ -124,11 +125,11 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="代理所属运营商" label-width="200px" prop="operators">
-                <el-select v-model="getIpCondition.operators" filterable placeholder="请选择代理所属运营商">
+                <el-select v-model="getIpCondition.operators" filterable placeholder="请选择代理所属运营商" style="width:150px">
                     <el-option label="不限" value=""></el-option>
-                    <el-option label="中国移动" value="中国移动"></el-option>
-                    <el-option label="中国联通" value="中国联通"></el-option>
-                    <el-option label="中国电信" value="中国电信"></el-option>
+                    <el-option label="中国移动" value="mobile"></el-option>
+                    <el-option label="中国联通" value="unicom"></el-option>
+                    <el-option label="中国电信" value="telecom"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="响应格式" label-width="200px" prop="outputType">
@@ -221,7 +222,7 @@
                     let cityName = objCitys[cityCode][0];
                     let provinceItem = this.searchProvince(provinceName);
                     if (provinceItem === null) {
-                        provinceItem = {id: provinceName, text: provinceName, citys: []};
+                        provinceItem = {id: provinceName, text: provinceName, citys: [{code: '', text: '不限'}]};
                         this.provinceList.push(provinceItem);
                     }
                     provinceItem.citys.push({code: cityCode, text: cityName});

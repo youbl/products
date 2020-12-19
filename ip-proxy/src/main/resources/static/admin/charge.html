@@ -188,7 +188,9 @@
                             alert('充值失败');
                             return;
                         }
+                        this.loadChargsDatas();
                         alert('充值成功，用户当前余额：' + (response.data.money / 100));
+                        this.tab.activeTab = 'first';
                     }).catch(error => this.ajaxError(error));
                 });
             },

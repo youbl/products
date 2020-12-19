@@ -177,7 +177,7 @@ public class ManageController {
         }
         money.setDescription(details.getUserName() + ":" + money.getDescription());
         managerService.chargeUser(money);
-        return userService.findByName(details.getUserName(), false);
+        return userService.findByName(money.getName(), false);
     }
 
     /**

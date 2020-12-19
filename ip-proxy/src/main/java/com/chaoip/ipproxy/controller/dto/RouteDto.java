@@ -4,6 +4,7 @@ import com.chaoip.ipproxy.repository.entity.Route;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import com.chaoip.ipproxy.util.CityHelper;
 
@@ -22,12 +23,9 @@ import java.time.LocalDateTime;
  */
 @Data
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class RouteDto {
-    public RouteDto() {
-        // empty
-    }
-
     private int id;
 
     /**
@@ -54,7 +52,7 @@ public class RouteDto {
     /**
      * 服务运营商
      */
-    @Pattern(regexp = "^(unicom|中国联通|mobile|中国移动|telecom|中国电信)$", message = "运营商只支持 unicom,mobile,telecom")
+    @Pattern(regexp = "^(unicom|mobile|telecom)$", message = "运营商只支持 unicom,mobile,telecom")
     private String operators;
     /**
      * 过期时间，单位秒
@@ -86,29 +84,18 @@ public class RouteDto {
     private int pageSize;
 
     public Route mapTo() {
-        String operatorName = "";
-
         if (getOperators() != null) {
             switch (getOperators()) {
                 case "unicom":
-                case "中国联通":
-                    operatorName = "中国联通";
-                    break;
                 case "mobile":
-                case "中国移动":
-                    operatorName = "中国移动";
-                    break;
                 case "telecom":
-                case "中国电信":
-                    operatorName = "中国电信";
                     break;
                 default:
                     throw new IllegalArgumentException("无效的运营商: " + getOperators());
             }
         }
-        String cityName = "";
         if (getArea() != null) {
-            cityName = CityHelper.getByAreaCode(getArea());
+            String cityName = CityHelper.getByAreaCode(getArea());
             if (StringUtils.isEmpty(cityName)) {
                 throw new IllegalArgumentException("无效的城市区号: " + getArea());
             }
@@ -118,8 +105,8 @@ public class RouteDto {
                 .ip(getIp())
                 .port(getPort())
                 .protocal(getProtocal())
-                .area(cityName)
-                .operators(operatorName)
+                .area(getArea())
+                .operators(getOperators())
                 .expireTime(LocalDateTime.now().plusSeconds(getExpireTime()))
                 .build();
     }
