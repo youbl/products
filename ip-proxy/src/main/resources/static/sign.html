@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>区号列表</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script src="/res/unpkg/elemeIndex.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+</head>
+
+<body style="height: 900px;">
+<div id="divApp" style="height: 100%;">
+
+<h1>sign签名计算方式说明：</h1>
+<div>MD5(账号-订单号)，例如您的账号为 beinet，订单号为 CDL202012191543290173730</div>
+<div>则计算结果为： </div>
+<div>MD5(“beinet-CDL202012191543290173730”) = ba18fde7931f83cc2bbd689a857a64b2</div>
+
+</div>
+
+<script>
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                citys:[]
+            }
+        },
+        created: function () {
+        },
+        methods: {
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (!msg)
+                        msg = '出错了';
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>

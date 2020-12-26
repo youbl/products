@@ -2,38 +2,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta name="format-detection" content="telephone=no">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0,minimum-scale=1.0,user-scalable=no" />
     <title>超代理 - 企业级代理云服务提供商</title>
-
     <meta name="keywords" content="超代理,代理服务器,代理ip,http代理,https代理,socks代理,socks5代理,私密代理,代理,ip池,http隧道,socks隧道,私密代理ip,爬虫代理ip,刷单代理ip,爬虫代理,数据采集代理,更换ip,动态ip,随机五位端口,稳定代理ip,代理ip地址,花刺代理ip,ip代理,免费代理服务器,免费代理ip,高匿代理,高匿代理ip,最新代理ip,代理api接口,代理服务器ip,代理地址,代理列表,代理ip购买,http proxy,socks proxy,socks5 proxy" />
     <meta name="description" content="超代理创立于2013年，专注代理服务器领域，为企业和开发者提供高品质的HTTP代理IP云服务，每天代理IP超20万个，提供完备的API接口和SDK，赋能于大规模数据采集。" />
 
-    <meta content="index,follow" name="robots"/>
-    <meta content="index,follow" name="GOOGLEBOT"/>
-    <meta content="超代理"  name="Author"/>
-    <meta name="renderer" content="webkit" />
-    <meta name="baidu_union_verify" content="c087a423b52225f404d4c97e59e53464">
-    <meta name="google-site-verification" content="Pd8y4Id4xJSxMvj-OwUhaZaK7COpr-8LcANUG30jxW8" />
-    <meta name="google-site-verification" content="VqxCNkms5J6_V8eHmKeUQWnBRukgNmLIZUD4Do3LWns" />
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script src="/res/unpkg/elemeIndex.js"></script>
 
-
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
     <link rel="stylesheet" href="/res/all.css" media="screen" />
-
-
-    <style>
-    </style>
-
-
-    <meta name="renderer" content="webkit">
-    <meta name="baidu-site-verification" content="AO3Q6dKj9R" />
-    <meta name="baidu-site-verification" content="1flUdvqxyo" />
-    <meta name="sogou_site_verification" content="9ELczs5cQc"/>
-    <meta name="360-site-verification" content="54b4b98644076c5e014603c7c2ffba78" />
-    <meta baidu-gxt-verify-token="0fd36d429c039b254364ec1f35f82358">
 </head>
 
 <body>
@@ -81,11 +60,71 @@
     </div>
 
 
-    <div id="content">
+    <div id="divApp">
+<el-container style="height:100%;border: 1px solid #eee">
+  <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+    <el-menu :default-openeds="['1', '2']">
+      <el-submenu index="1">
+        <template slot="title"><i class="el-icon-menu"></i>开发指南</template>
+        <el-menu-item-group>
+          <!--template slot="title">分组一</template-->
+          <el-menu-item index="1-1" @click.native="switchTab(11)">快速入门</el-menu-item>
+          <el-menu-item index="1-2" @click.native="switchTab(12)">提取代理API</el-menu-item>
+        </el-menu-item-group>
+      </el-submenu>
+      <el-submenu index="2">
+        <template slot="title"><i class="el-icon-message"></i>常见问题</template>
+        <el-menu-item-group>
+          <el-menu-item index="2-1" @click.native="switchTab(21)">问题1</el-menu-item>
+          <el-menu-item index="2-2" @click.native="switchTab(22)">问题2</el-menu-item>
+        </el-menu-item-group>
+      </el-submenu>
+    </el-menu>
+  </el-aside>
+  
+  <el-container>    
+    <el-main v-show="showTab===11">
+         <h1>快速入门</h1>                
+                <p>本文档帮助您快速地开发使用代理服务器。</p>
+                <br/>
+<h2>一、入门步骤</h2>
+<p><img src="/img/dev_flow_dps.png" style="max-width:840px;width:100%;height:auto;" data-rjs="2"></p>
+<h2>二、步骤详解</h2>
+<h3 >1. 生成API链接</h3>
+<p>在历史订单页，已支付成功的订单后面会出现“提取代理”按钮，点击它即可生成提取代理API</p>
+<ul>
+<li><a href="/profile/user.html?page=22">生成提取代理API链接</a></li>
+</ul>
+<br>
+<h3 id="2-api">2. 调用API提取代理</h3>
 
-     
-     
+<p>也可以直接根据API接口参数要求，直接生成提取代理API链接</p>
+<ul>
+<li><a href="javascript:void(0)" @click="switchTab(12)">提取代理API</a></li>
+</ul>
+<br>
 
+<h3 id="3">3. 完成代理测试</h3>
+<p>获取代理IP后，在本地或服务器上完成调试，确认代理IP可用。</p>
+<br>
+
+<h3 id="4">4. 开始编写采集程序</h3>
+<p>调试完成后就可以开始编程了</p>
+<br>
+
+<h3 id="5">5. 开始抓取</h3>
+<p>完成编程后就可以运行程序开始抓取了~</p>
+    </el-main>
+    
+    
+    <el-main v-if="showTab===12">
+                <iframe src="api1.html" width="100%" height="800px" scrolling="auto"
+                        frameborder="0"></iframe>
+    </el-main>
+  </el-container>
+</el-container>
+
+</style>
     </div>
 
 
@@ -171,5 +210,35 @@
     </div>
     <a href="javascript:void(0);" id="top_btn" class="label btt" style="display:none;z-index: 9999;"><span class="bt6"><i class="iconfont icon-up-to-top"></i></span></a>
 </div>
+<script>
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                showTab: 11,
+            }
+        },
+        created: function () {
+        },
+        methods: {
+            // 订单是否有效
+            switchTab: function (tab) {
+                this.showTab = tab;
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (!msg)
+                        msg = '出错了';
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
 </body>
 </html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>API1</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script src="/res/unpkg/elemeIndex.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+         table{ border-collapse:collapse; border:solid 1px Black; }
+        table td, th{ width:50px; height:20px;  border:solid 1px Black; padding:5px;}
+    </style>
+</head>
+
+<body style="height: 900px;">
+<div id="divApp" style="height: 100%;">
+<article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="ip">获取私密代理IP</h1>
+<h3 id="1">1. 接口描述</h3>
+<div>接口地址： /ip/search</p>
+<p>实时批量获取代理IP列表。</p>
+<ol>
+<li>HTTP GET接口</li>
+<li>参数和返回内容均采用utf-8编码</li>
+<li>接口最快调用频率: 1秒10次</li>
+</ol>
+
+<h3 id="2">2. 参数说明</h3>
+<div class="md-typeset__scrollwrap"><div class="md-typeset__table">
+<table style="width:900px;">
+<thead>
+<tr>
+<th style="width:100px;">参数</th>
+<th style="width:50px;">必填</th>
+<th style="width:400px;">参数说明</th>
+<th style="width:350px;">取值说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>orderNo</td>
+<td><em>是</em></td>
+<td>订单号，已支付，且有效的代理订单号。</td>
+<td><a href="/profile/user.html?page=22">查看我的订单</a></td>
+</tr>
+<tr>
+<td>sign</td>
+<td><em>是</em></td>
+<td>签名，用于合法性验证</td>
+<td><a href="/sign.html">签名算法</a></td>
+</tr>
+<tr>
+<td>pageSize</td>
+<td>否</td>
+<td>每次提取的代理数量</td>
+<td>默认值：10</td>
+</tr>
+<tr>
+<td>operators</td>
+<td>否</td>
+<td>运营商，只能为空，或取3个字符串之一：unicom mobile telecom</td>
+<td>默认值：不限</td>
+</tr>
+<tr>
+<td>province</td>
+<td>否</td>
+<td>代理所在省份，汉字省份名，选项见<a href="/province.html">省份列表</a></td>
+<td>默认值：不限</td>
+</tr>
+<tr>
+<td>area</td>
+<td>否</td>
+<td>代理所在城市，只能使用数字区号，选项见<a href="/city.html">区号列表</a></td>
+<td>默认值：不限</td>
+</tr>
+<tr>
+<td>expireTime</td>
+<td>否</td>
+<td>代理最小有效时长，单位秒，如 300， 1800</td>
+<td>默认值：不限</td>
+</tr>
+<tr>
+<td>protocal</td>
+<td>否</td>
+<td>代理协议，只能是http socks 两者之一</td>
+<td>默认值：不限</td>
+</tr>
+<tr>
+<td>outputType</td>
+<td>否</td>
+<td>输出格式，text或json</td>
+<td>默认值：text</td>
+</tr>
+</tbody>
+</table></div></div>
+<h3 id="3">3. 返回值</h3>
+<h4>json格式</h4>
+<div class="md-typeset__scrollwrap"><div class="md-typeset__table"><table>
+<thead>
+<tr>
+<th style="width:100px">参数</th>
+<th style="width:400px">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ip</td>
+<td>代理IP</td>
+</tr>
+<tr>
+<td>port</td>
+<td>代理端口</td>
+</tr>
+<tr>
+<td>protocal</td>
+<td>代理的协议</td>
+</tr>
+<tr>
+<td>province</td>
+<td>代理所在省份</td>
+</tr>
+<tr>
+<td>area</td>
+<td>代理所在城市区号，见<a href="/city.html">区号列表</a></td>
+</tr>
+<tr>
+<td>operators</td>
+<td>代理所属运营商</td>
+</tr>
+<tr>
+<td>expireTime</td>
+<td>代理过期时间</td>
+</tr>
+</tbody>
+</table></div></div>
+<h4 id="_1">文本格式</h4>
+<p>正常返回代理列表，每行一个代理，代理格式 <code>ip:port</code><br>
+格式样例：<br>
+</p>
+<pre>
+110.229.159.155:63148
+182.46.110.15:63119
+182.46.110.15:63120
+140.255.190.59:63074
+122.5.108.58:63104
+140.255.187.218:63088
+</pre></div><p></p>
+    
+<h3 >4. 异常描述</h3>
+<ol>
+<li>订单号不存在：请确认订单号是否正确，是否不小心多了空格</li>
+<li>订单未支付成功：未支付的订单不能提取IP</li>
+<li>订单已关闭：该订单被管理员关闭，详情请咨询客服</li>
+<li>订单已过期：订单有效期已到，请重新购买</li>
+<li>今天IP提取总数已达限制：订单每天默认限制提取1000个，超出时将会提示此错误</li>
+</ol>
+   
+            </article>
+</div>
+
+<script>
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+            }
+        },
+        created: function () {
+        },
+        methods: {
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (!msg)
+                        msg = '出错了';
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>

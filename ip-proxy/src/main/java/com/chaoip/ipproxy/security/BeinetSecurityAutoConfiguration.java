@@ -83,11 +83,12 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 .accessDeniedHandler(new BeinetHandleAccessDenied())            // 指定登录用户访问无权限url的异常处理器
                 .and()
                 .authorizeRequests()                // 开始指定请求授权
-                .antMatchers("/res/**", "/error/**").permitAll()     // res根路径及子目录请求，不限制访问
+                .antMatchers("/res/**", "/error/**", "/img/**").permitAll()     // res根路径及子目录请求，不限制访问
                 .antMatchers("/favicon.ico").permitAll()     // ico不限制访问
                 .antMatchers("/user/**").permitAll()    // user控制器请求，不限制访问
                 .antMatchers("/ip/search/**").permitAll()    // 提取IP请求，不限制访问
                 .antMatchers("/login/**").permitAll()   // login相关页面请求，不限制访问
+                .antMatchers("/*.html/**").permitAll()   // 根目录的html，不限制访问
                 .antMatchers("/admin/**").hasRole("ADMIN") // 管理页面请求，要求ADMIN角色才能访问
                 .antMatchers("/manage/**").hasRole("ADMIN")// 管理页面请求，要求ADMIN角色才能访问
                 //.antMatchers("/**").permitAll()
