@@ -14,25 +14,25 @@
 <body style="height: 900px;">
 <div id="divApp" style="height: 100%;">
     <el-table
-    :data="citys"
-    stripe
-    style="width: 100%">
-    <el-table-column
-      prop="code"
-      label="区号"
-      width="180">
-      </el-table-column>
-  <el-table-column
-      prop="province"
-      label="省份"
-      width="180">
-      </el-table-column>
-  <el-table-column
-      prop="city"
-      label="城市"
-      width="180">
-     </el-table-column>
- </el-table>
+            :data="citys"
+            stripe
+            style="width: 100%">
+        <el-table-column
+                prop="code"
+                label="区号"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="province"
+                label="省份"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="city"
+                label="城市"
+                width="180">
+        </el-table-column>
+    </el-table>
 </div>
 
 <script>
@@ -40,343 +40,343 @@
         el: '#divApp',
         data: function () {
             return {
-                citys:[]
+                citys: []
             }
         },
         created: function () {
-            
-this.citys.push({code:'010', city:'北京市', province:'北京市'});
-this.citys.push({code:'021', city:'上海市', province:'上海市'});
-this.citys.push({code:'022', city:'天津市', province:'天津市'});
-this.citys.push({code:'023', city:'重庆市', province:'重庆市'});
-this.citys.push({code:'852', city:'香港', province:'香港'});
-this.citys.push({code:'853', city:'澳门', province:'澳门'});
 
-this.citys.push({code:'0310', city:'河北省邯郸市', province:'河北'});
-this.citys.push({code:'0311', city:'河北省石家庄', province:'河北'});
-this.citys.push({code:'0312', city:'河北省保定市', province:'河北'});
-this.citys.push({code:'0313', city:'河北省张家口', province:'河北'});
-this.citys.push({code:'0314', city:'河北省承德市', province:'河北'});
-this.citys.push({code:'0315', city:'河北省唐山市', province:'河北'});
-this.citys.push({code:'0316', city:'河北省廊坊市', province:'河北'});
-this.citys.push({code:'0317', city:'河北省沧州市', province:'河北'});
-this.citys.push({code:'0318', city:'河北省衡水市', province:'河北'});
-this.citys.push({code:'0319', city:'河北省邢台市', province:'河北'});
-this.citys.push({code:'0335', city:'河北省秦皇岛', province:'河北'});
+            this.citys.push({code: '010', city: '北京市', province: '北京市'});
+            this.citys.push({code: '021', city: '上海市', province: '上海市'});
+            this.citys.push({code: '022', city: '天津市', province: '天津市'});
+            this.citys.push({code: '023', city: '重庆市', province: '重庆市'});
+            this.citys.push({code: '852', city: '香港', province: '香港'});
+            this.citys.push({code: '853', city: '澳门', province: '澳门'});
 
-this.citys.push({code:'0570', city:'浙江省衢州市', province:'浙江'});
-this.citys.push({code:'0571', city:'浙江省杭州市', province:'浙江'});
-this.citys.push({code:'0572', city:'浙江省湖州市', province:'浙江'});
-this.citys.push({code:'0573', city:'浙江省嘉兴市', province:'浙江'});
-this.citys.push({code:'0574', city:'浙江省宁波市', province:'浙江'});
-this.citys.push({code:'0575', city:'浙江省绍兴市', province:'浙江'});
-this.citys.push({code:'0576', city:'浙江省台州市', province:'浙江'});
-this.citys.push({code:'0577', city:'浙江省温州市', province:'浙江'});
-this.citys.push({code:'0578', city:'浙江省丽水市', province:'浙江'});
-this.citys.push({code:'0579', city:'浙江省金华市', province:'浙江'});
-this.citys.push({code:'0580', city:'浙江省舟山市', province:'浙江'});
+            this.citys.push({code: '0310', city: '河北省邯郸市', province: '河北'});
+            this.citys.push({code: '0311', city: '河北省石家庄', province: '河北'});
+            this.citys.push({code: '0312', city: '河北省保定市', province: '河北'});
+            this.citys.push({code: '0313', city: '河北省张家口', province: '河北'});
+            this.citys.push({code: '0314', city: '河北省承德市', province: '河北'});
+            this.citys.push({code: '0315', city: '河北省唐山市', province: '河北'});
+            this.citys.push({code: '0316', city: '河北省廊坊市', province: '河北'});
+            this.citys.push({code: '0317', city: '河北省沧州市', province: '河北'});
+            this.citys.push({code: '0318', city: '河北省衡水市', province: '河北'});
+            this.citys.push({code: '0319', city: '河北省邢台市', province: '河北'});
+            this.citys.push({code: '0335', city: '河北省秦皇岛', province: '河北'});
 
-this.citys.push({code:'024', city:'辽宁省沈阳市', province:'辽宁'});
-this.citys.push({code:'0410', city:'辽宁省铁岭市', province:'辽宁'});
-this.citys.push({code:'0411', city:'辽宁省大连市', province:'辽宁'});
-this.citys.push({code:'0412', city:'辽宁省鞍山市', province:'辽宁'});
-this.citys.push({code:'0413', city:'辽宁省抚顺市', province:'辽宁'});
-this.citys.push({code:'0414', city:'辽宁省本溪市', province:'辽宁'});
-this.citys.push({code:'0415', city:'辽宁省丹东市', province:'辽宁'});
-this.citys.push({code:'0416', city:'辽宁省锦州市', province:'辽宁'});
-this.citys.push({code:'0417', city:'辽宁省营口市', province:'辽宁'});
-this.citys.push({code:'0418', city:'辽宁省阜新市', province:'辽宁'});
-this.citys.push({code:'0419', city:'辽宁省辽阳市', province:'辽宁'});
-this.citys.push({code:'0421', city:'辽宁省朝阳市', province:'辽宁'});
-this.citys.push({code:'0427', city:'辽宁省盘锦市', province:'辽宁'});
-this.citys.push({code:'0429', city:'辽宁省葫芦岛', province:'辽宁'});
+            this.citys.push({code: '0570', city: '浙江省衢州市', province: '浙江'});
+            this.citys.push({code: '0571', city: '浙江省杭州市', province: '浙江'});
+            this.citys.push({code: '0572', city: '浙江省湖州市', province: '浙江'});
+            this.citys.push({code: '0573', city: '浙江省嘉兴市', province: '浙江'});
+            this.citys.push({code: '0574', city: '浙江省宁波市', province: '浙江'});
+            this.citys.push({code: '0575', city: '浙江省绍兴市', province: '浙江'});
+            this.citys.push({code: '0576', city: '浙江省台州市', province: '浙江'});
+            this.citys.push({code: '0577', city: '浙江省温州市', province: '浙江'});
+            this.citys.push({code: '0578', city: '浙江省丽水市', province: '浙江'});
+            this.citys.push({code: '0579', city: '浙江省金华市', province: '浙江'});
+            this.citys.push({code: '0580', city: '浙江省舟山市', province: '浙江'});
 
-this.citys.push({code:'027', city:'湖北省武汉市', province:'湖北'});
-this.citys.push({code:'0710', city:'湖北省襄城市', province:'湖北'});
-this.citys.push({code:'0711', city:'湖北省鄂州市', province:'湖北'});
-this.citys.push({code:'0712', city:'湖北省孝感市', province:'湖北'});
-this.citys.push({code:'0713', city:'湖北省黄州市', province:'湖北'});
-this.citys.push({code:'0714', city:'湖北省黄石市', province:'湖北'});
-this.citys.push({code:'0715', city:'湖北省咸宁市', province:'湖北'});
-this.citys.push({code:'0716', city:'湖北省荆沙市', province:'湖北'});
-this.citys.push({code:'0717', city:'湖北省宜昌市', province:'湖北'});
-this.citys.push({code:'0718', city:'湖北省恩施市', province:'湖北'});
-this.citys.push({code:'0719', city:'湖北省十堰市', province:'湖北'});
-this.citys.push({code:'0722', city:'湖北省随枣市', province:'湖北'});
-this.citys.push({code:'0724', city:'湖北省荆门市', province:'湖北'});
-this.citys.push({code:'0728', city:'湖北省江汉市', province:'湖北'});
+            this.citys.push({code: '024', city: '辽宁省沈阳市', province: '辽宁'});
+            this.citys.push({code: '0410', city: '辽宁省铁岭市', province: '辽宁'});
+            this.citys.push({code: '0411', city: '辽宁省大连市', province: '辽宁'});
+            this.citys.push({code: '0412', city: '辽宁省鞍山市', province: '辽宁'});
+            this.citys.push({code: '0413', city: '辽宁省抚顺市', province: '辽宁'});
+            this.citys.push({code: '0414', city: '辽宁省本溪市', province: '辽宁'});
+            this.citys.push({code: '0415', city: '辽宁省丹东市', province: '辽宁'});
+            this.citys.push({code: '0416', city: '辽宁省锦州市', province: '辽宁'});
+            this.citys.push({code: '0417', city: '辽宁省营口市', province: '辽宁'});
+            this.citys.push({code: '0418', city: '辽宁省阜新市', province: '辽宁'});
+            this.citys.push({code: '0419', city: '辽宁省辽阳市', province: '辽宁'});
+            this.citys.push({code: '0421', city: '辽宁省朝阳市', province: '辽宁'});
+            this.citys.push({code: '0427', city: '辽宁省盘锦市', province: '辽宁'});
+            this.citys.push({code: '0429', city: '辽宁省葫芦岛', province: '辽宁'});
 
-this.citys.push({code:'025', city:'江苏省南京市', province:'江苏'});
-this.citys.push({code:'0510', city:'江苏省无锡市', province:'江苏'});
-this.citys.push({code:'0511', city:'江苏省镇江市', province:'江苏'});
-this.citys.push({code:'0512', city:'江苏省苏州市', province:'江苏'});
-this.citys.push({code:'0513', city:'江苏省南通市', province:'江苏'});
-this.citys.push({code:'0514', city:'江苏省扬州市', province:'江苏'});
-this.citys.push({code:'0515', city:'江苏省盐城市', province:'江苏'});
-this.citys.push({code:'0516', city:'江苏省徐州市', province:'江苏'});
-this.citys.push({code:'0517', city:'江苏省淮安市', province:'江苏'});
-this.citys.push({code:'0518', city:'江苏省连云港', province:'江苏'});
-this.citys.push({code:'0519', city:'江苏省常州市', province:'江苏'});
-this.citys.push({code:'0523', city:'江苏省泰州市', province:'江苏'});
+            this.citys.push({code: '027', city: '湖北省武汉市', province: '湖北'});
+            this.citys.push({code: '0710', city: '湖北省襄城市', province: '湖北'});
+            this.citys.push({code: '0711', city: '湖北省鄂州市', province: '湖北'});
+            this.citys.push({code: '0712', city: '湖北省孝感市', province: '湖北'});
+            this.citys.push({code: '0713', city: '湖北省黄州市', province: '湖北'});
+            this.citys.push({code: '0714', city: '湖北省黄石市', province: '湖北'});
+            this.citys.push({code: '0715', city: '湖北省咸宁市', province: '湖北'});
+            this.citys.push({code: '0716', city: '湖北省荆沙市', province: '湖北'});
+            this.citys.push({code: '0717', city: '湖北省宜昌市', province: '湖北'});
+            this.citys.push({code: '0718', city: '湖北省恩施市', province: '湖北'});
+            this.citys.push({code: '0719', city: '湖北省十堰市', province: '湖北'});
+            this.citys.push({code: '0722', city: '湖北省随枣市', province: '湖北'});
+            this.citys.push({code: '0724', city: '湖北省荆门市', province: '湖北'});
+            this.citys.push({code: '0728', city: '湖北省江汉市', province: '湖北'});
 
-this.citys.push({code:'0470', city:'内蒙古海拉尔', province:'内蒙古'});
-this.citys.push({code:'0471', city:'内蒙古呼和浩特', province:'内蒙古'});
-this.citys.push({code:'0472', city:'内蒙古包头市', province:'内蒙古'});
-this.citys.push({code:'0473', city:'内蒙古乌海市', province:'内蒙古'});
-this.citys.push({code:'0474', city:'内蒙古集宁市', province:'内蒙古'});
-this.citys.push({code:'0475', city:'内蒙古通辽市', province:'内蒙古'});
-this.citys.push({code:'0476', city:'内蒙古赤峰市', province:'内蒙古'});
-this.citys.push({code:'0477', city:'内蒙古东胜市', province:'内蒙古'});
-this.citys.push({code:'0478', city:'内蒙古临河市', province:'内蒙古'});
-this.citys.push({code:'0479', city:'内蒙古锡林浩特', province:'内蒙古'});
-this.citys.push({code:'0482', city:'内蒙古乌兰浩特', province:'内蒙古'});
-this.citys.push({code:'0483', city:'内蒙古阿拉善左旗', province:'内蒙古'});
+            this.citys.push({code: '025', city: '江苏省南京市', province: '江苏'});
+            this.citys.push({code: '0510', city: '江苏省无锡市', province: '江苏'});
+            this.citys.push({code: '0511', city: '江苏省镇江市', province: '江苏'});
+            this.citys.push({code: '0512', city: '江苏省苏州市', province: '江苏'});
+            this.citys.push({code: '0513', city: '江苏省南通市', province: '江苏'});
+            this.citys.push({code: '0514', city: '江苏省扬州市', province: '江苏'});
+            this.citys.push({code: '0515', city: '江苏省盐城市', province: '江苏'});
+            this.citys.push({code: '0516', city: '江苏省徐州市', province: '江苏'});
+            this.citys.push({code: '0517', city: '江苏省淮安市', province: '江苏'});
+            this.citys.push({code: '0518', city: '江苏省连云港', province: '江苏'});
+            this.citys.push({code: '0519', city: '江苏省常州市', province: '江苏'});
+            this.citys.push({code: '0523', city: '江苏省泰州市', province: '江苏'});
 
-this.citys.push({code:'0790', city:'江西省新余市', province:'江西'});
-this.citys.push({code:'0791', city:'江西省南昌市', province:'江西'});
-this.citys.push({code:'0792', city:'江西省九江市', province:'江西'});
-this.citys.push({code:'0793', city:'江西省上饶市', province:'江西'});
-this.citys.push({code:'0794', city:'江西省临川市', province:'江西'});
-this.citys.push({code:'0795', city:'江西省宜春市', province:'江西'});
-this.citys.push({code:'0796', city:'江西省吉安市', province:'江西'});
-this.citys.push({code:'0797', city:'江西省赣州市', province:'江西'});
-this.citys.push({code:'0798', city:'江西省景德镇', province:'江西'});
-this.citys.push({code:'0799', city:'江西省萍乡市', province:'江西'});
-this.citys.push({code:'0701', city:'江西省鹰潭市', province:'江西'});
+            this.citys.push({code: '0470', city: '内蒙古海拉尔', province: '内蒙古'});
+            this.citys.push({code: '0471', city: '内蒙古呼和浩特', province: '内蒙古'});
+            this.citys.push({code: '0472', city: '内蒙古包头市', province: '内蒙古'});
+            this.citys.push({code: '0473', city: '内蒙古乌海市', province: '内蒙古'});
+            this.citys.push({code: '0474', city: '内蒙古集宁市', province: '内蒙古'});
+            this.citys.push({code: '0475', city: '内蒙古通辽市', province: '内蒙古'});
+            this.citys.push({code: '0476', city: '内蒙古赤峰市', province: '内蒙古'});
+            this.citys.push({code: '0477', city: '内蒙古东胜市', province: '内蒙古'});
+            this.citys.push({code: '0478', city: '内蒙古临河市', province: '内蒙古'});
+            this.citys.push({code: '0479', city: '内蒙古锡林浩特', province: '内蒙古'});
+            this.citys.push({code: '0482', city: '内蒙古乌兰浩特', province: '内蒙古'});
+            this.citys.push({code: '0483', city: '内蒙古阿拉善左旗', province: '内蒙古'});
 
-this.citys.push({code:'0350', city:'山西省忻州市', province:'山西'});
-this.citys.push({code:'0351', city:'山西省太原市', province:'山西'});
-this.citys.push({code:'0352', city:'山西省大同市', province:'山西'});
-this.citys.push({code:'0353', city:'山西省阳泉市', province:'山西'});
-this.citys.push({code:'0354', city:'山西省榆次市', province:'山西'});
-this.citys.push({code:'0355', city:'山西省长治市', province:'山西'});
-this.citys.push({code:'0356', city:'山西省晋城市', province:'山西'});
-this.citys.push({code:'0357', city:'山西省临汾市', province:'山西'});
-this.citys.push({code:'0358', city:'山西省离石市', province:'山西'});
-this.citys.push({code:'0359', city:'山西省运城市', province:'山西'});
+            this.citys.push({code: '0790', city: '江西省新余市', province: '江西'});
+            this.citys.push({code: '0791', city: '江西省南昌市', province: '江西'});
+            this.citys.push({code: '0792', city: '江西省九江市', province: '江西'});
+            this.citys.push({code: '0793', city: '江西省上饶市', province: '江西'});
+            this.citys.push({code: '0794', city: '江西省临川市', province: '江西'});
+            this.citys.push({code: '0795', city: '江西省宜春市', province: '江西'});
+            this.citys.push({code: '0796', city: '江西省吉安市', province: '江西'});
+            this.citys.push({code: '0797', city: '江西省赣州市', province: '江西'});
+            this.citys.push({code: '0798', city: '江西省景德镇', province: '江西'});
+            this.citys.push({code: '0799', city: '江西省萍乡市', province: '江西'});
+            this.citys.push({code: '0701', city: '江西省鹰潭市', province: '江西'});
 
-this.citys.push({code:'0930', city:'甘肃省临夏市', province:'甘肃'});
-this.citys.push({code:'0931', city:'甘肃省兰州市', province:'甘肃'});
-this.citys.push({code:'0932', city:'甘肃省定西市', province:'甘肃'});
-this.citys.push({code:'0933', city:'甘肃省平凉市', province:'甘肃'});
-this.citys.push({code:'0934', city:'甘肃省西峰市', province:'甘肃'});
-this.citys.push({code:'0935', city:'甘肃省武威市', province:'甘肃'});
-this.citys.push({code:'0936', city:'甘肃省张掖市', province:'甘肃'});
-this.citys.push({code:'0937', city:'甘肃省酒泉市', province:'甘肃'});
-this.citys.push({code:'0938', city:'甘肃省天水市', province:'甘肃'});
-this.citys.push({code:'0941', city:'甘肃省甘南州', province:'甘肃'});
-this.citys.push({code:'0943', city:'甘肃省白银市', province:'甘肃'});
+            this.citys.push({code: '0350', city: '山西省忻州市', province: '山西'});
+            this.citys.push({code: '0351', city: '山西省太原市', province: '山西'});
+            this.citys.push({code: '0352', city: '山西省大同市', province: '山西'});
+            this.citys.push({code: '0353', city: '山西省阳泉市', province: '山西'});
+            this.citys.push({code: '0354', city: '山西省榆次市', province: '山西'});
+            this.citys.push({code: '0355', city: '山西省长治市', province: '山西'});
+            this.citys.push({code: '0356', city: '山西省晋城市', province: '山西'});
+            this.citys.push({code: '0357', city: '山西省临汾市', province: '山西'});
+            this.citys.push({code: '0358', city: '山西省离石市', province: '山西'});
+            this.citys.push({code: '0359', city: '山西省运城市', province: '山西'});
 
-this.citys.push({code:'0530', city:'山东省菏泽市', province:'山东'});
-this.citys.push({code:'0531', city:'山东省济南市', province:'山东'});
-this.citys.push({code:'0532', city:'山东省青岛市', province:'山东'});
-this.citys.push({code:'0533', city:'山东省淄博市', province:'山东'});
-this.citys.push({code:'0534', city:'山东省德州市', province:'山东'});
-this.citys.push({code:'0535', city:'山东省烟台市', province:'山东'});
-this.citys.push({code:'0536', city:'山东省淮坊市', province:'山东'});
-this.citys.push({code:'0537', city:'山东省济宁市', province:'山东'});
-this.citys.push({code:'0538', city:'山东省泰安市', province:'山东'});
-this.citys.push({code:'0539', city:'山东省临沂市', province:'山东'});
+            this.citys.push({code: '0930', city: '甘肃省临夏市', province: '甘肃'});
+            this.citys.push({code: '0931', city: '甘肃省兰州市', province: '甘肃'});
+            this.citys.push({code: '0932', city: '甘肃省定西市', province: '甘肃'});
+            this.citys.push({code: '0933', city: '甘肃省平凉市', province: '甘肃'});
+            this.citys.push({code: '0934', city: '甘肃省西峰市', province: '甘肃'});
+            this.citys.push({code: '0935', city: '甘肃省武威市', province: '甘肃'});
+            this.citys.push({code: '0936', city: '甘肃省张掖市', province: '甘肃'});
+            this.citys.push({code: '0937', city: '甘肃省酒泉市', province: '甘肃'});
+            this.citys.push({code: '0938', city: '甘肃省天水市', province: '甘肃'});
+            this.citys.push({code: '0941', city: '甘肃省甘南州', province: '甘肃'});
+            this.citys.push({code: '0943', city: '甘肃省白银市', province: '甘肃'});
 
-this.citys.push({code:'0450', city:'黑龙江阿城市', province:'黑龙江'});
-this.citys.push({code:'0451', city:'黑龙江哈尔滨', province:'黑龙江'});
-this.citys.push({code:'0452', city:'黑龙江齐齐哈尔', province:'黑龙江'});
-this.citys.push({code:'0453', city:'黑龙江牡丹江', province:'黑龙江'});
-this.citys.push({code:'0454', city:'黑龙江佳木斯', province:'黑龙江'});
-this.citys.push({code:'0455', city:'黑龙江绥化市', province:'黑龙江'});
-this.citys.push({code:'0456', city:'黑龙江黑河市', province:'黑龙江'});
-this.citys.push({code:'0457', city:'黑龙江加格达奇', province:'黑龙江'});
-this.citys.push({code:'0458', city:'黑龙江伊春市', province:'黑龙江'});
-this.citys.push({code:'0459', city:'黑龙江大庆市', province:'黑龙江'});
+            this.citys.push({code: '0530', city: '山东省菏泽市', province: '山东'});
+            this.citys.push({code: '0531', city: '山东省济南市', province: '山东'});
+            this.citys.push({code: '0532', city: '山东省青岛市', province: '山东'});
+            this.citys.push({code: '0533', city: '山东省淄博市', province: '山东'});
+            this.citys.push({code: '0534', city: '山东省德州市', province: '山东'});
+            this.citys.push({code: '0535', city: '山东省烟台市', province: '山东'});
+            this.citys.push({code: '0536', city: '山东省淮坊市', province: '山东'});
+            this.citys.push({code: '0537', city: '山东省济宁市', province: '山东'});
+            this.citys.push({code: '0538', city: '山东省泰安市', province: '山东'});
+            this.citys.push({code: '0539', city: '山东省临沂市', province: '山东'});
 
-this.citys.push({code:'0591', city:'福建省福州市', province:'福建'});
-this.citys.push({code:'0592', city:'福建省厦门市', province:'福建'});
-this.citys.push({code:'0593', city:'福建省宁德市', province:'福建'});
-this.citys.push({code:'0594', city:'福建省莆田市', province:'福建'});
-this.citys.push({code:'0595', city:'福建省泉州市', province:'福建'});
-this.citys.push({code:'0596', city:'福建省漳州市', province:'福建'});
-this.citys.push({code:'0597', city:'福建省龙岩市', province:'福建'});
-this.citys.push({code:'0598', city:'福建省三明市', province:'福建'});
-this.citys.push({code:'0599', city:'福建省南平市', province:'福建'});
+            this.citys.push({code: '0450', city: '黑龙江阿城市', province: '黑龙江'});
+            this.citys.push({code: '0451', city: '黑龙江哈尔滨', province: '黑龙江'});
+            this.citys.push({code: '0452', city: '黑龙江齐齐哈尔', province: '黑龙江'});
+            this.citys.push({code: '0453', city: '黑龙江牡丹江', province: '黑龙江'});
+            this.citys.push({code: '0454', city: '黑龙江佳木斯', province: '黑龙江'});
+            this.citys.push({code: '0455', city: '黑龙江绥化市', province: '黑龙江'});
+            this.citys.push({code: '0456', city: '黑龙江黑河市', province: '黑龙江'});
+            this.citys.push({code: '0457', city: '黑龙江加格达奇', province: '黑龙江'});
+            this.citys.push({code: '0458', city: '黑龙江伊春市', province: '黑龙江'});
+            this.citys.push({code: '0459', city: '黑龙江大庆市', province: '黑龙江'});
 
-this.citys.push({code:'020', city:'广东省广州市', province:'广东'});
-this.citys.push({code:'0751', city:'广东省韶关市', province:'广东'});
-this.citys.push({code:'0752', city:'广东省惠州市', province:'广东'});
-this.citys.push({code:'0753', city:'广东省梅州市', province:'广东'});
-this.citys.push({code:'0754', city:'广东省汕头市', province:'广东'});
-this.citys.push({code:'0755', city:'广东省深圳市', province:'广东'});
-this.citys.push({code:'0756', city:'广东省珠海市', province:'广东'});
-this.citys.push({code:'0757', city:'广东省佛山市', province:'广东'});
-this.citys.push({code:'0758', city:'广东省肇庆市', province:'广东'});
-this.citys.push({code:'0759', city:'广东省湛江市', province:'广东'});
-this.citys.push({code:'0760', city:'广东省中山市', province:'广东'});
-this.citys.push({code:'0762', city:'广东省河源市', province:'广东'});
-this.citys.push({code:'0763', city:'广东省清远市', province:'广东'});
-this.citys.push({code:'0765', city:'广东省顺德市', province:'广东'});
-this.citys.push({code:'0766', city:'广东省云浮市', province:'广东'});
-this.citys.push({code:'0768', city:'广东省潮州市', province:'广东'});
-this.citys.push({code:'0769', city:'广东省东莞市', province:'广东'});
-this.citys.push({code:'0660', city:'广东省汕尾市', province:'广东'});
-this.citys.push({code:'0661', city:'广东省潮阳市', province:'广东'});
-this.citys.push({code:'0662', city:'广东省阳江市', province:'广东'});
-this.citys.push({code:'0663', city:'广东省揭西市', province:'广东'});
+            this.citys.push({code: '0591', city: '福建省福州市', province: '福建'});
+            this.citys.push({code: '0592', city: '福建省厦门市', province: '福建'});
+            this.citys.push({code: '0593', city: '福建省宁德市', province: '福建'});
+            this.citys.push({code: '0594', city: '福建省莆田市', province: '福建'});
+            this.citys.push({code: '0595', city: '福建省泉州市', province: '福建'});
+            this.citys.push({code: '0596', city: '福建省漳州市', province: '福建'});
+            this.citys.push({code: '0597', city: '福建省龙岩市', province: '福建'});
+            this.citys.push({code: '0598', city: '福建省三明市', province: '福建'});
+            this.citys.push({code: '0599', city: '福建省南平市', province: '福建'});
 
-this.citys.push({code:'028', city:'四川省成都市', province:'四川'});
-this.citys.push({code:'0810', city:'四川省涪陵市', province:'四川'});
-this.citys.push({code:'0811', city:'四川省重庆市', province:'四川'});
-this.citys.push({code:'0812', city:'四川省攀枝花', province:'四川'});
-this.citys.push({code:'0813', city:'四川省自贡市', province:'四川'});
-this.citys.push({code:'0814', city:'四川省永川市', province:'四川'});
-this.citys.push({code:'0816', city:'四川省绵阳市', province:'四川'});
-this.citys.push({code:'0817', city:'四川省南充市', province:'四川'});
-this.citys.push({code:'0818', city:'四川省达县市', province:'四川'});
-this.citys.push({code:'0819', city:'四川省万县市', province:'四川'});
-this.citys.push({code:'0825', city:'四川省遂宁市', province:'四川'});
-this.citys.push({code:'0826', city:'四川省广安市', province:'四川'});
-this.citys.push({code:'0827', city:'四川省巴中市', province:'四川'});
-this.citys.push({code:'0830', city:'四川省泸州市', province:'四川'});
-this.citys.push({code:'0831', city:'四川省宜宾市', province:'四川'});
-this.citys.push({code:'0832', city:'四川省内江市', province:'四川'});
-this.citys.push({code:'0833', city:'四川省乐山市', province:'四川'});
-this.citys.push({code:'0834', city:'四川省西昌市', province:'四川'});
-this.citys.push({code:'0835', city:'四川省雅安市', province:'四川'});
-this.citys.push({code:'0836', city:'四川省康定市', province:'四川'});
-this.citys.push({code:'0837', city:'四川省马尔康', province:'四川'});
-this.citys.push({code:'0838', city:'四川省德阳市', province:'四川'});
-this.citys.push({code:'0839', city:'四川省广元市', province:'四川'});
-this.citys.push({code:'0840', city:'四川省泸州市', province:'四川'});
+            this.citys.push({code: '020', city: '广东省广州市', province: '广东'});
+            this.citys.push({code: '0751', city: '广东省韶关市', province: '广东'});
+            this.citys.push({code: '0752', city: '广东省惠州市', province: '广东'});
+            this.citys.push({code: '0753', city: '广东省梅州市', province: '广东'});
+            this.citys.push({code: '0754', city: '广东省汕头市', province: '广东'});
+            this.citys.push({code: '0755', city: '广东省深圳市', province: '广东'});
+            this.citys.push({code: '0756', city: '广东省珠海市', province: '广东'});
+            this.citys.push({code: '0757', city: '广东省佛山市', province: '广东'});
+            this.citys.push({code: '0758', city: '广东省肇庆市', province: '广东'});
+            this.citys.push({code: '0759', city: '广东省湛江市', province: '广东'});
+            this.citys.push({code: '0760', city: '广东省中山市', province: '广东'});
+            this.citys.push({code: '0762', city: '广东省河源市', province: '广东'});
+            this.citys.push({code: '0763', city: '广东省清远市', province: '广东'});
+            this.citys.push({code: '0765', city: '广东省顺德市', province: '广东'});
+            this.citys.push({code: '0766', city: '广东省云浮市', province: '广东'});
+            this.citys.push({code: '0768', city: '广东省潮州市', province: '广东'});
+            this.citys.push({code: '0769', city: '广东省东莞市', province: '广东'});
+            this.citys.push({code: '0660', city: '广东省汕尾市', province: '广东'});
+            this.citys.push({code: '0661', city: '广东省潮阳市', province: '广东'});
+            this.citys.push({code: '0662', city: '广东省阳江市', province: '广东'});
+            this.citys.push({code: '0663', city: '广东省揭西市', province: '广东'});
 
-this.citys.push({code:'0730', city:'湖南省岳阳市', province:'湖南'});
-this.citys.push({code:'0731', city:'湖南省长沙市', province:'湖南'});
-this.citys.push({code:'0732', city:'湖南省湘潭市', province:'湖南'});
-this.citys.push({code:'0733', city:'湖南省株州市', province:'湖南'});
-this.citys.push({code:'0734', city:'湖南省衡阳市', province:'湖南'});
-this.citys.push({code:'0735', city:'湖南省郴州市', province:'湖南'});
-this.citys.push({code:'0736', city:'湖南省常德市', province:'湖南'});
-this.citys.push({code:'0737', city:'湖南省益阳市', province:'湖南'});
-this.citys.push({code:'0738', city:'湖南省娄底市', province:'湖南'});
-this.citys.push({code:'0739', city:'湖南省邵阳市', province:'湖南'});
-this.citys.push({code:'0743', city:'湖南省吉首市', province:'湖南'});
-this.citys.push({code:'0744', city:'湖南省张家界', province:'湖南'});
-this.citys.push({code:'0745', city:'湖南省怀化市', province:'湖南'});
-this.citys.push({code:'0746', city:'湖南省永州冷', province:'湖南'});
+            this.citys.push({code: '028', city: '四川省成都市', province: '四川'});
+            this.citys.push({code: '0810', city: '四川省涪陵市', province: '四川'});
+            this.citys.push({code: '0811', city: '四川省重庆市', province: '四川'});
+            this.citys.push({code: '0812', city: '四川省攀枝花', province: '四川'});
+            this.citys.push({code: '0813', city: '四川省自贡市', province: '四川'});
+            this.citys.push({code: '0814', city: '四川省永川市', province: '四川'});
+            this.citys.push({code: '0816', city: '四川省绵阳市', province: '四川'});
+            this.citys.push({code: '0817', city: '四川省南充市', province: '四川'});
+            this.citys.push({code: '0818', city: '四川省达县市', province: '四川'});
+            this.citys.push({code: '0819', city: '四川省万县市', province: '四川'});
+            this.citys.push({code: '0825', city: '四川省遂宁市', province: '四川'});
+            this.citys.push({code: '0826', city: '四川省广安市', province: '四川'});
+            this.citys.push({code: '0827', city: '四川省巴中市', province: '四川'});
+            this.citys.push({code: '0830', city: '四川省泸州市', province: '四川'});
+            this.citys.push({code: '0831', city: '四川省宜宾市', province: '四川'});
+            this.citys.push({code: '0832', city: '四川省内江市', province: '四川'});
+            this.citys.push({code: '0833', city: '四川省乐山市', province: '四川'});
+            this.citys.push({code: '0834', city: '四川省西昌市', province: '四川'});
+            this.citys.push({code: '0835', city: '四川省雅安市', province: '四川'});
+            this.citys.push({code: '0836', city: '四川省康定市', province: '四川'});
+            this.citys.push({code: '0837', city: '四川省马尔康', province: '四川'});
+            this.citys.push({code: '0838', city: '四川省德阳市', province: '四川'});
+            this.citys.push({code: '0839', city: '四川省广元市', province: '四川'});
+            this.citys.push({code: '0840', city: '四川省泸州市', province: '四川'});
 
-this.citys.push({code:'0370', city:'河南省商丘市', province:'河南'});
-this.citys.push({code:'0371', city:'河南省郑州市', province:'河南'});
-this.citys.push({code:'0372', city:'河南省安阳市', province:'河南'});
-this.citys.push({code:'0373', city:'河南省新乡市', province:'河南'});
-this.citys.push({code:'0374', city:'河南省许昌市', province:'河南'});
-this.citys.push({code:'0375', city:'河南省平顶山', province:'河南'});
-this.citys.push({code:'0376', city:'河南省信阳市', province:'河南'});
-this.citys.push({code:'0377', city:'河南省南阳市', province:'河南'});
-this.citys.push({code:'0378', city:'河南省开封市', province:'河南'});
-this.citys.push({code:'0379', city:'河南省洛阳市', province:'河南'});
-this.citys.push({code:'0391', city:'河南省焦作市', province:'河南'});
-this.citys.push({code:'0392', city:'河南省鹤壁市', province:'河南'});
-this.citys.push({code:'0393', city:'河南省濮阳市', province:'河南'});
-this.citys.push({code:'0394', city:'河南省周口市', province:'河南'});
-this.citys.push({code:'0395', city:'河南省漯河市', province:'河南'});
-this.citys.push({code:'0396', city:'河南省驻马店', province:'河南'});
-this.citys.push({code:'0398', city:'河南省三门峡', province:'河南'});
+            this.citys.push({code: '0730', city: '湖南省岳阳市', province: '湖南'});
+            this.citys.push({code: '0731', city: '湖南省长沙市', province: '湖南'});
+            this.citys.push({code: '0732', city: '湖南省湘潭市', province: '湖南'});
+            this.citys.push({code: '0733', city: '湖南省株州市', province: '湖南'});
+            this.citys.push({code: '0734', city: '湖南省衡阳市', province: '湖南'});
+            this.citys.push({code: '0735', city: '湖南省郴州市', province: '湖南'});
+            this.citys.push({code: '0736', city: '湖南省常德市', province: '湖南'});
+            this.citys.push({code: '0737', city: '湖南省益阳市', province: '湖南'});
+            this.citys.push({code: '0738', city: '湖南省娄底市', province: '湖南'});
+            this.citys.push({code: '0739', city: '湖南省邵阳市', province: '湖南'});
+            this.citys.push({code: '0743', city: '湖南省吉首市', province: '湖南'});
+            this.citys.push({code: '0744', city: '湖南省张家界', province: '湖南'});
+            this.citys.push({code: '0745', city: '湖南省怀化市', province: '湖南'});
+            this.citys.push({code: '0746', city: '湖南省永州冷', province: '湖南'});
 
-this.citys.push({code:'0870', city:'云南省昭通市', province:'云南'});
-this.citys.push({code:'0871', city:'云南省昆明市', province:'云南'});
-this.citys.push({code:'0872', city:'云南省大理市', province:'云南'});
-this.citys.push({code:'0873', city:'云南省个旧市', province:'云南'});
-this.citys.push({code:'0874', city:'云南省曲靖市', province:'云南'});
-this.citys.push({code:'0875', city:'云南省保山市', province:'云南'});
-this.citys.push({code:'0876', city:'云南省文山市', province:'云南'});
-this.citys.push({code:'0877', city:'云南省玉溪市', province:'云南'});
-this.citys.push({code:'0878', city:'云南省楚雄市', province:'云南'});
-this.citys.push({code:'0879', city:'云南省思茅市', province:'云南'});
-this.citys.push({code:'0691', city:'云南省景洪市', province:'云南'});
-this.citys.push({code:'0692', city:'云南省潞西市', province:'云南'});
-this.citys.push({code:'0881', city:'云南省东川市', province:'云南'});
-this.citys.push({code:'0883', city:'云南省临沧市', province:'云南'});
-this.citys.push({code:'0886', city:'云南省六库市', province:'云南'});
-this.citys.push({code:'0887', city:'云南省中甸市', province:'云南'});
-this.citys.push({code:'0888', city:'云南省丽江市', province:'云南'});
+            this.citys.push({code: '0370', city: '河南省商丘市', province: '河南'});
+            this.citys.push({code: '0371', city: '河南省郑州市', province: '河南'});
+            this.citys.push({code: '0372', city: '河南省安阳市', province: '河南'});
+            this.citys.push({code: '0373', city: '河南省新乡市', province: '河南'});
+            this.citys.push({code: '0374', city: '河南省许昌市', province: '河南'});
+            this.citys.push({code: '0375', city: '河南省平顶山', province: '河南'});
+            this.citys.push({code: '0376', city: '河南省信阳市', province: '河南'});
+            this.citys.push({code: '0377', city: '河南省南阳市', province: '河南'});
+            this.citys.push({code: '0378', city: '河南省开封市', province: '河南'});
+            this.citys.push({code: '0379', city: '河南省洛阳市', province: '河南'});
+            this.citys.push({code: '0391', city: '河南省焦作市', province: '河南'});
+            this.citys.push({code: '0392', city: '河南省鹤壁市', province: '河南'});
+            this.citys.push({code: '0393', city: '河南省濮阳市', province: '河南'});
+            this.citys.push({code: '0394', city: '河南省周口市', province: '河南'});
+            this.citys.push({code: '0395', city: '河南省漯河市', province: '河南'});
+            this.citys.push({code: '0396', city: '河南省驻马店', province: '河南'});
+            this.citys.push({code: '0398', city: '河南省三门峡', province: '河南'});
 
-this.citys.push({code:'0550', city:'安徽省滁州市', province:'安徽'});
-this.citys.push({code:'0551', city:'安徽省合肥市', province:'安徽'});
-this.citys.push({code:'0552', city:'安徽省蚌埠市', province:'安徽'});
-this.citys.push({code:'0553', city:'安徽省芜湖市', province:'安徽'});
-this.citys.push({code:'0554', city:'安徽省淮南市', province:'安徽'});
-this.citys.push({code:'0555', city:'安徽省马鞍山', province:'安徽'});
-this.citys.push({code:'0556', city:'安徽省安庆市', province:'安徽'});
-this.citys.push({code:'0557', city:'安徽省宿州市', province:'安徽'});
-this.citys.push({code:'0558', city:'安徽省阜阳市', province:'安徽'});
-this.citys.push({code:'0559', city:'安徽省黄山市', province:'安徽'});
-this.citys.push({code:'0561', city:'安徽省淮北市', province:'安徽'});
-this.citys.push({code:'0562', city:'安徽省铜陵市', province:'安徽'});
-this.citys.push({code:'0563', city:'安徽省宣城市', province:'安徽'});
-this.citys.push({code:'0564', city:'安徽省六安市', province:'安徽'});
-this.citys.push({code:'0565', city:'安徽省巢湖市', province:'安徽'});
-this.citys.push({code:'0566', city:'安徽省贵池市', province:'安徽'});
+            this.citys.push({code: '0870', city: '云南省昭通市', province: '云南'});
+            this.citys.push({code: '0871', city: '云南省昆明市', province: '云南'});
+            this.citys.push({code: '0872', city: '云南省大理市', province: '云南'});
+            this.citys.push({code: '0873', city: '云南省个旧市', province: '云南'});
+            this.citys.push({code: '0874', city: '云南省曲靖市', province: '云南'});
+            this.citys.push({code: '0875', city: '云南省保山市', province: '云南'});
+            this.citys.push({code: '0876', city: '云南省文山市', province: '云南'});
+            this.citys.push({code: '0877', city: '云南省玉溪市', province: '云南'});
+            this.citys.push({code: '0878', city: '云南省楚雄市', province: '云南'});
+            this.citys.push({code: '0879', city: '云南省思茅市', province: '云南'});
+            this.citys.push({code: '0691', city: '云南省景洪市', province: '云南'});
+            this.citys.push({code: '0692', city: '云南省潞西市', province: '云南'});
+            this.citys.push({code: '0881', city: '云南省东川市', province: '云南'});
+            this.citys.push({code: '0883', city: '云南省临沧市', province: '云南'});
+            this.citys.push({code: '0886', city: '云南省六库市', province: '云南'});
+            this.citys.push({code: '0887', city: '云南省中甸市', province: '云南'});
+            this.citys.push({code: '0888', city: '云南省丽江市', province: '云南'});
 
-this.citys.push({code:'0951', city:'宁夏银川市', province:'宁夏'});
-this.citys.push({code:'0952', city:'宁夏石嘴山', province:'宁夏'});
-this.citys.push({code:'0953', city:'宁夏吴忠市', province:'宁夏'});
-this.citys.push({code:'0954', city:'宁夏固原市', province:'宁夏'});
+            this.citys.push({code: '0550', city: '安徽省滁州市', province: '安徽'});
+            this.citys.push({code: '0551', city: '安徽省合肥市', province: '安徽'});
+            this.citys.push({code: '0552', city: '安徽省蚌埠市', province: '安徽'});
+            this.citys.push({code: '0553', city: '安徽省芜湖市', province: '安徽'});
+            this.citys.push({code: '0554', city: '安徽省淮南市', province: '安徽'});
+            this.citys.push({code: '0555', city: '安徽省马鞍山', province: '安徽'});
+            this.citys.push({code: '0556', city: '安徽省安庆市', province: '安徽'});
+            this.citys.push({code: '0557', city: '安徽省宿州市', province: '安徽'});
+            this.citys.push({code: '0558', city: '安徽省阜阳市', province: '安徽'});
+            this.citys.push({code: '0559', city: '安徽省黄山市', province: '安徽'});
+            this.citys.push({code: '0561', city: '安徽省淮北市', province: '安徽'});
+            this.citys.push({code: '0562', city: '安徽省铜陵市', province: '安徽'});
+            this.citys.push({code: '0563', city: '安徽省宣城市', province: '安徽'});
+            this.citys.push({code: '0564', city: '安徽省六安市', province: '安徽'});
+            this.citys.push({code: '0565', city: '安徽省巢湖市', province: '安徽'});
+            this.citys.push({code: '0566', city: '安徽省贵池市', province: '安徽'});
 
-this.citys.push({code:'0431', city:'吉林省长春市', province:'吉林'});
-this.citys.push({code:'0432', city:'吉林省吉林市', province:'吉林'});
-this.citys.push({code:'0433', city:'吉林省延吉市', province:'吉林'});
-this.citys.push({code:'0434', city:'吉林省四平市', province:'吉林'});
-this.citys.push({code:'0435', city:'吉林省通化市', province:'吉林'});
-this.citys.push({code:'0436', city:'吉林省白城市', province:'吉林'});
-this.citys.push({code:'0437', city:'吉林省辽源市', province:'吉林'});
-this.citys.push({code:'0438', city:'吉林省松原市', province:'吉林'});
-this.citys.push({code:'0439', city:'吉林省浑江市', province:'吉林'});
-this.citys.push({code:'0440', city:'吉林省珲春市', province:'吉林'});
+            this.citys.push({code: '0951', city: '宁夏银川市', province: '宁夏'});
+            this.citys.push({code: '0952', city: '宁夏石嘴山', province: '宁夏'});
+            this.citys.push({code: '0953', city: '宁夏吴忠市', province: '宁夏'});
+            this.citys.push({code: '0954', city: '宁夏固原市', province: '宁夏'});
 
-this.citys.push({code:'0770', city:'广西省防城港', province:'广西'});
-this.citys.push({code:'0771', city:'广西省南宁市', province:'广西'});
-this.citys.push({code:'0772', city:'广西省柳州市', province:'广西'});
-this.citys.push({code:'0773', city:'广西省桂林市', province:'广西'});
-this.citys.push({code:'0774', city:'广西省梧州市', province:'广西'});
-this.citys.push({code:'0775', city:'广西省玉林市', province:'广西'});
-this.citys.push({code:'0776', city:'广西省百色市', province:'广西'});
-this.citys.push({code:'0777', city:'广西省钦州市', province:'广西'});
-this.citys.push({code:'0778', city:'广西省河池市', province:'广西'});
-this.citys.push({code:'0779', city:'广西省北海市', province:'广西'});
+            this.citys.push({code: '0431', city: '吉林省长春市', province: '吉林'});
+            this.citys.push({code: '0432', city: '吉林省吉林市', province: '吉林'});
+            this.citys.push({code: '0433', city: '吉林省延吉市', province: '吉林'});
+            this.citys.push({code: '0434', city: '吉林省四平市', province: '吉林'});
+            this.citys.push({code: '0435', city: '吉林省通化市', province: '吉林'});
+            this.citys.push({code: '0436', city: '吉林省白城市', province: '吉林'});
+            this.citys.push({code: '0437', city: '吉林省辽源市', province: '吉林'});
+            this.citys.push({code: '0438', city: '吉林省松原市', province: '吉林'});
+            this.citys.push({code: '0439', city: '吉林省浑江市', province: '吉林'});
+            this.citys.push({code: '0440', city: '吉林省珲春市', province: '吉林'});
 
-this.citys.push({code:'0851', city:'贵州省贵阳市', province:'贵州'});
-this.citys.push({code:'0852', city:'贵州省遵义市', province:'贵州'});
-this.citys.push({code:'0853', city:'贵州省安顺市', province:'贵州'});
-this.citys.push({code:'0854', city:'贵州省都均市', province:'贵州'});
-this.citys.push({code:'0855', city:'贵州省凯里市', province:'贵州'});
-this.citys.push({code:'0856', city:'贵州省铜仁市', province:'贵州'});
-this.citys.push({code:'0857', city:'贵州省毕节市', province:'贵州'});
-this.citys.push({code:'0858', city:'贵州省六盘水', province:'贵州'});
-this.citys.push({code:'0859', city:'贵州省兴义市', province:'贵州'});
+            this.citys.push({code: '0770', city: '广西省防城港', province: '广西'});
+            this.citys.push({code: '0771', city: '广西省南宁市', province: '广西'});
+            this.citys.push({code: '0772', city: '广西省柳州市', province: '广西'});
+            this.citys.push({code: '0773', city: '广西省桂林市', province: '广西'});
+            this.citys.push({code: '0774', city: '广西省梧州市', province: '广西'});
+            this.citys.push({code: '0775', city: '广西省玉林市', province: '广西'});
+            this.citys.push({code: '0776', city: '广西省百色市', province: '广西'});
+            this.citys.push({code: '0777', city: '广西省钦州市', province: '广西'});
+            this.citys.push({code: '0778', city: '广西省河池市', province: '广西'});
+            this.citys.push({code: '0779', city: '广西省北海市', province: '广西'});
 
-this.citys.push({code:'029', city:'陕西省西安市', province:'陕西'});
-this.citys.push({code:'0910', city:'陕西省咸阳市', province:'陕西'});
-this.citys.push({code:'0911', city:'陕西省延安市', province:'陕西'});
-this.citys.push({code:'0912', city:'陕西省榆林市', province:'陕西'});
-this.citys.push({code:'0913', city:'陕西省渭南市', province:'陕西'});
-this.citys.push({code:'0914', city:'陕西省商洛市', province:'陕西'});
-this.citys.push({code:'0915', city:'陕西省安康市', province:'陕西'});
-this.citys.push({code:'0916', city:'陕西省汉中市', province:'陕西'});
-this.citys.push({code:'0917', city:'陕西省宝鸡市', province:'陕西'});
-this.citys.push({code:'0919', city:'陕西省铜川市', province:'陕西'});
+            this.citys.push({code: '0851', city: '贵州省贵阳市', province: '贵州'});
+            this.citys.push({code: '0852', city: '贵州省遵义市', province: '贵州'});
+            this.citys.push({code: '0853', city: '贵州省安顺市', province: '贵州'});
+            this.citys.push({code: '0854', city: '贵州省都均市', province: '贵州'});
+            this.citys.push({code: '0855', city: '贵州省凯里市', province: '贵州'});
+            this.citys.push({code: '0856', city: '贵州省铜仁市', province: '贵州'});
+            this.citys.push({code: '0857', city: '贵州省毕节市', province: '贵州'});
+            this.citys.push({code: '0858', city: '贵州省六盘水', province: '贵州'});
+            this.citys.push({code: '0859', city: '贵州省兴义市', province: '贵州'});
 
-this.citys.push({code:'0971', city:'青海省西宁市', province:'青海'});
-this.citys.push({code:'0972', city:'青海省海东市', province:'青海'});
-this.citys.push({code:'0973', city:'青海省同仁市', province:'青海'});
-this.citys.push({code:'0974', city:'青海省共和市', province:'青海'});
-this.citys.push({code:'0975', city:'青海省玛沁市', province:'青海'});
-this.citys.push({code:'0976', city:'青海省玉树市', province:'青海'});
-this.citys.push({code:'0977', city:'青海省德令哈', province:'青海'});
+            this.citys.push({code: '029', city: '陕西省西安市', province: '陕西'});
+            this.citys.push({code: '0910', city: '陕西省咸阳市', province: '陕西'});
+            this.citys.push({code: '0911', city: '陕西省延安市', province: '陕西'});
+            this.citys.push({code: '0912', city: '陕西省榆林市', province: '陕西'});
+            this.citys.push({code: '0913', city: '陕西省渭南市', province: '陕西'});
+            this.citys.push({code: '0914', city: '陕西省商洛市', province: '陕西'});
+            this.citys.push({code: '0915', city: '陕西省安康市', province: '陕西'});
+            this.citys.push({code: '0916', city: '陕西省汉中市', province: '陕西'});
+            this.citys.push({code: '0917', city: '陕西省宝鸡市', province: '陕西'});
+            this.citys.push({code: '0919', city: '陕西省铜川市', province: '陕西'});
 
-this.citys.push({code:'0890', city:'海南省儋州市', province:'海南'});
-this.citys.push({code:'0898', city:'海南省海口市', province:'海南'});
-this.citys.push({code:'0899', city:'海南省三亚市', province:'海南'});
+            this.citys.push({code: '0971', city: '青海省西宁市', province: '青海'});
+            this.citys.push({code: '0972', city: '青海省海东市', province: '青海'});
+            this.citys.push({code: '0973', city: '青海省同仁市', province: '青海'});
+            this.citys.push({code: '0974', city: '青海省共和市', province: '青海'});
+            this.citys.push({code: '0975', city: '青海省玛沁市', province: '青海'});
+            this.citys.push({code: '0976', city: '青海省玉树市', province: '青海'});
+            this.citys.push({code: '0977', city: '青海省德令哈', province: '青海'});
 
-this.citys.push({code:'0891', city:'西藏拉萨市', province:'西藏'});
-this.citys.push({code:'0892', city:'西藏日喀则', province:'西藏'});
-this.citys.push({code:'0893', city:'西藏山南市', province:'西藏'});
+            this.citys.push({code: '0890', city: '海南省儋州市', province: '海南'});
+            this.citys.push({code: '0898', city: '海南省海口市', province: '海南'});
+            this.citys.push({code: '0899', city: '海南省三亚市', province: '海南'});
+
+            this.citys.push({code: '0891', city: '西藏拉萨市', province: '西藏'});
+            this.citys.push({code: '0892', city: '西藏日喀则', province: '西藏'});
+            this.citys.push({code: '0893', city: '西藏山南市', province: '西藏'});
         },
         methods: {
             ajaxError: function (error) {

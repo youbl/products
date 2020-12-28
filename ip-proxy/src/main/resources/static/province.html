@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
     <meta charset="UTF-8">
@@ -14,14 +14,15 @@
 <body style="height: 900px;">
 <div id="divApp" style="height: 100%;">
     <el-table
-    :data="provinceData"
-    stripe
-    style="width: 100%">
-    <el-table-column
-      prop="name"
-      label="省份选项"
-      width="180">
-  </el-table>
+            :data="provinceData"
+            stripe
+            style="width: 100%">
+        <el-table-column
+                prop="name"
+                label="省份选项"
+                width="180">
+        </el-table-column>
+    </el-table>
 </div>
 
 <script>
@@ -29,38 +30,38 @@
         el: '#divApp',
         data: function () {
             return {
-                provinceData:[{'name':'北京市'},
-{'name':'上海市'},
-{'name':'天津市'},
-{'name':'重庆市'},
-{'name':'香港'},
-{'name':'澳门'},
-{'name':'河北'},
-{'name':'浙江'},
-{'name':'辽宁'},
-{'name':'湖北'},
-{'name':'江苏'},
-{'name':'内蒙古'},
-{'name':'江西'},
-{'name':'山西'},
-{'name':'甘肃'},
-{'name':'山东'},
-{'name':'黑龙江'},
-{'name':'福建'},
-{'name':'广东'},
-{'name':'四川'},
-{'name':'湖南'},
-{'name':'河南'},
-{'name':'云南'},
-{'name':'安徽'},
-{'name':'宁夏'},
-{'name':'吉林'},
-{'name':'广西'},
-{'name':'贵州'},
-{'name':'陕西'},
-{'name':'青海'},
-{'name':'海南'},
-{'name':'西藏'},]
+                provinceData: [{'name': '北京市'},
+                    {'name': '上海市'},
+                    {'name': '天津市'},
+                    {'name': '重庆市'},
+                    {'name': '香港'},
+                    {'name': '澳门'},
+                    {'name': '河北'},
+                    {'name': '浙江'},
+                    {'name': '辽宁'},
+                    {'name': '湖北'},
+                    {'name': '江苏'},
+                    {'name': '内蒙古'},
+                    {'name': '江西'},
+                    {'name': '山西'},
+                    {'name': '甘肃'},
+                    {'name': '山东'},
+                    {'name': '黑龙江'},
+                    {'name': '福建'},
+                    {'name': '广东'},
+                    {'name': '四川'},
+                    {'name': '湖南'},
+                    {'name': '河南'},
+                    {'name': '云南'},
+                    {'name': '安徽'},
+                    {'name': '宁夏'},
+                    {'name': '吉林'},
+                    {'name': '广西'},
+                    {'name': '贵州'},
+                    {'name': '陕西'},
+                    {'name': '青海'},
+                    {'name': '海南'},
+                    {'name': '西藏'},]
             }
         },
         created: function () {
