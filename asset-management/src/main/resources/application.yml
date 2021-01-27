@@ -1,0 +1,56 @@
+server:
+  port: 8801
+
+spring:
+  application:
+    name: asset-management
+  profiles:
+    active: unittest
+
+  jpa:
+    show-sql: false  # 这个只会输出在控制台，不会记录到日志里，没必要开启
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    open-in-view: false
+
+---  # 2个三横杠之间表示一个环境配置
+spring:
+  profiles: unittest # 单元测试，通过注解 ActiveProfiles 使用这一段
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update  # 实体与数据库不一致时，自动修改表结构
+---
+spring:
+  profiles: dev # 开发使用这一段
+
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/firstdemodb?characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: beinet
+    password: beinet.cn
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    tomcat:
+      initSQL: "SET NAMES utf8mb4"
+  jpa:
+    hibernate:
+      ddl-auto: validate # 实体与数据库不一致时，报异常，不应当修改生产数据库，当然也不应该给权限
+
+---
+spring:
+  profiles: prod # 生产使用这一段
+
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/firstdemodb?characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: beinet
+    password: beinet.cn
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    tomcat:
+      initSQL: "SET NAMES utf8mb4"
+  jpa:
+    hibernate:
+      ddl-auto: validate # 实体与数据库不一致时，报异常，不应当修改生产数据库，当然也不应该给权限
+---

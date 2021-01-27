@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>固定资产管理系统</title>
+    <script type="text/javascript" src="/static/res/include.js"></script>
+</head>
+<body>
+<div id="divApp" style="text-align: center;">
+    <el-form style="width:500px">
+        <h1 style="text-align: center">
+            登录
+        </h1>
+        <el-form-item label="用户名" label-width="200px">
+            <el-input v-model="login.beinetUser" placeholder="请输入"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" label-width="200px">
+            <el-input v-model="login.beinetPwd" placeholder="请输入" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="图形验证码" label-width="200px" prop="imgCode" style="text-align: left">
+            <el-input v-model="login.imgCode" placeholder="请输入图形验证码" maxlength="6" style="width:50%"></el-input>
+            <img :src="imgCodeBase64" style="cursor: pointer; height: 30px;" @click="getImgCode"/>
+        </el-form-item>
+        <div>
+            <el-button icon="el-icon-success" type="primary" @click="doLogin">登 录</el-button>
+            <el-button @click="openRegister">注 册</el-button>
+        </div>
+    </el-form>
+</div>
+<script type="text/javascript">
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                imgCodeBase64: '/favicon.ico',
+                login: {
+                    beinetUser: '',
+                    beinetPwd: '',
+                    imgSn: '',
+                    imgCode: '',
+                },
+            }
+        },
+        created: function () {
+            this.getImgCode();
+        },
+        computed: {},
+        methods: {
+            openRegister: function () {
+                window.open('reg.html');
+            },
+            getImgCode: function () {
+                let url = '/img';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.sn) {
+                        return alert('获取图形验证码失败');
+                    }
+                    this.imgCodeBase64 = "data:image/jpg;base64," + response.data.img;
+                    this.login.imgSn = response.data.sn;
+                }).catch(error => this.ajaxError(error));
+            },
+            doLogin: function () {
+                let url = '/login';
+                // 默认登录使用的是form形式，因此要用Qs转换一下
+                return axios.post(url, Qs.stringify(this.login)).then(response => {
+                    let goUrl = '/profile/user.html';
+
+                    top.location.href = goUrl;
+                }).catch(error => this.ajaxError(error));
+            },
+            ajaxError: function (error) {
+                this.getImgCode();
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (!msg)
+                        msg = '出错了';
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>
