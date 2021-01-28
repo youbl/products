@@ -1,44 +1,54 @@
 package beinet.cn.assetmanagement.user.service;
 
-import beinet.cn.assetmanagement.user.entity.ValidCode;
-import beinet.cn.assetmanagement.user.repository.ValidCodeRepository;
+import beinet.cn.assetmanagement.user.model.Validcode;
+import beinet.cn.assetmanagement.user.repository.ValidcodeRepository;
 import beinet.cn.assetmanagement.utils.StrHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-/**
- * ValidCodeService
- *
- * @author youbl
- * @version 1.0
- * @date 2021/1/27 22:59
- */
 @Service
-public class ValidCodeService {
-    private final ValidCodeRepository validCodeRepository;
+public class ValidcodeService {
+    private final ValidcodeRepository validcodeRepository;
 
-    public ValidCodeService(ValidCodeRepository validCodeRepository) {
-        this.validCodeRepository = validCodeRepository;
+    public ValidcodeService(ValidcodeRepository validcodeRepository) {
+        this.validcodeRepository = validcodeRepository;
     }
+
+    public List<Validcode> findAll() {
+        return validcodeRepository.findAll();
+    }
+
+    public Validcode findById(Integer id) {
+        return validcodeRepository.findById(id).orElse(null);
+    }
+
+    public Validcode save(Validcode item) {
+        if (item == null) {
+            return null;
+        }
+        return validcodeRepository.save(item);
+    }
+
+
 
     /**
      * 插入新的验证码
      *
      * @return 验证码对象
      */
-    public ValidCode addCodeAndGetSn() {
+    public Validcode addCodeAndGetSn() {
         String code = StrHelper.getRndStr(4, 0);
         String sn = StrHelper.getRndStr(6, 0);
-        ValidCode record = ValidCode.builder()
+        Validcode record = Validcode.builder()
                 .code(code)
                 .sn(sn)
                 .type(0)
                 .enableErrNum(1)
                 .build();
-        validCodeRepository.save(record);
+        validcodeRepository.save(record);
         return record;
     }
 
@@ -54,7 +64,7 @@ public class ValidCodeService {
         if (StringUtils.isEmpty(code) || StringUtils.isEmpty(sn)) {
             return false;
         }
-        ValidCode record = validCodeRepository.findTopBySnAndEnableErrNumIsGreaterThan(sn, 0);
+        Validcode record = validcodeRepository.findTopBySnAndEnableErrNumIsGreaterThan(sn, 0);
         if (record == null) {
             return false;
         }
@@ -66,7 +76,8 @@ public class ValidCodeService {
             // 失败时，验证码可用次数减1
             record.setEnableErrNum(record.getEnableErrNum() - 1);
         }
-        validCodeRepository.save(record);
+        validcodeRepository.save(record);
         return ret;
     }
+
 }

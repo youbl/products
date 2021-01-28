@@ -5,7 +5,7 @@ spring:
   application:
     name: asset-management
   profiles:
-    active: unittest
+    active: dev
 
   jpa:
     show-sql: false  # 这个只会输出在控制台，不会记录到日志里，没必要开启
@@ -29,7 +29,7 @@ spring:
   profiles: dev # 开发使用这一段
 
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/firstdemodb?characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    url: jdbc:mysql://10.2.5.2:3306/assets?characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
     username: beinet
     password: beinet.cn
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -44,7 +44,7 @@ spring:
   profiles: prod # 生产使用这一段
 
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/firstdemodb?characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    url: jdbc:mysql://127.0.0.1:3306/assets?characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
     username: beinet
     password: beinet.cn
     driver-class-name: com.mysql.cj.jdbc.Driver
