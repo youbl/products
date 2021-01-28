@@ -41,6 +41,9 @@ public class Users {
     @Column(columnDefinition = "tinyint(4) COMMENT '性别 0男 1女'")
     private int sex;
 
+    @Column(columnDefinition = "tinyint(4) COMMENT '状态 0有效 1禁用'")
+    private int state;
+
     @Column(columnDefinition = "datetime COMMENT '创建时间'", insertable = false, updatable = false)
     private java.time.LocalDateTime creationTime;
 

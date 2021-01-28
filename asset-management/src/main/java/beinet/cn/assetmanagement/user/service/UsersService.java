@@ -22,6 +22,10 @@ public class UsersService {
         return usersRepository.findById(id).orElse(null);
     }
 
+    public Users findByAccount(String account) {
+        return usersRepository.findByAccount(account);
+    }
+
     public Users save(Users item) {
         if (item == null) {
             return null;
