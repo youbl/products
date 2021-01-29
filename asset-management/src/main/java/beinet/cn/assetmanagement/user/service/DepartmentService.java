@@ -22,6 +22,10 @@ public class DepartmentService {
         return departmentRepository.findById(id).orElse(null);
     }
 
+    public Department findByName(String name) {
+        return departmentRepository.findByDepartmentName(name);
+    }
+
     public Department save(Department item) {
         if (item == null) {
             return null;

@@ -21,23 +21,23 @@ public class ValidcodeController {
         this.validcodeService = validcodeService;
     }
 
-    @GetMapping("validcodes")
-    public List<Validcode> findAll() {
-        return validcodeService.findAll();
-    }
-
-    @GetMapping("validcode")
-    public Validcode findById(Integer id) {
-        return validcodeService.findById(id);
-    }
-
-    @PostMapping("validcode")
-    public Validcode save(@RequestBody Validcode item) {
-        if (item == null) {
-            return null;
-        }
-        return validcodeService.save(item);
-    }
+//    @GetMapping("validcodes")
+//    public List<Validcode> findAll() {
+//        return validcodeService.findAll();
+//    }
+//
+//    @GetMapping("validcode")
+//    public Validcode findById(Integer id) {
+//        return validcodeService.findById(id);
+//    }
+//
+//    @PostMapping("validcode")
+//    public Validcode save(@RequestBody Validcode item) {
+//        if (item == null) {
+//            return null;
+//        }
+//        return validcodeService.save(item);
+//    }
 
     /**
      * 获取图形验证码和序号

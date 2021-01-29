@@ -38,10 +38,6 @@ public class Validcode {
     @Column(columnDefinition = "datetime COMMENT '最后修改时间'", insertable = false, updatable = false)
     private java.time.LocalDateTime lastModificationTime;
 
-    @Size(max = 200)
-    @Column(columnDefinition = "varchar(200) COMMENT '说明'")
-    private String description;
-
     public ValidcodeDto mapTo() {
         ValidcodeDto result = new ValidcodeDto();
         result.setId(this.getId());
@@ -51,7 +47,6 @@ public class Validcode {
         result.setEnableErrNum(this.getEnableErrNum());
         result.setCreationTime(this.getCreationTime());
         result.setLastModificationTime(this.getLastModificationTime());
-        result.setDescription(this.getDescription());
         return result;
     }
 /*

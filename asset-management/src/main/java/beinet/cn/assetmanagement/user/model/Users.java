@@ -1,6 +1,11 @@
 package beinet.cn.assetmanagement.user.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 // <groupId>org.hibernate.validator</groupId><artifactId>hibernate-validator</artifactId>
@@ -8,6 +13,11 @@ import javax.validation.constraints.*;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@DynamicInsert
+@DynamicUpdate
 @Table(name = "Users", catalog = "assets")
 public class Users {
     @Id
@@ -41,7 +51,7 @@ public class Users {
     @Column(columnDefinition = "tinyint(4) COMMENT '性别 0男 1女'")
     private int sex;
 
-    @Column(columnDefinition = "tinyint(4) COMMENT '状态 0有效 1禁用'")
+    @Column(columnDefinition = "tinyint(4) COMMENT '状态 0待审核 1禁用 8可用'")
     private int state;
 
     @Column(columnDefinition = "datetime COMMENT '创建时间'", insertable = false, updatable = false)

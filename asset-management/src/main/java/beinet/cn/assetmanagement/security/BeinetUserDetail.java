@@ -54,7 +54,7 @@ public class BeinetUserDetail implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.getState() == 0;
+        return user.getState() == 8;
     }
 
     @Override

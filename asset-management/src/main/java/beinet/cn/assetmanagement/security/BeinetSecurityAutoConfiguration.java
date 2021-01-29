@@ -1,6 +1,7 @@
 package beinet.cn.assetmanagement.security;
 
 import beinet.cn.assetmanagement.user.service.UsersService;
+import beinet.cn.assetmanagement.user.service.ValidcodeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +10,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -30,6 +33,14 @@ import java.util.Map;
 @Configuration
 public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     static final String LOGIN_PAGE = "/login/index.html";
+
+    private final ValidcodeService validcodeService;
+    private final AuthenticationFailureHandler failureHandler;
+
+    public BeinetSecurityAutoConfiguration(ValidcodeService validcodeService) {
+        this.validcodeService = validcodeService;
+        this.failureHandler = new BeinetHandleFail();
+    }
 
     @Bean
     public PasswordEncoder createPasswordEncoder() {
@@ -64,7 +75,7 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 .loginPage(LOGIN_PAGE)         // 使用自定义的登录表单
                 .loginProcessingUrl("/login")       // 接收POST登录请求的处理地址
                 .successHandler(new BeinetHandleSuccess()) // 登录验证通过后的处理器
-                .failureHandler(new BeinetHandleFail())    // 登录验证失败后的处理器
+                .failureHandler(failureHandler)    // 登录验证失败后的处理器
                 .permitAll()                        // 允许上述请求匿名访问, 注：不加这句，会导致302死循环
                 .and()                              // 把前面的返回结果，转换回HttpSecurity，以便后续的流式操作
                 .logout()                           // 开启退出登录接口
@@ -77,17 +88,19 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 .accessDeniedHandler(new BeinetHandleAccessDenied())            // 指定登录用户访问无权限url的异常处理器
                 .and()
                 .authorizeRequests()                // 开始指定请求授权
-                .antMatchers("/res/**", "/error/**", "/img/**").permitAll()     // res根路径及子目录请求，不限制访问
-                .antMatchers("/favicon.ico").permitAll()     // ico不限制访问
-                .antMatchers("/login/**").permitAll()   // login相关页面请求，不限制访问
-                .antMatchers("/**/*.html/**").permitAll()   // html，不限制访问
+                .antMatchers("/static/**", "/res/**", "/error/**", "/img/**").permitAll()     // res根路径及子目录请求，不限制访问
+                .antMatchers("/favicon.ico").permitAll()        // ico不限制访问
+                .antMatchers("/login/**").permitAll()           // login相关页面请求，不限制访问
+                .antMatchers("/departments").permitAll()        // 注册页面需要获取部门列表
+                .antMatchers("/validcode/img/**").permitAll()   // 验证码请求，不限制访问
+                .antMatchers("/**/*.html/**").permitAll()       // html，不限制访问
                 //.antMatchers("/admin/**").hasRole("ADMIN") // 管理页面请求，要求ADMIN角色才能访问
                 //.antMatchers("/manage/**").hasRole("ADMIN")// 管理页面请求，要求ADMIN角色才能访问
                 .anyRequest().authenticated();      // 其它所有请求都要求登录后访问，但是不限制角色
 
-        //BeinetAuthenticationFilter filter = new BeinetAuthenticationFilter();
-        //http.addFilterBefore(filter, RequestCacheAwareFilter.class);
-        //http.addFilterAfter(filter, BasicAuthenticationFilter.class);
+        // 在用户名密码校验之前，检查图形验证码是否正确
+        ValidCodeFilter filter = new ValidCodeFilter(validcodeService, failureHandler);
+        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
 
 

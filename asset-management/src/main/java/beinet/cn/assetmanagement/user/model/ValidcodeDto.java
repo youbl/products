@@ -29,7 +29,6 @@ public class ValidcodeDto {
         result.setEnableErrNum(this.getEnableErrNum());
         result.setCreationTime(this.getCreationTime());
         result.setLastModificationTime(this.getLastModificationTime());
-        result.setDescription(this.getDescription());
         return result;
     }
 }

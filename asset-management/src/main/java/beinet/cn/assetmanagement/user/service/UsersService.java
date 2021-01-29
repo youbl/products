@@ -1,7 +1,9 @@
 package beinet.cn.assetmanagement.user.service;
 
 import beinet.cn.assetmanagement.user.model.Users;
+import beinet.cn.assetmanagement.user.model.UsersDto;
 import beinet.cn.assetmanagement.user.repository.UsersRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,9 +11,12 @@ import java.util.List;
 @Service
 public class UsersService {
     private final UsersRepository usersRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsersService(UsersRepository usersRepository) {
+    public UsersService(UsersRepository usersRepository,
+                        PasswordEncoder passwordEncoder) {
         this.usersRepository = usersRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<Users> findAll() {
@@ -33,4 +38,11 @@ public class UsersService {
         return usersRepository.save(item);
     }
 
+    public Users save(UsersDto item) {
+        if (item == null) {
+            return null;
+        }
+        item.setPassword(passwordEncoder.encode(item.getPassword()));
+        return save(item.mapTo());
+    }
 }

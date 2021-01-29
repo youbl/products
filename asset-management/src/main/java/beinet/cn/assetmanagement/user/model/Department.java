@@ -1,6 +1,11 @@
 package beinet.cn.assetmanagement.user.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 // <groupId>org.hibernate.validator</groupId><artifactId>hibernate-validator</artifactId>
@@ -8,6 +13,11 @@ import javax.validation.constraints.*;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@DynamicInsert
+@DynamicUpdate
 @Table(name = "Department", catalog = "assets")
 public class Department {
     @Id

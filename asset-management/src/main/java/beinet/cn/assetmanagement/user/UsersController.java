@@ -1,12 +1,14 @@
 package beinet.cn.assetmanagement.user;
 
 import beinet.cn.assetmanagement.user.model.Users;
+import beinet.cn.assetmanagement.user.model.UsersDto;
 import beinet.cn.assetmanagement.user.service.UsersService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -27,8 +29,14 @@ public class UsersController {
         return usersService.findById(id);
     }
 
-    @PostMapping("users")
-    public Users save(@RequestBody Users item) {
+    /**
+     * 注册页面调用接口
+     *
+     * @param item
+     * @return
+     */
+    @PostMapping("/login/users")
+    public Users save(@Valid @RequestBody UsersDto item) {
         if (item == null) {
             return null;
         }

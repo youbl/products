@@ -33,7 +33,6 @@ public class ValidcodeService {
     }
 
 
-
     /**
      * 插入新的验证码
      *
@@ -64,11 +63,11 @@ public class ValidcodeService {
         if (StringUtils.isEmpty(code) || StringUtils.isEmpty(sn)) {
             return false;
         }
-        Validcode record = validcodeRepository.findTopBySnAndEnableErrNumIsGreaterThan(sn, 0);
+        Validcode record = validcodeRepository.findTopBySnAndEnableErrNumIsGreaterThan(sn.trim(), 0);
         if (record == null) {
             return false;
         }
-        boolean ret = (record.getCode().equalsIgnoreCase(code));
+        boolean ret = (record.getCode().equalsIgnoreCase(code.trim()));
         if (ret) {
             // 成功时，验证码要作废
             record.setEnableErrNum(0);
