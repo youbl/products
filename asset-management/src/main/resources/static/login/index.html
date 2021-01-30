@@ -69,7 +69,7 @@
                 let url = '/login';
                 // 默认登录使用的是form形式，因此要用Qs转换一下
                 return axios.post(url, Qs.stringify(this.login)).then(response => {
-                    let goUrl = '/profile/user.html';
+                    let goUrl = '/profile/nav.html';
 
                     top.location.href = goUrl;
                 }).catch(error => {

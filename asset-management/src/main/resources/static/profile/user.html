@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>固定资产管理系统</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/elemeIndex.js"></script>
+    <script type="text/javascript" src="/res/qs.min.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+</head>
+<body>
+<div id="divApp" style="text-align: center;">
+</div>
+<script type="text/javascript">
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                showTab: 11,
+                user: {},
+                allPage: {
+                    11: '/profile/user.html',    // 充值页面
+                    21: '/profile/product.html',// 用户购买页
+                    22: '/profile/buylist.html', // 用户已购订单页
+                    26: '/admin/user.html',     // 管理用户列表页
+                    27: '/admin/list.html',       // 管理ip列表页
+                    28: '/admin/charge.html', // 管理员查看充值页面
+                    25: '/admin/buylist.html',     // 管理用户订单列表页
+                    29: '/admin/config.html',  // 站点配置页面
+                },
+            }
+        },
+        created: function () {
+        },
+        computed: {},
+        methods: {
+            switchTab: function (tab) {
+                this.showTab = tab;
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (!msg)
+                        msg = '出错了';
+                    alert(msg);
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>
