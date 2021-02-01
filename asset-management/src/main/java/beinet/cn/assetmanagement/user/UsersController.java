@@ -1,5 +1,7 @@
 package beinet.cn.assetmanagement.user;
 
+import beinet.cn.assetmanagement.security.AuthDetails;
+import beinet.cn.assetmanagement.user.model.PasswordDto;
 import beinet.cn.assetmanagement.user.model.Users;
 import beinet.cn.assetmanagement.user.model.UsersDto;
 import beinet.cn.assetmanagement.user.service.UsersService;
@@ -19,28 +21,56 @@ public class UsersController {
         this.usersService = usersService;
     }
 
-    @GetMapping("userss")
+    @GetMapping("/login/currentUser")
+    public Users getCurrentUser(AuthDetails details) {
+        if (details.getAccount().equals("匿名")) {
+            return null;
+        }
+        return usersService.findByAccount(details.getAccount(), true);
+    }
+
+    @GetMapping("users")
     public List<Users> findAll() {
         return usersService.findAll();
     }
 
-    @GetMapping("users")
-    public Users findById(Integer id) {
-        return usersService.findById(id);
+    /**
+     * 修改密码接口
+     *
+     * @param item    数据dto
+     * @param details 当前登录信息
+     */
+    @PostMapping("/users/password")
+    public void changePassword(@Valid @RequestBody PasswordDto item, AuthDetails details) {
+        if (item == null) {
+            return;
+        }
+        if (!details.getAccount().equals(item.getAccount())) {
+            throw new RuntimeException("登录账号不一致");
+        }
+        usersService.changePassword(item, details.getAccount());
     }
 
     /**
-     * 注册页面调用接口
+     * 注册页面或个人资料修改 调用接口
      *
-     * @param item
-     * @return
+     * @param item    前端提交信息
+     * @param details 登录信息，匿名表示注册，否则表示修改个人资料
+     * @return 修改后的信息
      */
     @PostMapping("/login/users")
-    public Users save(@Valid @RequestBody UsersDto item) {
+    public Users save(@Valid @RequestBody UsersDto item, AuthDetails details) {
         if (item == null) {
             return null;
         }
-        return usersService.save(item);
+        if (item.getAccount().equals("匿名")) {
+            throw new RuntimeException("不允许账号使用 匿名");
+        }
+        if (!details.getAccount().equals("匿名") &&
+                !details.getAccount().equals(item.getAccount())) {
+            throw new RuntimeException("登录账号不允许修改");
+        }
+        return usersService.save(item, details.getAccount());
     }
 
 }

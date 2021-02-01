@@ -18,12 +18,13 @@ import java.net.URLEncoder;
  * @date 2020/11/25 15:00
  */
 public class BeinetAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    private final static String DENY_MSG = "Unauthorized";
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException {
         if (isAjax(request)) {
-            BeinetSecurityAutoConfiguration.outputDenyMsg(response, authException.getMessage());
+            BeinetSecurityAutoConfiguration.outputDenyMsg(response, DENY_MSG);//authException.getMessage());
         } else {
             response.sendRedirect(BeinetSecurityAutoConfiguration.LOGIN_PAGE + getReturnUrl(request));
         }

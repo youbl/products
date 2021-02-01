@@ -19,27 +19,21 @@
 <div id="divApp" style="text-align: center;">
     <el-form :model="register" :rules="rulesRegister" ref="registerForm" style="width:500px">
         <h1 style="text-align: center">
-            员工信息
+            修改密码
         </h1>
         <el-form-item label="当前账号" label-width="200px" prop="account">
             <el-input v-model="register.account" placeholder="请输入账号" maxlength="30"
                       readonly="true" class="noborder"></el-input>
         </el-form-item>
-        <el-form-item label="员工工号" label-width="200px" prop="code">
-            <el-input v-model="register.code" placeholder="请输入工号" maxlength="30"></el-input>
+        <el-form-item label="旧的密码" label-width="200px" prop="passwordOld">
+            <el-input v-model="register.passwordOld" placeholder="请输入旧的密码" maxlength="30" show-password></el-input>
         </el-form-item>
-        <el-form-item label="员工姓名" label-width="200px" prop="userName">
-            <el-input v-model="register.userName" placeholder="请输入姓名" maxlength="10"></el-input>
+        <el-form-item label="新的密码" label-width="200px" prop="password">
+            <el-input v-model="register.password" placeholder="请输入新的密码" maxlength="30" show-password></el-input>
         </el-form-item>
-        <el-form-item label="所属部门" label-width="200px" prop="department" style="text-align: left">
-            <el-select v-model="register.department" filterable placeholder="请选择部门">
-                <el-option label="请选择部门" value=""></el-option>
-                <el-option
-                        v-for="item in departmentList"
-                        :label="item.departmentName"
-                        :value="item.id">
-                </el-option>
-            </el-select>
+        <el-form-item label="密码确认" label-width="200px" prop="passwordConfirm">
+            <el-input v-model="register.passwordConfirm" placeholder="请再次输入密码" maxlength="30"
+                      show-password></el-input>
         </el-form-item>
         <div>
             <el-button icon="el-icon-success" type="primary" @click="doRegister('registerForm')">保 存</el-button>
@@ -50,36 +44,42 @@
     const vueApp = new Vue({
         el: '#divApp',
         data: function () {
+            let validatePass = (rule, value, callback) => {
+                if (this.register.password != this.register.passwordConfirm)
+                    return callback(new Error('两次密码输入不一致.'));
+                return callback();
+            };
             return {
                 user: {},
-                departmentList: [],
                 register: {
                     account: '',
-                    code: '',
-                    userName: '',
-                    department: '',
-                    password: 'xx',// 无作用，纯粹用于跳过后端校验
+                    passwordOld: '',
+                    password: '',
+                    passwordConfirm: '',
                 },
                 rulesRegister: {
                     account: [
                         {required: true, message: '账号必填', trigger: 'blur'},
                         {min: 3, max: 30, message: '账号长度为3~30个字符', trigger: 'blur'},
                     ],
-                    code: [
-                        {required: true, message: '工号不能为空', trigger: 'blur'},
-                        // {pattern: /^1\d{10}$/, message: '手机号格式有误'},
+                    passwordOld: [
+                        {required: true, message: '旧密码必填', trigger: 'blur'},
+                        {min: 6, max: 30, message: '密码长度为6~30个字符', trigger: 'blur'},
                     ],
-                    userName: [
-                        {required: true, message: '姓名不能为空', trigger: 'blur'},
+                    password: [
+                        {required: true, message: '新密码必填', trigger: 'blur'},
+                        {min: 6, max: 30, message: '密码长度为6~30个字符', trigger: 'blur'},
                     ],
-                    department: [
-                        {required: true, message: '部门必须选择', trigger: 'blur'},
+                    passwordConfirm: [
+                        {required: true, message: '确认密码必填', trigger: 'blur'},
+                        {min: 6, max: 30, message: '密码长度为6~30个字符', trigger: 'blur'},
+                        {validator: validatePass, trigger: 'blur'},
                     ],
                 },
             }
         },
         created: function () {
-            this.getCurrentUser().then(this.loadDepartments);
+            this.getCurrentUser();
         },
         computed: {},
         methods: {
@@ -91,30 +91,15 @@
                         return this.goLogin();
                     }
                     this.register.account = this.user.account;
-                    this.register.code = this.user.code;
-                    this.register.userName = this.user.userName;
-                    this.register.department = this.user.department;
-                }).catch(error => this.ajaxError(error));
-            },
-            loadDepartments: function () {
-                let url = '/departments';
-                return axios.get(url).then(response => {
-                    if (!response || !response.data || !response.data.length) {
-                        return alert('没有找到部门配置，请联系管理员配置');
-                    }
-                    this.departmentList = response.data;
                 }).catch(error => this.ajaxError(error));
             },
             doRegister: function (form) {
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
-                    let url = '/login/users';
+                    let url = '/users/password';
                     return axios.post(url, this.register).then(response => {
-                        if (!response || !response.data || !response.data.id) {
-                            return alert('资料修改失败');
-                        }
-                        alert('资料修改成功');
+                        alert('密码修改成功');
                     }).catch(error => this.ajaxError(error));
                 });
             },

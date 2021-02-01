@@ -61,6 +61,7 @@
                 return callback();
             };
             return {
+                user: {},
                 departmentList: [],
                 imgCodeBase64: '/favicon.ico',
                 register: {
@@ -104,10 +105,19 @@
             }
         },
         created: function () {
-            this.loadDepartments().then(this.getImgCode);
+            this.getCurrentUser().then(this.loadDepartments).then(this.getImgCode);
         },
         computed: {},
         methods: {
+            getCurrentUser: function () {
+                let url = '/login/currentUser';
+                return axios.get(url).then(response => {
+                    this.user = response.data;
+                    if (this.user) {
+                        top.location.href = '/profile/nav.html';
+                    }
+                }).catch(error => this.ajaxError(error));
+            },
             loadDepartments: function () {
                 let url = '/departments';
                 return axios.get(url).then(response => {

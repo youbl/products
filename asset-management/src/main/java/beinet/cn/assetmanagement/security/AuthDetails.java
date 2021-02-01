@@ -11,7 +11,7 @@ import lombok.Data;
  */
 @Data
 public class AuthDetails {
-    private String userName;
+    private String account;
     private String role;
 
     private String userAgent;

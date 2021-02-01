@@ -27,7 +27,7 @@ public class UsersDto {
     @Min(value = 1, message = "部门必须选择")
     private int department;
 
-    @NotBlank(message = "姓名不能为空")
+    @NotBlank(message = "密码不能为空")
     private String password;
 
     private String phone;

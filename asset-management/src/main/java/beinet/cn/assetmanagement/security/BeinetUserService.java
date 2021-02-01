@@ -38,7 +38,7 @@ public class BeinetUserService implements UserDetailsService {
         if (username == null || username.isEmpty())
             throw new IllegalArgumentException("username can't be empty.");
 
-        Users ret = usersService.findByAccount(username);
+        Users ret = usersService.findByAccount(username, false);
         if (ret == null)
             throw new UsernameNotFoundException(username + " not found.");
         return new BeinetUserDetail(ret);

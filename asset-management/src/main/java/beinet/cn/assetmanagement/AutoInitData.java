@@ -42,7 +42,7 @@ public class AutoInitData implements CommandLineRunner {
     }
 
     void addAdmin() {
-        if (usersService.findByAccount(ADMIN) != null) {
+        if (usersService.findByAccount(ADMIN, false) != null) {
             log.info("管理员已存在，无需创建: {}", ADMIN);
             return;
         }
@@ -53,7 +53,7 @@ public class AutoInitData implements CommandLineRunner {
                 .userName("超管")
                 .state(8)
                 .build();
-        usersService.save(admin);
+        usersService.save(admin, null);
         log.info("管理员创建成功: {} {}", admin.getId(), admin.getAccount());
     }
 

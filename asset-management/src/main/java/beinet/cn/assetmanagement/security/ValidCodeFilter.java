@@ -5,6 +5,7 @@ import beinet.cn.assetmanagement.utils.CachingStreamRequestWrapper;
 import org.apache.commons.io.IOUtils;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -44,11 +45,11 @@ public class ValidCodeFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-//        // 已登录，不校验验证码
-//        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
+        // 已登录，不校验验证码
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         boolean needCheck = false;
         for (RequestMatcher matcher : this.pathMatcher) {

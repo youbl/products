@@ -117,7 +117,7 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
         }
     }
 
-    static void outputDenyMsg(HttpServletResponse response, String message) throws IOException {
+    public static void outputDenyMsg(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
         response.setContentType("application/json; charset=utf-8");
