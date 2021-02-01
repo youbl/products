@@ -60,15 +60,41 @@
         </el-table>
     </template>
 
+    <!-- 编辑弹窗 -->
     <el-dialog title="员工编辑" :visible.sync="openEditDialog">
-        <el-form :model="editData" ref="editForm" style="width:500px">
-            <el-form-item label="部门名称" label-width="200px">
-                <el-input v-model="editData.departmentName" placeholder="请输入部门名称"></el-input>
-            </el-form-item>
-            <el-form-item label="部门备注" label-width="200px">
-                <el-input v-model="editData.description" placeholder="请输入部门备注"></el-input>
-            </el-form-item>
-        </el-form>
+        <el-form-item label="登录账号" label-width="200px" prop="account">
+            <el-input v-model="register.account" placeholder="请输入账号" maxlength="30"
+                      readonly="true" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="员工工号" label-width="200px" prop="code">
+            <el-input v-model="register.code" placeholder="请输入工号" maxlength="30"></el-input>
+        </el-form-item>
+        <el-form-item label="员工姓名" label-width="200px" prop="userName">
+            <el-input v-model="register.userName" placeholder="请输入姓名" maxlength="10"></el-input>
+        </el-form-item>
+        <el-form-item label="所属部门" label-width="200px" prop="department" style="text-align: left">
+            <el-select v-model="register.department" filterable placeholder="请选择部门">
+                <el-option label="请选择部门" value=""></el-option>
+                <el-option
+                        v-for="item in departmentList"
+                        :label="item.departmentName"
+                        :value="item.id">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="角色" label-width="200px" prop="roles" style="text-align: left">
+            <el-radio-group v-model="register.roles">
+                <el-radio :label="USER">普通用户</el-radio>
+                <el-radio :label="ADMIN">超管</el-radio>
+            </el-radio-group>
+        </el-form-item>
+        <el-form-item label="状态" label-width="200px" prop="state" style="text-align: left">
+            <el-radio-group v-model="register.state">
+                <el-radio :label="0">待审核</el-radio>
+                <el-radio :label="8">启用</el-radio>
+                <el-radio :label="1">禁用</el-radio>
+            </el-radio-group>
+        </el-form-item>
         <div slot="footer" class="dialog-footer">
             <el-button icon="el-icon-success" type="primary" @click="saveData('editForm')">保 存</el-button>
             <el-button @click="hideEditDialog">取 消</el-button>
@@ -205,13 +231,13 @@
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
-                    let url = '/department';
+                    let url = '/users';
                     return axios.post(url, this.editData).then(response => {
                         if (!response || !response.data || !response.data.id) {
                             return alert('保存失败');
                         }
                         this.hideEditDialog();
-                        this.loadDepartments();
+                        this.loadUsers();
                         alert('保存成功');
                     }).catch(error => this.ajaxError(error));
                 });

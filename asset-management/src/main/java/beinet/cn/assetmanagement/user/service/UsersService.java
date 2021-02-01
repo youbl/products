@@ -71,7 +71,7 @@ public class UsersService {
         save(user);
     }
 
-    public Users save(UsersDto item, String currentAccount) {
+    public Users saveByUser(UsersDto item, String currentAccount) {
         if (item == null) {
             return null;
         }
@@ -84,6 +84,14 @@ public class UsersService {
         }
         // 已登录时，表示更新资料
         return update(item, currentAccount);
+    }
+
+    public Users saveByAdmin(UsersDto item) {
+        Users newUser = item.mapTo();
+        if (newUser.getId() <= 0) {
+            newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        }
+        return save(newUser);
     }
 
     private Users update(UsersDto item, String currentAccount) {

@@ -59,7 +59,7 @@ public class AutoInitData implements CommandLineRunner {
                 .department(departmentId)
                 .build()
                 .mapTo();
-        admin.setRoles("USER,ADMIN");
+        admin.setRoles("ADMIN");
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         usersService.save(admin);
         log.info("管理员创建成功: {} {}", admin.getId(), admin.getAccount());

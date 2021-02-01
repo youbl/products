@@ -33,16 +33,40 @@ public class UsersController {
         return usersService.findAll();
     }
 
+    /**
+     * 管理员编辑用户接口
+     *
+     * @param dto     用户
+     * @param details 登录信息
+     */
     @PreAuthorize("hasAnyRole('ADMIN')")
-    @PostMapping("/users/password/{id}")
-    public void resetPassword(@PathVariable int id, AuthDetails details) {
-        usersService.resetPassword(id);
+    @PostMapping("/users")
+    public void editUser(@RequestBody UsersDto dto, AuthDetails details) {
+        usersService.saveByAdmin(dto);
     }
 
+    /**
+     * 禁用 启用接口
+     *
+     * @param id      用户id
+     * @param details 登录信息
+     */
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/users/state/{id}")
     public void changeUserStatus(@PathVariable int id, AuthDetails details) {
         usersService.changeUserStatus(id);
+    }
+
+    /**
+     * 重置密码接口
+     *
+     * @param id      用户id
+     * @param details 登录信息
+     */
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PostMapping("/users/password/{id}")
+    public void resetPassword(@PathVariable int id, AuthDetails details) {
+        usersService.resetPassword(id);
     }
 
     /**
@@ -81,7 +105,7 @@ public class UsersController {
                 !details.getAccount().equals(item.getAccount())) {
             throw new RuntimeException("登录账号不允许修改");
         }
-        return usersService.save(item, details.getAccount());
+        return usersService.saveByUser(item, details.getAccount());
     }
 
 }
