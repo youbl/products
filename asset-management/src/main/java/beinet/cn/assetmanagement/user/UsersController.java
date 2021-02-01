@@ -5,10 +5,8 @@ import beinet.cn.assetmanagement.user.model.PasswordDto;
 import beinet.cn.assetmanagement.user.model.Users;
 import beinet.cn.assetmanagement.user.model.UsersDto;
 import beinet.cn.assetmanagement.user.service.UsersService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -29,9 +27,22 @@ public class UsersController {
         return usersService.findByAccount(details.getAccount(), true);
     }
 
-    @GetMapping("users")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/users")
     public List<Users> findAll() {
         return usersService.findAll();
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PostMapping("/users/password/{id}")
+    public void resetPassword(@PathVariable int id, AuthDetails details) {
+        usersService.resetPassword(id);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PostMapping("/users/state/{id}")
+    public void changeUserStatus(@PathVariable int id, AuthDetails details) {
+        usersService.changeUserStatus(id);
     }
 
     /**

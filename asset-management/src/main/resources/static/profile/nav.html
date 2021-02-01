@@ -25,7 +25,7 @@
 <div id="divApp" style="text-align: center;">
     <el-container style="height: 100%; border: 1px solid #eee">
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-            <el-menu :default-openeds="['1', '2']">
+            <el-menu :default-openeds="['1', '2', '3']">
                 <el-submenu index="1">
                     <template slot="title"><i class="el-icon-menu"></i>账户相关</template>
                     <el-menu-item-group>
@@ -38,18 +38,15 @@
                     <el-menu-item-group>
                         <el-menu-item index="2-1" @click.native="switchTab(21)">我的资产</el-menu-item>
                         <el-menu-item index="2-2" @click.native="switchTab(22)">资产领用</el-menu-item>
-                        <el-menu-item index="2-6" @click.native="switchTab(26)"
-                                      v-if="isAdmin">部门维护
-                        </el-menu-item>
-                        <el-menu-item index="2-7" @click.native="switchTab(26)"
-                                      v-if="isAdmin">用户管理
-                        </el-menu-item>
-                        <el-menu-item index="2-8" @click.native="switchTab(27)"
-                                      v-if="isAdmin">资产分类管理
-                        </el-menu-item>
-                        <el-menu-item index="2-9" @click.native="switchTab(27)"
-                                      v-if="isAdmin">资产管理
-                        </el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+                <el-submenu index="3" v-if="isAdmin">
+                    <template slot="title"><i class="el-icon-menu"></i>管理功能</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="3-1" @click.native="switchTab(31)">部门维护</el-menu-item>
+                        <el-menu-item index="3-2" @click.native="switchTab(32)">用户管理</el-menu-item>
+                        <el-menu-item index="3-3" @click.native="switchTab(33)">资产分类管理</el-menu-item>
+                        <el-menu-item index="3-4" @click.native="switchTab(34)">资产管理</el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
             </el-menu>
@@ -83,10 +80,11 @@
             return {
                 showTab: 11,
                 user: {},
-                isAdmin: false,
                 allPage: {
                     11: '/profile/user.html',       // 个人信息页面
                     12: '/profile/pwd.html',        // 修改密码页面
+                    31: '/admin/departments.html',  // 部门列表管理页面
+                    32: '/admin/users.html',        // 用户列表管理页面
                 },
             }
         },
@@ -94,7 +92,11 @@
             this.getCurrentUser();
             this.adjustAllIframe();
         },
-        computed: {},
+        computed: {
+            isAdmin: function () {
+                return this.user && this.user.roles && this.user.roles.indexOf('ADMIN') >= 0;
+            },
+        },
         methods: {
             switchTab: function (tab) {
                 this.showTab = tab;

@@ -51,13 +51,13 @@ public class Validcode {
     }
 /*
 INSERT INTO assets.Validcode (
-  code, sn, type, enableErrNum, description
+  code, sn, type, enableErrNum
 )VALUES(
-  :code, :sn, :type, :enableErrNum, :description
+  :code, :sn, :type, :enableErrNum
 );
 
 UPDATE assets.Validcode SET
-  code = :code, sn = :sn, type = :type, enableErrNum = :enableErrNum, description = :description
+  code = :code, sn = :sn, type = :type, enableErrNum = :enableErrNum
 WHERE ;
 */
 }

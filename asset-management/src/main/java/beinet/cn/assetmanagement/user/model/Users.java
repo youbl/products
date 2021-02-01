@@ -44,12 +44,16 @@ public class Users {
     @Column(columnDefinition = "varchar(50) COMMENT '加密后的密码'")
     private String password;
 
-    @Size(max = 2)
-    @Column(columnDefinition = "varchar(2) COMMENT '联系电话'")
+    @Size(max = 20)
+    @Column(columnDefinition = "varchar(20) COMMENT '联系电话'")
     private String phone;
 
     @Column(columnDefinition = "tinyint(4) COMMENT '性别 0男 1女'")
     private int sex;
+
+    @Size(max = 100)
+    @Column(columnDefinition = "varchar(100) COMMENT '角色'")
+    private String roles;
 
     @Column(columnDefinition = "tinyint(4) COMMENT '状态 0待审核 1禁用 8可用'")
     private int state;
@@ -70,19 +74,20 @@ public class Users {
         result.setPassword(this.getPassword());
         result.setPhone(this.getPhone());
         result.setSex(this.getSex());
+        result.setState(this.getState());
         result.setCreationTime(this.getCreationTime());
         result.setLastModificationTime(this.getLastModificationTime());
         return result;
     }
 /*
 INSERT INTO assets.Users (
-  code, account, userName, department, password, phone, sex
+  code, account, userName, department, password, phone, sex, roles, state
 )VALUES(
-  :code, :account, :userName, :department, :password, :phone, :sex
+  :code, :account, :userName, :department, :password, :phone, :sex, :roles, :state
 );
 
 UPDATE assets.Users SET
-  code = :code, account = :account, userName = :userName, department = :department, password = :password, phone = :phone, sex = :sex
+  code = :code, account = :account, userName = :userName, department = :department, password = :password, phone = :phone, sex = :sex, roles = :roles, state = :state
 WHERE ;
 */
 }

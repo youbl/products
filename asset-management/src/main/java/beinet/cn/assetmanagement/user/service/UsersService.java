@@ -37,6 +37,18 @@ public class UsersService {
         return result;
     }
 
+    public void resetPassword(int id) {
+        Users result = usersRepository.findById(id).orElseThrow(() -> new RuntimeException("指定id未找到用户:" + id));
+        result.setPassword(passwordEncoder.encode("123456"));
+        save(result);
+    }
+
+    public void changeUserStatus(int id) {
+        Users result = usersRepository.findById(id).orElseThrow(() -> new RuntimeException("指定id未找到用户:" + id));
+        result.setState(result.getState() == 8 ? 1 : 8);
+        save(result);
+    }
+
     public Users save(Users item) {
         if (item == null) {
             return null;
@@ -64,8 +76,11 @@ public class UsersService {
             return null;
         }
         if (StringUtils.isEmpty(currentAccount) || currentAccount.equals("匿名")) {
+            // 注册
             item.setPassword(passwordEncoder.encode(item.getPassword()));
-            return save(item.mapTo());
+            Users newUser = item.mapTo();
+            newUser.setRoles("USER");
+            return save(newUser);
         }
         // 已登录时，表示更新资料
         return update(item, currentAccount);

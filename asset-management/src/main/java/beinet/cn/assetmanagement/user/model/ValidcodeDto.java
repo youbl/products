@@ -18,8 +18,6 @@ public class ValidcodeDto {
 
     private java.time.LocalDateTime lastModificationTime;
 
-    private String description;
-
     public Validcode mapTo() {
         Validcode result = new Validcode();
         result.setId(this.getId());

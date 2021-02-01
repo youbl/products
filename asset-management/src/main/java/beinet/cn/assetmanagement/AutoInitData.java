@@ -7,6 +7,7 @@ import beinet.cn.assetmanagement.user.service.DepartmentService;
 import beinet.cn.assetmanagement.user.service.UsersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,44 +29,53 @@ public class AutoInitData implements CommandLineRunner {
 
     private final UsersService usersService;
     private final DepartmentService departmentService;
+    private final PasswordEncoder passwordEncoder;
 
     public AutoInitData(UsersService usersService,
-                        DepartmentService departmentService) {
+                        DepartmentService departmentService,
+                        PasswordEncoder passwordEncoder) {
         this.usersService = usersService;
         this.departmentService = departmentService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public void run(String... args) throws Exception {
-        addAdmin();
-        addFirstDepartment();
+    public void run(String... args) {
+        Department department = addFirstDepartment();
+        addAdmin(department.getId());
     }
 
-    void addAdmin() {
+    void addAdmin(int departmentId) {
         if (usersService.findByAccount(ADMIN, false) != null) {
             log.info("管理员已存在，无需创建: {}", ADMIN);
             return;
         }
-        UsersDto admin = UsersDto.builder()
+        Users admin = UsersDto.builder()
                 .account(ADMIN)
                 .password(PASSWORD)
                 .code("0000")
                 .userName("超管")
                 .state(8)
-                .build();
-        usersService.save(admin, null);
+                .department(departmentId)
+                .build()
+                .mapTo();
+        admin.setRoles("USER,ADMIN");
+        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+        usersService.save(admin);
         log.info("管理员创建成功: {} {}", admin.getId(), admin.getAccount());
     }
 
-    void addFirstDepartment() {
-        if (departmentService.findByName(FIRST_DEPART) != null) {
+    Department addFirstDepartment() {
+        Department department = departmentService.findByName(FIRST_DEPART);
+        if (department != null) {
             log.info("部门已存在，无需创建: {}", FIRST_DEPART);
-            return;
+            return department;
         }
-        Department department = Department.builder()
+        department = Department.builder()
                 .departmentName(FIRST_DEPART)
                 .build();
         departmentService.save(department);
         log.info("部门创建成功: {} {}", department.getId(), department.getDepartmentName());
+        return department;
     }
 }

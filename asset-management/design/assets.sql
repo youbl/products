@@ -2,7 +2,8 @@
 SQLyog Ultimate
 MySQL - 5.7.27-log : Database - assets
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -89,6 +90,7 @@ CREATE TABLE `users` (
   `password` varchar(50) NOT NULL DEFAULT '' COMMENT '加密后的密码',
   `phone` varchar(20) NOT NULL DEFAULT '' COMMENT '联系电话',
   `sex` tinyint(4) NOT NULL DEFAULT '0' COMMENT '性别 0男 1女',
+  `roles` varchar(100) NOT NULL DEFAULT '' COMMENT '角色',
   `state` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0待审核 1禁用 8可用',
   `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `LastModificationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',

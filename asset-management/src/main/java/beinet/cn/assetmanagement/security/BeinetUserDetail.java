@@ -2,7 +2,9 @@ package beinet.cn.assetmanagement.security;
 
 import beinet.cn.assetmanagement.user.model.Users;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,23 +20,29 @@ import java.util.List;
  */
 public class BeinetUserDetail implements UserDetails {
     private final Users user;
+    private List<GrantedAuthority> roles;
 
     public BeinetUserDetail(Users user) {
         this.user = user;
+        setRoles();
+    }
+
+    private void setRoles() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        if (!StringUtils.isEmpty(user.getRoles())) {
+            for (String role : user.getRoles().split(",")) {
+                if (role.length() <= 0)
+                    continue;
+                // Spring比较是按 ROLE_USER 形式进行比较
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+            }
+        }
+        roles = authorities;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-//        if (!StringUtils.isEmpty(roles)) {
-//            for (String role : roles.split(",")) {
-//                if (role.length() <= 0)
-//                    continue;
-//                // Spring比较是按 ROLE_USER 形式进行比较
-//                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
-//            }
-//        }
-        return authorities;
+        return roles;
     }
 
     @Override
