@@ -30,6 +30,8 @@ public class UsersDto {
     @NotBlank(message = "密码不能为空")
     private String password;
 
+    private String roles;
+
     private String phone;
 
     private int sex;
@@ -48,6 +50,7 @@ public class UsersDto {
         result.setUserName(this.getUserName());
         result.setDepartment(this.getDepartment());
         result.setPassword(this.getPassword());
+        result.setRoles(this.getRoles());
         result.setPhone(this.getPhone());
         result.setSex(this.getSex());
         result.setState(this.getState());

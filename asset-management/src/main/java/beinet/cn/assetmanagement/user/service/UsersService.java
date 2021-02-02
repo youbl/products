@@ -22,7 +22,7 @@ public class UsersService {
     }
 
     public List<Users> findAll() {
-        List<Users> results = usersRepository.findAll();
+        List<Users> results = usersRepository.findAllByOrderByAccountAsc();
         for (Users user : results) {
             hideSensitiveInfo(user);
         }
@@ -87,11 +87,22 @@ public class UsersService {
     }
 
     public Users saveByAdmin(UsersDto item) {
-        Users newUser = item.mapTo();
-        if (newUser.getId() <= 0) {
-            newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        Users user;
+        if (item.getId() > 0) {
+            user = usersRepository.findById(item.getId()).orElseThrow(() -> new RuntimeException("指定的id找不到用户:" + item.getId()));
+            if (!user.getAccount().equals(item.getAccount())) {
+                throw new RuntimeException("不允许修改登录账号:" + user.getAccount());
+            }
+            user.setCode(item.getCode());
+            user.setUserName(item.getUserName());
+            user.setDepartment(item.getDepartment());
+            user.setRoles(item.getRoles());
+            user.setState(item.getState());
+        } else {
+            user = item.mapTo();
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        return save(newUser);
+        return save(user);
     }
 
     private Users update(UsersDto item, String currentAccount) {

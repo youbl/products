@@ -29,6 +29,7 @@
         <el-table
                 :data="dataList"
                 stripe
+                border
                 style="width: 100%">
             <el-table-column v-for="(value, key, index) in dataList[0]" :prop="key" :label="key">
             </el-table-column>

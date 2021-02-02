@@ -29,6 +29,7 @@
         <el-table
                 :data="dataList"
                 stripe
+                border
                 style="width: 100%">
             <el-table-column v-for="(value, key, index) in dataList[0]"
                              :prop="key"
@@ -39,21 +40,23 @@
             <el-table-column label="部门">
                 <template slot-scope="scope">{{getDepartName(scope.row.department)}}</template>
             </el-table-column>
-            <el-table-column label="状态">
-                <template slot-scope="scope">{{getStateName(scope.row.state)}}</template>
+            <el-table-column label="状态" width="80">
+                <template slot-scope="scope">
+                    <span :style="scope.row.state===8?'':'color:red;font-weight:bold'">
+                        {{getStateName(scope.row.state)}}
+                    </span>
+                </template>
             </el-table-column>
             <el-table-column label="" width="250">
                 <template slot-scope="scope">
-                    <el-button size="mini"
+                    <el-button size="mini" type="primary" plain
                                @click="showEdit(scope.$index, scope.row)">编辑
                     </el-button>
-                    <el-button
-                            size="mini"
-                            @click="handleResetPwd(scope.$index, scope.row)">密码重置
+                    <el-button size="mini" type="success"
+                               @click="handleResetPwd(scope.$index, scope.row)">密码重置
                     </el-button>
                     <el-button v-text="getRevertStateName(scope.row.state)"
-                               size="mini"
-                               type="danger"
+                               size="mini" type="danger"
                                @click="handleDisable(scope.$index, scope.row)"></el-button>
                 </template>
             </el-table-column>
@@ -62,39 +65,46 @@
 
     <!-- 编辑弹窗 -->
     <el-dialog title="员工编辑" :visible.sync="openEditDialog">
-        <el-form-item label="登录账号" label-width="200px" prop="account">
-            <el-input v-model="register.account" placeholder="请输入账号" maxlength="30"
-                      readonly="true" class="noborder"></el-input>
-        </el-form-item>
-        <el-form-item label="员工工号" label-width="200px" prop="code">
-            <el-input v-model="register.code" placeholder="请输入工号" maxlength="30"></el-input>
-        </el-form-item>
-        <el-form-item label="员工姓名" label-width="200px" prop="userName">
-            <el-input v-model="register.userName" placeholder="请输入姓名" maxlength="10"></el-input>
-        </el-form-item>
-        <el-form-item label="所属部门" label-width="200px" prop="department" style="text-align: left">
-            <el-select v-model="register.department" filterable placeholder="请选择部门">
-                <el-option label="请选择部门" value=""></el-option>
-                <el-option
-                        v-for="item in departmentList"
-                        :label="item.departmentName"
-                        :value="item.id">
-                </el-option>
-            </el-select>
-        </el-form-item>
-        <el-form-item label="角色" label-width="200px" prop="roles" style="text-align: left">
-            <el-radio-group v-model="register.roles">
-                <el-radio :label="USER">普通用户</el-radio>
-                <el-radio :label="ADMIN">超管</el-radio>
-            </el-radio-group>
-        </el-form-item>
-        <el-form-item label="状态" label-width="200px" prop="state" style="text-align: left">
-            <el-radio-group v-model="register.state">
-                <el-radio :label="0">待审核</el-radio>
-                <el-radio :label="8">启用</el-radio>
-                <el-radio :label="1">禁用</el-radio>
-            </el-radio-group>
-        </el-form-item>
+        <el-form :model="editData" ref="editForm">
+            <el-form-item label="登录账号" label-width="200px" prop="account" style="text-align: left">
+                <span style="display: inline-block; width: 300px;">
+                    <el-input v-model="editData.account" placeholder="请输入账号" maxlength="30"
+                              :readonly="editData.id > 0" :class="editData.id > 0 ? 'noborder' : ''"></el-input>
+                </span>
+                <span v-show="editData.id <= 0">初始密码: 123456</span>
+            </el-form-item>
+            <el-form-item label="员工工号" label-width="200px" prop="code" style="text-align: left">
+                <span style="display: inline-block; width: 300px;">
+                    <el-input v-model="editData.code" placeholder="请输入工号" maxlength="30"></el-input>
+                </span>
+            </el-form-item>
+            <el-form-item label="员工姓名" label-width="200px" prop="userName">
+                <el-input v-model="editData.userName" placeholder="请输入姓名" maxlength="10"></el-input>
+            </el-form-item>
+            <el-form-item label="所属部门" label-width="200px" prop="department" style="text-align: left">
+                <el-select v-model="editData.department" filterable placeholder="请选择部门">
+                    <el-option label="请选择部门" value=""></el-option>
+                    <el-option
+                            v-for="item in departmentList"
+                            :label="item.departmentName"
+                            :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="角色" label-width="200px" prop="roles" style="text-align: left">
+                <el-radio-group v-model="editData.roles">
+                    <el-radio label="USER">普通用户</el-radio>
+                    <el-radio label="ADMIN">超管</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="状态" label-width="200px" prop="state" style="text-align: left">
+                <el-radio-group v-model="editData.state">
+                    <el-radio :label="0">待审核</el-radio>
+                    <el-radio :label="8">启用</el-radio>
+                    <el-radio :label="1">禁用</el-radio>
+                </el-radio-group>
+            </el-form-item>
+        </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button icon="el-icon-success" type="primary" @click="saveData('editForm')">保 存</el-button>
             <el-button @click="hideEditDialog">取 消</el-button>
@@ -124,10 +134,7 @@
                     lastModificationTime: {width: 180, title: '更新时间', show: true},
                 },
                 openEditDialog: false,
-                editData: {
-                    departmentName: '',
-                    description: '',
-                },
+                editData: this.getNewData(),
             }
         },
         created: function () {
@@ -137,6 +144,17 @@
         },
         computed: {},
         methods: {
+            getNewData: function () {
+                return {
+                    id: 0,
+                    account: '',
+                    code: '',
+                    userName: '',
+                    department: '',
+                    roles: 'USER',
+                    state: 8,
+                };
+            },
             getCurrentUser: function () {
                 let url = '/login/currentUser';
                 return axios.get(url).then(response => {
@@ -220,22 +238,20 @@
                 if (data) {
                     this.editData = data;
                 } else {
-                    this.editData = {};
+                    this.editData = this.getNewData();
                 }
             },
             hideEditDialog: function () {
                 this.openEditDialog = false;
-                this.editData = {};
+                this.editData = this.getNewData();
             },
             saveData: function (form) {
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
+                    this.editData.password = 'xxx'; // 密码不会变，只为了绕过后台校验
                     let url = '/users';
                     return axios.post(url, this.editData).then(response => {
-                        if (!response || !response.data || !response.data.id) {
-                            return alert('保存失败');
-                        }
                         this.hideEditDialog();
                         this.loadUsers();
                         alert('保存成功');

@@ -41,7 +41,10 @@ public class UsersController {
      */
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/users")
-    public void editUser(@RequestBody UsersDto dto, AuthDetails details) {
+    public void editUser(@Valid @RequestBody UsersDto dto, AuthDetails details) {
+        if (dto.getId() <= 0) {
+            dto.setPassword("123456"); // 管理员新增时，要设置默认密码
+        }
         usersService.saveByAdmin(dto);
     }
 

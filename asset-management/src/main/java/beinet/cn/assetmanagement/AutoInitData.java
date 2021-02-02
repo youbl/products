@@ -24,7 +24,7 @@ public class AutoInitData implements CommandLineRunner {
 
     // 首次启动时的，默认用户名密码
     private static final String ADMIN = "admin";
-    private static final String PASSWORD = "beinet.123";
+    private static final String PASSWORD = "123456";
     private static final String FIRST_DEPART = "研发部";
 
     private final UsersService usersService;
@@ -56,10 +56,10 @@ public class AutoInitData implements CommandLineRunner {
                 .code("0000")
                 .userName("超管")
                 .state(8)
+                .roles("ADMIN")
                 .department(departmentId)
                 .build()
                 .mapTo();
-        admin.setRoles("ADMIN");
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         usersService.save(admin);
         log.info("管理员创建成功: {} {}", admin.getId(), admin.getAccount());
