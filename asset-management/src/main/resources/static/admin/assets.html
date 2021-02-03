@@ -16,9 +16,9 @@
     </style>
 </head>
 <body>
-<div id="divApp" style="text-align: center;width: 1000px;">
+<div id="divApp" style="text-align: center;width: 95%;">
     <h1 style="text-align: center">
-        部门管理
+        资产管理
     </h1>
 
     <template>
@@ -47,13 +47,50 @@
         </el-table>
     </template>
 
-    <el-dialog title="部门编辑" :visible.sync="openEditDialog">
+    <el-dialog title="资产编辑" :visible.sync="openEditDialog">
         <el-form :model="editData" ref="editForm" style="width:500px">
-            <el-form-item label="部门名称" label-width="200px">
-                <el-input v-model="editData.departmentName" placeholder="请输入部门名称"></el-input>
+            <el-form-item label="资产编号" label-width="200px">
+                <el-input v-model="editData.code" placeholder="后台自动生成" maxlength="30"
+                          :readonly="true" class="noborder"></el-input>
             </el-form-item>
-            <el-form-item label="部门说明" label-width="200px">
-                <el-input v-model="editData.description" placeholder="请输入部门说明"></el-input>
+
+            <el-form-item label="资产分类" label-width="200px" prop="classId" style="text-align: left">
+                <el-select v-model="editData.classId" filterable placeholder="请选择资产分类">
+                    <el-option label="请选择资产分类" value=""></el-option>
+                    <el-option
+                            v-for="item in classList"
+                            :label="item.className"
+                            :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="资产名称" label-width="200px">
+                <el-input v-model="editData.assetName" placeholder="请输入资产名称"></el-input>
+            </el-form-item>
+            <el-form-item label="资产说明" label-width="200px">
+                <el-input v-model="editData.description" placeholder="请输入资产说明"></el-input>
+            </el-form-item>
+            <el-form-item label="购买时间" label-width="200px" style="text-align: left">
+                <el-date-picker
+                        v-model="editData.buyTime"
+                        type="datetime"
+                        placeholder="请选择购买时间">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="购买价格" label-width="200px">
+                <el-input v-model="editData.price" placeholder="请输入购买价格"></el-input>
+            </el-form-item>
+            <el-form-item label="库房位置" label-width="200px">
+                <el-input v-model="editData.place" placeholder="请输入库房位置"></el-input>
+            </el-form-item>
+            <el-form-item label="资产状态" label-width="200px" prop="state" style="text-align: left">
+                <el-radio-group v-model="editData.state">
+                    <el-radio :label="0">库存</el-radio>
+                    <el-radio :label="1">借出</el-radio>
+                    <el-radio :label="2">故障</el-radio>
+                    <el-radio :label="3">报废</el-radio>
+                </el-radio-group>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -68,23 +105,38 @@
         data: function () {
             return {
                 user: {},
+                classList: [],
                 dataList: [],
                 dataAtt: {
                     id: {width: 40, title: 'ID', show: true},
-                    departmentName: {width: 200, title: '部门名称', show: true},
-                    description: {width: 250, title: '部门说明', show: true},
-                    creationTime: {width: 180, title: '创建时间', show: true},
-                    lastModificationTime: {width: 180, title: '更新时间', show: true},
+                    code: {width: 200, title: '资产编号', show: true},
+                    assetName: {width: 200, title: '资产名称', show: true},
+                    classId: {width: 10, title: '资产分类ID', show: false},
+                    description: {width: 250, title: '资产说明', show: true},
+                    buyTime: {width: 170, title: '购买时间', show: true},
+                    price: {width: 100, title: '购买价格', show: true},
+                    state: {width: 10, title: '状态', show: false},
+                    place: {width: 10, title: '库存位置', show: false},
+                    creationTime: {width: 170, title: '创建时间', show: true},
+                    lastModificationTime: {width: 170, title: '更新时间', show: true},
                 },
                 openEditDialog: false,
                 editData: {
-                    departmentName: '',
+                    code: '',
+                    assetName: '',
+                    classId: '',
                     description: '',
+                    buyTime: '',
+                    price: 0,
+                    state: 0,
+                    place: '',
                 },
             }
         },
         created: function () {
-            this.getCurrentUser().then(this.loadDepartments);
+            this.getCurrentUser()
+                .then(this.loadClasses)
+                .then(this.loadAssets);
         },
         computed: {},
         methods: {
@@ -97,11 +149,23 @@
                     }
                 }).catch(error => this.ajaxError(error));
             },
-            loadDepartments: function () {
-                let url = '/departments';
+            loadClasses: function () {
+                let url = '/assetClasses';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
-                        return alert('没有找到部门列表');
+                        return alert('未配置资产分类');
+                    }
+                    this.classList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadAssets: function () {
+                let url = '/assets';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    for (let i = 0; i < response.data.length; i++) {
+                        response.data[i].price = (response.data[i].price / 100.0).toString();
                     }
                     this.dataList = response.data;
                 }).catch(error => this.ajaxError(error));
@@ -122,13 +186,15 @@
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
-                    let url = '/department';
-                    return axios.post(url, this.editData).then(response => {
+                    let url = '/asset';
+                    let cloneObj = JSON.parse(JSON.stringify(this.editData));
+                    cloneObj.price = parseFloat(cloneObj.price.toString()) * 100;
+                    return axios.post(url, cloneObj).then(response => {
                         if (!response || !response.data || !response.data.id) {
                             return alert('保存失败');
                         }
                         this.hideEditDialog();
-                        this.loadDepartments();
+                        this.loadAssets();
                         alert('保存成功');
                     }).catch(error => this.ajaxError(error));
                 });

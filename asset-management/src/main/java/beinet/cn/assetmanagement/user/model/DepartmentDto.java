@@ -19,8 +19,6 @@ public class DepartmentDto {
         result.setId(this.getId());
         result.setDepartmentName(this.getDepartmentName());
         result.setDescription(this.getDescription());
-        result.setCreationTime(this.getCreationTime());
-        result.setLastModificationTime(this.getLastModificationTime());
         return result;
     }
 }

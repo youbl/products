@@ -18,7 +18,7 @@
 <body>
 <div id="divApp" style="text-align: center;width: 1000px;">
     <h1 style="text-align: center">
-        部门管理
+        资产分类管理
     </h1>
 
     <template>
@@ -47,13 +47,13 @@
         </el-table>
     </template>
 
-    <el-dialog title="部门编辑" :visible.sync="openEditDialog">
+    <el-dialog title="分类编辑" :visible.sync="openEditDialog">
         <el-form :model="editData" ref="editForm" style="width:500px">
-            <el-form-item label="部门名称" label-width="200px">
-                <el-input v-model="editData.departmentName" placeholder="请输入部门名称"></el-input>
+            <el-form-item label="分类名称" label-width="200px">
+                <el-input v-model="editData.className" placeholder="请输入分类名称"></el-input>
             </el-form-item>
-            <el-form-item label="部门说明" label-width="200px">
-                <el-input v-model="editData.description" placeholder="请输入部门说明"></el-input>
+            <el-form-item label="分类说明" label-width="200px">
+                <el-input v-model="editData.description" placeholder="请输入分类说明"></el-input>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -71,20 +71,20 @@
                 dataList: [],
                 dataAtt: {
                     id: {width: 40, title: 'ID', show: true},
-                    departmentName: {width: 200, title: '部门名称', show: true},
-                    description: {width: 250, title: '部门说明', show: true},
+                    className: {width: 200, title: '分类名称', show: true},
+                    description: {width: 250, title: '分类说明', show: true},
                     creationTime: {width: 180, title: '创建时间', show: true},
                     lastModificationTime: {width: 180, title: '更新时间', show: true},
                 },
                 openEditDialog: false,
                 editData: {
-                    departmentName: '',
+                    className: '',
                     description: '',
                 },
             }
         },
         created: function () {
-            this.getCurrentUser().then(this.loadDepartments);
+            this.getCurrentUser().then(this.loadClasses);
         },
         computed: {},
         methods: {
@@ -97,11 +97,11 @@
                     }
                 }).catch(error => this.ajaxError(error));
             },
-            loadDepartments: function () {
-                let url = '/departments';
+            loadClasses: function () {
+                let url = '/assetClasses';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
-                        return alert('没有找到部门列表');
+                        return;
                     }
                     this.dataList = response.data;
                 }).catch(error => this.ajaxError(error));
@@ -122,13 +122,13 @@
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
-                    let url = '/department';
+                    let url = '/assetClass';
                     return axios.post(url, this.editData).then(response => {
                         if (!response || !response.data || !response.data.id) {
                             return alert('保存失败');
                         }
                         this.hideEditDialog();
-                        this.loadDepartments();
+                        this.loadClasses();
                         alert('保存成功');
                     }).catch(error => this.ajaxError(error));
                 });

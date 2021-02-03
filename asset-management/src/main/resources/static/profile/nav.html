@@ -41,11 +41,11 @@
                     </el-menu-item-group>
                 </el-submenu>
                 <el-submenu index="3" v-if="isAdmin">
-                    <template slot="title"><i class="el-icon-menu"></i>管理功能</template>
+                    <template slot="title"><i class="el-icon-setting"></i>后台管理</template>
                     <el-menu-item-group>
                         <el-menu-item index="3-1" @click.native="switchTab(31)">部门维护</el-menu-item>
                         <el-menu-item index="3-2" @click.native="switchTab(32)">用户管理</el-menu-item>
-                        <el-menu-item index="3-3" @click.native="switchTab(33)">资产分类管理</el-menu-item>
+                        <el-menu-item index="3-3" @click.native="switchTab(33)">分类管理</el-menu-item>
                         <el-menu-item index="3-4" @click.native="switchTab(34)">资产管理</el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
@@ -83,8 +83,12 @@
                 allPage: {
                     11: '/profile/user.html',       // 个人信息页面
                     12: '/profile/pwd.html',        // 修改密码页面
+                    21: '/profile/assetsMine.html', // 我的资产页面
+                    22: '/profile/assetsGet.html',  // 资产借用页面
                     31: '/admin/departments.html',  // 部门列表管理页面
                     32: '/admin/users.html',        // 用户列表管理页面
+                    33: '/admin/assetsClass.html',  // 资产分类管理页面
+                    34: '/admin/assets.html',       // 资产管理页面
                 },
             }
         },
