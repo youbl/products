@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletResponse;
@@ -114,6 +115,22 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
         @Override
         public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
             resolvers.add(new AuthDetailArgumentResolver());
+        }
+
+        @Override
+        public void addResourceHandlers(ResourceHandlerRegistry registry) {
+            // url格式：/res/** 去 classpath:/static/res/ 下找文件，并提醒浏览器缓存1年
+            registry.addResourceHandler("/res/**")
+                    .addResourceLocations("classpath:/static/res/")
+                    .setCachePeriod(31535999); // 单位秒
+
+            registry.addResourceHandler("/**/*.html")
+                    .addResourceLocations("classpath:/static/")
+                    .setCachePeriod(31535999);
+
+            registry.addResourceHandler("/favicon.ico")
+                    .addResourceLocations("classpath:/static/")
+                    .setCachePeriod(31535999);
         }
     }
 

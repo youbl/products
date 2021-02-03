@@ -30,7 +30,8 @@ public class BeinetHandleLogout implements LogoutSuccessHandler {
         response.setContentType("application/json; charset=utf-8");
 
         Map<String, Object> data = new HashMap<>();
-        data.put("msg", authentication.getName() + " 成功退出登录");
+        String msg = authentication == null ? "当前未登录" : authentication.getName() + " 成功退出登录";
+        data.put("msg", msg);
         response.getOutputStream().write(new ObjectMapper().writeValueAsString(data).getBytes(StandardCharsets.UTF_8));
     }
 }
