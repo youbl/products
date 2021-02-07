@@ -26,12 +26,16 @@ public class Assetclass {
     @Column(columnDefinition = "varchar(20) COMMENT '分类名'")
     private String className;
 
-    @Size(max = 200)
-    @Column(columnDefinition = "varchar(200) COMMENT '说明'")
-    private String description;
+    @Size(max = 50)
+    @Column(columnDefinition = "varchar(50) COMMENT '管理员'")
+    private String admin;
 
     @Column(columnDefinition = "int(11) COMMENT '资产数量，用于资产code生成'")
     private int totalAmount;
+
+    @Size(max = 200)
+    @Column(columnDefinition = "varchar(200) COMMENT '说明'")
+    private String description;
 
     @Column(columnDefinition = "datetime COMMENT '创建时间'", insertable = false, updatable = false)
     private java.time.LocalDateTime creationTime;
@@ -44,6 +48,7 @@ public class Assetclass {
         AssetclassDto result = new AssetclassDto();
         result.setId(this.getId());
         result.setClassName(this.getClassName());
+        result.setAdmin(this.getAdmin());
         result.setCreationTime(this.getCreationTime());
         result.setLastModificationTime(this.getLastModificationTime());
         result.setDescription(this.getDescription());

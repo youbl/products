@@ -17,15 +17,16 @@ MySQL - 5.7.27-log : Database - assets
 DROP TABLE IF EXISTS `assetclass`;
 
 CREATE TABLE `assetclass` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id',
-  `className` varchar(20) NOT NULL DEFAULT '' COMMENT '分类名',
-  `description` varchar(200) NOT NULL DEFAULT '' COMMENT '说明',
-  `totalAmount` int(11) NOT NULL DEFAULT '0' COMMENT '资产数量，用于资产code生成',
-  `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `LastModificationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'Id',
+  `className` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '分类名',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '说明',
+  `admin` VARCHAR(50) NOT NULL DEFAULT '' COMMENT '管理员',
+  `totalAmount` INT(11) NOT NULL DEFAULT '0' COMMENT '资产数量，用于资产code生成',
+  `CreationTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `LastModificationTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unq_className` (`className`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资产分类表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='资产分类表';
 
 /*Table structure for table `assets` */
 

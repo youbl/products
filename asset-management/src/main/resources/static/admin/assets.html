@@ -138,7 +138,11 @@
                 .then(this.loadClasses)
                 .then(this.loadAssets);
         },
-        computed: {},
+        computed: {
+            isAdmin: function () {
+                return this.user && this.user.roles && this.user.roles.indexOf('ADMIN') >= 0;
+            },
+        },
         methods: {
             getCurrentUser: function () {
                 let url = '/login/currentUser';
@@ -154,6 +158,13 @@
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return alert('未配置资产分类');
+                    }
+                    if (!this.isAdmin) {
+                        for (let i = response.data.length - 1; i >= 0; i--) {
+                            if (response.data[i].admin !== this.user.userName) {
+                                response.data.splice(i, 1);
+                            }
+                        }
                     }
                     this.classList = response.data;
                 }).catch(error => this.ajaxError(error));

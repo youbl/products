@@ -1,8 +1,6 @@
 package beinet.cn.assetmanagement.assets.model;
 
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Data
 public class AssetclassDto {
@@ -16,10 +14,13 @@ public class AssetclassDto {
 
     private String description;
 
+    private String admin;
+
     public Assetclass mapTo() {
         Assetclass result = new Assetclass();
         result.setId(this.getId());
         result.setClassName(this.getClassName());
+        result.setAdmin(this.getAdmin());
         result.setDescription(this.getDescription());
         result.setCreationTime(this.getCreationTime());
         result.setLastModificationTime(this.getLastModificationTime());

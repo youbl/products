@@ -16,7 +16,7 @@
     </style>
 </head>
 <body>
-<div id="divApp" style="text-align: center;width: 1000px;">
+<div id="divApp" style="text-align: center;width: 98%;">
     <h1 style="text-align: center">
         资产分类管理
     </h1>
@@ -55,6 +55,16 @@
             <el-form-item label="分类说明" label-width="200px">
                 <el-input v-model="editData.description" placeholder="请输入分类说明"></el-input>
             </el-form-item>
+            <el-form-item label="分类管理员" label-width="200px" prop="department" style="text-align: left">
+                <el-select v-model="editData.admin" filterable placeholder="请选择分类管理员">
+                    <el-option label="请选择分类管理员" value=""></el-option>
+                    <el-option
+                            v-for="item in userList"
+                            :label="item.userName"
+                            :value="item.userName">
+                    </el-option>
+                </el-select>
+            </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button icon="el-icon-success" type="primary" @click="saveData('editForm')">保 存</el-button>
@@ -68,23 +78,28 @@
         data: function () {
             return {
                 user: {},
+                userList: [],
+
                 dataList: [],
                 dataAtt: {
                     id: {width: 40, title: 'ID', show: true},
                     className: {width: 200, title: '分类名称', show: true},
-                    description: {width: 250, title: '分类说明', show: true},
+                    description: {width: 350, title: '分类说明', show: true},
                     creationTime: {width: 180, title: '创建时间', show: true},
                     lastModificationTime: {width: 180, title: '更新时间', show: true},
+                    totalAmount: {width: 180, title: '总数', show: false},
+                    admin: {width: 80, title: '管理员', show: true},
                 },
                 openEditDialog: false,
                 editData: {
                     className: '',
                     description: '',
+                    admin: '',
                 },
             }
         },
         created: function () {
-            this.getCurrentUser().then(this.loadClasses);
+            this.getCurrentUser().then(this.loadUsers).then(this.loadClasses);
         },
         computed: {},
         methods: {
@@ -95,6 +110,15 @@
                     if (!this.user) {
                         return this.goLogin();
                     }
+                }).catch(error => this.ajaxError(error));
+            },
+            loadUsers: function () {
+                let url = '/users';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return alert('没有找到用户列表');
+                    }
+                    this.userList = response.data;
                 }).catch(error => this.ajaxError(error));
             },
             loadClasses: function () {
