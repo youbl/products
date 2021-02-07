@@ -13,7 +13,6 @@ import com.chaoip.ipproxy.service.RealOrderService;
 import com.chaoip.ipproxy.service.ValidCodeService;
 import com.chaoip.ipproxy.util.ImgHelper;
 import com.chaoip.ipproxy.util.QrcodeHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;

@@ -1,14 +1,11 @@
 package com.chaoip.ipproxy.service;
 
-import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.ChargeDto;
 import com.chaoip.ipproxy.repository.PayOrderRepository;
-import com.chaoip.ipproxy.repository.entity.BeinetUser;
 import com.chaoip.ipproxy.repository.entity.OrderStatus;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
-import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.util.AliPayHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.chaoip.ipproxy.util.WechatPay;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,14 +24,17 @@ import java.util.List;
 @Slf4j
 public class PayService {
     private final AliPayHelper aliPayHelper;
+    private final WechatPay wechatPay;
+
     private final PayOrderRepository payOrderRepository;
     private final ApplicationEventPublisher eventPublisher; // 发送支付事件用
 
     public PayService(AliPayHelper aliPayHelper,
+                      WechatPay wechatPay,
                       PayOrderRepository payOrderRepository,
-                      BeinetUserService beinetUserService,
                       ApplicationEventPublisher eventPublisher) {
         this.aliPayHelper = aliPayHelper;
+        this.wechatPay = wechatPay;
         this.payOrderRepository = payOrderRepository;
         this.eventPublisher = eventPublisher;
     }
@@ -47,7 +47,12 @@ public class PayService {
      * @return 订单
      */
     public PayOrder addOrder(ChargeDto money, String name) throws Exception {
-        PayOrder order = aliPayHelper.getPayUrl(name, money.getMoney(), money.getTitle(), money.getDescription());
+        PayOrder order;
+        if (money.getPayType() == 1) {
+            order = aliPayHelper.getPayUrl(name, money.getMoney(), money.getTitle(), money.getDescription());
+        } else {
+            order = wechatPay.getPayUrl(name, money.getMoney(), money.getTitle() + money.getDescription());
+        }
         return save(order);
     }
 
@@ -92,7 +97,12 @@ public class PayService {
             throw new RuntimeException("您的订单已处理完毕: " + orderNo);
         }
 
-        boolean ret = aliPayHelper.queryPayResult(order);
+        boolean ret;
+        if (order.getPayType() == 1) {
+            ret = aliPayHelper.queryPayResult(order);
+        } else {
+            ret = wechatPay.queryPayResult(order);
+        }
         order.setPayTime(LocalDateTime.now());
         if (ret) {
             order.setStatus(OrderStatus.SUCCESS);
@@ -120,6 +130,7 @@ public class PayService {
                 .name(money.getName())
                 .money(money.getMoney())
                 .payUrl("")
+                .payType(3)
                 .title(money.getTitle())
                 .description(money.getDescription())
                 .status(OrderStatus.SUCCESS)

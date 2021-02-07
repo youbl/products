@@ -61,7 +61,8 @@
                                       maxlength="3000"></el-input>
                         </el-form-item>
                         <el-form-item label="阿里公钥" label-width="200px" prop="publicKey">
-                            <el-input v-model="verifyConfig.publicKey" placeholder="请输入阿里公钥" maxlength="3000"></el-input>
+                            <el-input v-model="verifyConfig.publicKey" placeholder="请输入阿里公钥"
+                                      maxlength="3000"></el-input>
                         </el-form-item>
                         <el-form-item label="字符集" label-width="200px" prop="charset">
                             <el-input v-model="verifyConfig.charset" placeholder="请输入字符集" maxlength="30"></el-input>
@@ -97,7 +98,8 @@
                                       maxlength="3000"></el-input>
                         </el-form-item>
                         <el-form-item label="阿里公钥" label-width="200px" prop="publicKey">
-                            <el-input v-model="alipayConfig.publicKey" placeholder="请输入阿里公钥" maxlength="3000"></el-input>
+                            <el-input v-model="alipayConfig.publicKey" placeholder="请输入阿里公钥"
+                                      maxlength="3000"></el-input>
                         </el-form-item>
                         <el-form-item label="字符集" label-width="200px" prop="charset">
                             <el-input v-model="alipayConfig.charset" placeholder="请输入字符集" maxlength="30"></el-input>
@@ -116,6 +118,42 @@
                         <el-button type="primary" @click="saveAliPayConfig('alipayConfigForm')">保存配置</el-button>
                     </div>
                 </el-tab-pane>
+
+                <el-tab-pane label="微信支付配置" name="fourth" style="width:800px;">
+                    <el-form :model="wechatConfig" ref="wechatConfigForm">
+                        <el-form-item label="支付接口" label-width="200px" prop="url">
+                            <el-input v-model="wechatConfig.payurl" placeholder="请输入支付下单接口地址"
+                                      maxlength="300"></el-input>
+                        </el-form-item>
+                        <el-form-item label="查询接口" label-width="200px" prop="url">
+                            <el-input v-model="wechatConfig.queryurl" placeholder="请输入支付成败接口地址"
+                                      maxlength="300"></el-input>
+                        </el-form-item>
+                        <el-form-item label="AppID" label-width="200px" prop="appId">
+                            <el-input v-model="wechatConfig.appId" placeholder="请输入AppID" maxlength="30"></el-input>
+                        </el-form-item>
+                        <el-form-item label="用户私钥" label-width="200px" prop="privateKey">
+                            <el-input v-model="wechatConfig.privateKey" placeholder="请输入用户私钥"
+                                      maxlength="3000"></el-input>
+                        </el-form-item>
+                        <el-form-item label="商户号" label-width="200px" prop="mchId">
+                            <el-input v-model="wechatConfig.mchId" placeholder="请输入商户号" maxlength="100"></el-input>
+                        </el-form-item>
+                        <el-form-item label="证书号" label-width="200px" prop="mchSerialNo">
+                            <el-input v-model="wechatConfig.mchSerialNo" placeholder="请输入商户证书序列号"
+                                      maxlength="100"></el-input>
+                        </el-form-item>
+                        <el-form-item label="V3密钥" label-width="200px" prop="apiV3Key">
+                            <el-input v-model="wechatConfig.apiV3Key" placeholder="请输入V3密钥" maxlength="100"></el-input>
+                        </el-form-item>
+                        <el-form-item label="回调地址" label-width="200px" prop="callback">
+                            <el-input v-model="wechatConfig.callback" placeholder="请输入回调地址" maxlength="300"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div style="text-align: center">
+                        <el-button type="primary" @click="savewechatConfig('wechatConfigForm')">保存配置</el-button>
+                    </div>
+                </el-tab-pane>
             </el-tabs>
         </template>
     </div>
@@ -130,11 +168,13 @@
             smsConfig: {},
             verifyConfig: {},
             alipayConfig: {},
+            wechatConfig: {},
         },
         created: function () {
             this.loadSmsConfig();
             this.loadVerifyConfig();
             this.loadAliPayConfig();
+            this.loadWechatPayConfig();
         },
         computed: {},
         methods: {
@@ -151,6 +191,10 @@
             loadAliPayConfig: function () {
                 let url = '/manage/config/alipay';
                 this.loadConfig(url, data => this.alipayConfig = data);
+            },
+            loadWechatPayConfig: function () {
+                let url = '/manage/config/wechatpay';
+                this.loadConfig(url, data => this.wechatConfig = data);
             },
             loadConfig: function (url, callback) {
                 axios.get(url).then(response => {
@@ -172,6 +216,10 @@
             saveAliPayConfig: function () {
                 let url = '/manage/config/alipay';
                 this.saveConfig(url, this.alipayConfig);
+            },
+            savewechatConfig: function () {
+                let url = '/manage/config/wechatpay';
+                this.saveConfig(url, this.wechatConfig);
             },
             saveConfig: function (url, data) {
                 axios.post(url, data).then(response => {

@@ -23,4 +23,6 @@ public class ChargeDto {
     private String title;
     @NotBlank(message = "备注不能为空")
     private String description;
+
+    private int payType;
 }

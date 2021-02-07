@@ -3,6 +3,8 @@ package com.chaoip.ipproxy.util;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.service.SiteConfigService;
 import com.chaoip.ipproxy.util.config.WechatConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
 import com.wechat.pay.contrib.apache.httpclient.auth.AutoUpdateCertificatesVerifier;
 import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
@@ -30,6 +32,8 @@ import java.security.PrivateKey;
 @Component
 @Slf4j
 public class WechatPay {
+    private static ObjectMapper mapper = new ObjectMapper();
+
     protected final SiteConfigService configService;
 
     public WechatPay(SiteConfigService configService) {
@@ -52,7 +56,15 @@ public class WechatPay {
     public PayOrder getPayUrl(String account, int moneyCent, String description) throws Exception {
         WechatConfig config = getConfig();
 
-        // 加载商户私钥（privateKey：私钥字符串）
+        HttpPost request = new HttpPost(config.getPayurl());
+        request.setHeader("Content-Type", "application/json;charset=UTF-8");
+        request.setHeader("Accept", "application/json");
+
+        StringEntity se = new StringEntity(getJson(config, moneyCent, description));
+        se.setContentType("text/json");
+        request.setEntity(se);
+
+        // 加载商户私钥（privateKey：私钥字符串） pem文件，或p12文件里解析出来的
         PrivateKey merchantPrivateKey = PemUtil
                 .loadPrivateKey(new ByteArrayInputStream(config.getPrivateKey().getBytes("utf-8")));
 
@@ -64,19 +76,28 @@ public class WechatPay {
         try (CloseableHttpClient httpClient = WechatPayHttpClientBuilder.create()
                 .withMerchant(config.getMchId(), config.getMchSerialNo(), merchantPrivateKey)
                 .withValidator(new WechatPay2Validator(verifier)).build()) {
-            HttpPost request = new HttpPost(config.getUrl());
-            request.setHeader("Content-Type", "application/json;charset=UTF-8");
-            request.setHeader("Accept", "application/json");
-
-            StringEntity se = new StringEntity(getJson(config, moneyCent, description));
-            se.setContentType("text/json");
-            request.setEntity(se);
             CloseableHttpResponse response = httpClient.execute(request);
+            System.out.println(response);
         }
         return null;
     }
 
-    private String getJson(WechatConfig config, int moneyCent, String description) {
+    /**
+     * 查询支付状态
+     *
+     * @param order
+     * @return
+     */
+    public boolean queryPayResult(PayOrder order) throws Exception {
+        // https://api.mch.weixin.qq.com/v3/pay/transactions/id/{transaction_id}?mchid={mchid}
+        WechatConfig config = getConfig();
+        String queryUrl = config.getQueryurl()
+                .replace("{transaction_id}", order.getOrderNo())
+                .replace("{mchid}", config.getMchId());
+        return false;
+    }
+
+    private String getJson(WechatConfig config, int moneyCent, String description) throws Exception {
         WebchatPayDto dto = new WebchatPayDto();
         dto.setAppid(config.getAppId());
         dto.setMchid(config.getMchId());
@@ -89,7 +110,7 @@ public class WechatPay {
         dto.setAmount(amountDTO);
         amountDTO.setTotal(moneyCent);
 
-        return dto.toString();
+        return mapper.writeValueAsString(dto);
         /*
 {
 	"time_expire": "2018-06-08T10:34:56+08:00",

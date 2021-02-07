@@ -46,6 +46,10 @@ public class PayOrder {
     private String payUrl;
 
     /**
+     * 1 支付宝；2 微信；3 其它
+     */
+    private int payType;
+    /**
      * 申请支付金额
      */
     private int money;

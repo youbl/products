@@ -28,6 +28,12 @@
                     <el-form-item label="充值备注" label-width="200px" prop="description">
                         <el-input v-model="userCharge.description" placeholder="请输入充值备注" maxlength="20"></el-input>
                     </el-form-item>
+                    <el-form-item label="支付选项" label-width="200px" prop="payType">
+                        <el-radio-group v-model="userCharge.payType">
+                            <el-radio :label="1">支付宝</el-radio>
+                            <el-radio :label="2">微信</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
                 </el-form>
                 <div style="text-align: center">
                     <el-button type="primary" @click="doCharge('userChargeForm')"
@@ -114,6 +120,7 @@
                     money: 1000,
                     title: '充值',
                     description: '充值',
+                    payType: 1,
                 },
                 rulesUserCharge: {
                     money: [
