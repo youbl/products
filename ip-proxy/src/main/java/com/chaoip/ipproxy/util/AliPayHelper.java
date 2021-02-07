@@ -31,7 +31,7 @@ public class AliPayHelper extends AliBase {
     }
 
     @Override
-    protected AliConfigBase getConfig() throws JsonProcessingException {
+    protected AliConfigBase getConfig() throws Exception {
         return configService.getAliPayConfig();
     }
 
@@ -45,7 +45,7 @@ public class AliPayHelper extends AliBase {
      * @throws JsonProcessingException 序列化异常
      * @throws AlipayApiException      阿里异常
      */
-    public PayOrder getPayUrl(String account, int moneyCent, String title, String description) throws AlipayApiException, JsonProcessingException {
+    public PayOrder getPayUrl(String account, int moneyCent, String title, String description) throws Exception {
         this.config = getConfig();
 
         String orderNo = getTransId();
@@ -98,7 +98,7 @@ public class AliPayHelper extends AliBase {
      * @throws JsonProcessingException 序列化异常
      * @throws AlipayApiException      阿里异常
      */
-    public boolean queryPayResult(PayOrder order) throws JsonProcessingException, AlipayApiException {
+    public boolean queryPayResult(PayOrder order) throws Exception {
         AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
         request.setBizContent("{\"out_trade_no\":\"" + order.getOrderNo() + "\"}");// +
         // "\"trade_no\":\"\"," +                   // 支付宝交易号

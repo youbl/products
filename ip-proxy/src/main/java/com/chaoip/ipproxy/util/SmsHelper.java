@@ -8,7 +8,6 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.chaoip.ipproxy.service.SiteConfigService;
 import com.chaoip.ipproxy.util.config.SmsConfig;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,7 +33,7 @@ public final class SmsHelper {
      * @param code  验证码
      * @return 结果
      */
-    public String send(String phone, String code) throws JsonProcessingException {
+    public String send(String phone, String code) throws Exception {
         SmsConfig config = (configService.getSmsConfig());
 
         DefaultProfile profile = DefaultProfile.getProfile(config.getRegion(), config.getAk(), config.getSk());

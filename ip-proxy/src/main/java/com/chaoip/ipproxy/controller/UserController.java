@@ -14,7 +14,6 @@ import com.chaoip.ipproxy.service.ValidCodeService;
 import com.chaoip.ipproxy.util.ImgHelper;
 import com.chaoip.ipproxy.util.QrcodeHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.zxing.WriterException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
@@ -104,7 +103,7 @@ public class UserController {
      */
     @PreAuthorize("isAuthenticated()")
     @PostMapping("identify")
-    public String realNameIdentify(@Valid @RequestBody IdentifyDto dto, AuthDetails details) throws AlipayApiException, IOException, WriterException {
+    public String realNameIdentify(@Valid @RequestBody IdentifyDto dto, AuthDetails details) throws Exception {
         if (!codeService.validByCodeAndSn(dto.getImgCode(), dto.getImgSn())) {
             throw new IllegalArgumentException("图形验证码错误");
         }
@@ -135,7 +134,7 @@ public class UserController {
      * @throws AlipayApiException 异常
      */
     @GetMapping("callback/{orderNo}")
-    public String callback(@PathVariable(required = false) String orderNo, HttpServletRequest request) throws AlipayApiException, JsonProcessingException {
+    public String callback(@PathVariable(required = false) String orderNo, HttpServletRequest request) throws Exception {
         if (StringUtils.isEmpty(orderNo)) {
             return phoneStr("订单号不能为空", request);
         }
@@ -177,7 +176,7 @@ public class UserController {
      * @return url
      */
     @PostMapping("pay")
-    public PayOrder pay(@RequestBody ChargeDto money, AuthDetails details) throws AlipayApiException, JsonProcessingException {
+    public PayOrder pay(@RequestBody ChargeDto money, AuthDetails details) throws Exception {
         if (details == null) {
             throw new IllegalArgumentException("获取登录信息失败");
         }
@@ -192,7 +191,7 @@ public class UserController {
      * @throws AlipayApiException 异常
      */
     @GetMapping("payback/{orderNo}")
-    public String payback(@PathVariable(required = false) String orderNo, HttpServletRequest request) throws AlipayApiException, JsonProcessingException {
+    public String payback(@PathVariable(required = false) String orderNo, HttpServletRequest request) throws Exception {
         if (StringUtils.isEmpty(orderNo)) {
             return phoneStr("订单号不能为空", request);
         }
@@ -253,7 +252,7 @@ public class UserController {
      * @return 序号
      */
     @PostMapping("sms")
-    public Map<String, String> smsCode(@RequestBody SmsDto dto) throws JsonProcessingException {
+    public Map<String, String> smsCode(@RequestBody SmsDto dto) throws Exception {
         if (!codeService.validByCodeAndSn(dto.getCode(), dto.getSn())) {
             throw new IllegalArgumentException("图形验证码错误");
         }

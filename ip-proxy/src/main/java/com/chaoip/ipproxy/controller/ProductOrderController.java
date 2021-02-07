@@ -49,7 +49,7 @@ public class ProductOrderController {
      * @throws AlipayApiException      异常
      */
     @PostMapping("")
-    public PayOrder buy(@Valid @RequestBody ProductOrderDto dto, AuthDetails details) throws JsonProcessingException, AlipayApiException {
+    public PayOrder buy(@Valid @RequestBody ProductOrderDto dto, AuthDetails details) throws Exception {
         return productOrderService.buy(dto, details.getUserName());
     }
 

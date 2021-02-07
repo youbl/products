@@ -5,7 +5,6 @@ import com.chaoip.ipproxy.repository.ValidCodeRepository;
 import com.chaoip.ipproxy.repository.entity.ValidCode;
 import com.chaoip.ipproxy.util.SmsHelper;
 import com.chaoip.ipproxy.util.StrHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -78,7 +77,7 @@ public class ValidCodeService {
      * @param dto 参数
      * @return 验证码序号
      */
-    public String sendSmsCode(SmsDto dto) throws JsonProcessingException {
+    public String sendSmsCode(SmsDto dto) throws Exception {
         // 获取一个新的验证码
         ValidCode code = addCodeAndGetSn(dto.getPhone());
         // 发短信

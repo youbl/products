@@ -91,6 +91,13 @@
             <version>4.10.192.ALL</version>
         </dependency>
 
+        <!-- 微信支付SDK -->
+        <dependency>
+            <groupId>com.github.wechatpay-apiv3</groupId>
+            <artifactId>wechatpay-apache-httpclient</artifactId>
+            <version>0.2.1</version>
+        </dependency>
+
         <!-- 二维码支持包 -->
         <dependency>
             <groupId>com.google.zxing</groupId>

@@ -22,7 +22,7 @@ public class SmsHelperTest {
     private SmsHelper smsHelper;
 
     @Test
-    public void test_send() throws JsonProcessingException {
+    public void test_send() throws Exception {
         String phone = "15980726586";
         String code = "zaxya1234";
         String ret = smsHelper.send(phone, code);

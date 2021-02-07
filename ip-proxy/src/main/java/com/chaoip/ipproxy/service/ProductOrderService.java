@@ -165,7 +165,7 @@ public class ProductOrderService {
      */
     @Synchronized
     @Transactional
-    public PayOrder buy(ProductOrderDto dto, String username) throws JsonProcessingException, AlipayApiException {
+    public PayOrder buy(ProductOrderDto dto, String username) throws Exception {
         BeinetUser user = userService.findByName(username, false);
         if (user == null) {
             throw new RuntimeException("用户未找到：" + username);

@@ -11,7 +11,7 @@ import lombok.Data;
  */
 @Data
 public class AliConfigBase {
-    private String url;
+    private String url;         // API地址
     private String appId;
     private String privateKey;
     private String publicKey;

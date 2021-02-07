@@ -5,6 +5,7 @@ import com.chaoip.ipproxy.repository.entity.SiteConfig;
 import com.chaoip.ipproxy.util.config.AliPayConfig;
 import com.chaoip.ipproxy.util.config.SmsConfig;
 import com.chaoip.ipproxy.util.config.VerifyConfig;
+import com.chaoip.ipproxy.util.config.WechatConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SiteConfigService {
     private static final String ALIPAY_KEY = "alipay";
+    private static final String WECHATPAY_KEY = "wechatpay";
     private static final String SMS_KEY = "sms";
     private static final String VERIFY_KEY = "verify";
 
@@ -36,12 +38,8 @@ public class SiteConfigService {
      * @return 配置
      * @throws JsonProcessingException 异常
      */
-    public AliPayConfig getAliPayConfig() throws JsonProcessingException {
-        SiteConfig record = siteConfigRepository.findByKey(ALIPAY_KEY);
-        if (record != null) {
-            return mapper.readValue(record.getValue(), AliPayConfig.class);
-        }
-        return new AliPayConfig();
+    public AliPayConfig getAliPayConfig() throws JsonProcessingException, InstantiationException, IllegalAccessException {
+        return getConfig(ALIPAY_KEY, AliPayConfig.class);
     }
 
     /**
@@ -51,13 +49,27 @@ public class SiteConfigService {
      * @throws JsonProcessingException 异常
      */
     public void savetAliPayConfig(AliPayConfig config) throws JsonProcessingException {
-        SiteConfig record = siteConfigRepository.findByKey(ALIPAY_KEY);
-        if (record == null) {
-            record = new SiteConfig();
-            record.setKey(ALIPAY_KEY);
-        }
-        record.setValue(mapper.writeValueAsString(config));
-        siteConfigRepository.save(record);
+        saveConfig(config, ALIPAY_KEY);
+    }
+
+    /**
+     * 读取微信支付配置
+     *
+     * @return 配置
+     * @throws JsonProcessingException 异常
+     */
+    public WechatConfig getWechatConfig() throws JsonProcessingException, InstantiationException, IllegalAccessException {
+        return getConfig(WECHATPAY_KEY, WechatConfig.class);
+    }
+
+    /**
+     * 保存支付宝支付配置
+     *
+     * @param config 配置
+     * @throws JsonProcessingException 异常
+     */
+    public void saveWechatConfig(WechatConfig config) throws JsonProcessingException {
+        saveConfig(config, WECHATPAY_KEY);
     }
 
     /**
@@ -66,12 +78,8 @@ public class SiteConfigService {
      * @return 配置
      * @throws JsonProcessingException 异常
      */
-    public SmsConfig getSmsConfig() throws JsonProcessingException {
-        SiteConfig record = siteConfigRepository.findByKey(SMS_KEY);
-        if (record != null) {
-            return mapper.readValue(record.getValue(), SmsConfig.class);
-        }
-        return new SmsConfig();
+    public SmsConfig getSmsConfig() throws JsonProcessingException, InstantiationException, IllegalAccessException {
+        return getConfig(SMS_KEY, SmsConfig.class);
     }
 
     /**
@@ -81,13 +89,7 @@ public class SiteConfigService {
      * @throws JsonProcessingException 异常
      */
     public void savetSmsConfig(SmsConfig config) throws JsonProcessingException {
-        SiteConfig record = siteConfigRepository.findByKey(SMS_KEY);
-        if (record == null) {
-            record = new SiteConfig();
-            record.setKey(SMS_KEY);
-        }
-        record.setValue(mapper.writeValueAsString(config));
-        siteConfigRepository.save(record);
+        saveConfig(config, SMS_KEY);
     }
 
     /**
@@ -96,12 +98,8 @@ public class SiteConfigService {
      * @return 配置
      * @throws JsonProcessingException 异常
      */
-    public VerifyConfig getVerifyConfig() throws JsonProcessingException {
-        SiteConfig record = siteConfigRepository.findByKey(VERIFY_KEY);
-        if (record != null) {
-            return mapper.readValue(record.getValue(), VerifyConfig.class);
-        }
-        return new VerifyConfig();
+    public VerifyConfig getVerifyConfig() throws JsonProcessingException, InstantiationException, IllegalAccessException {
+        return getConfig(VERIFY_KEY, VerifyConfig.class);
     }
 
     /**
@@ -111,10 +109,22 @@ public class SiteConfigService {
      * @throws JsonProcessingException 异常
      */
     public void savetVerifyConfig(VerifyConfig config) throws JsonProcessingException {
-        SiteConfig record = siteConfigRepository.findByKey(VERIFY_KEY);
+        saveConfig(config, VERIFY_KEY);
+    }
+
+    private <T> T getConfig(String key, Class<T> clazz) throws JsonProcessingException, IllegalAccessException, InstantiationException {
+        SiteConfig record = siteConfigRepository.findByKey(key);
+        if (record != null) {
+            return mapper.readValue(record.getValue(), clazz);
+        }
+        return clazz.newInstance();
+    }
+
+    private void saveConfig(Object config, String key) throws JsonProcessingException {
+        SiteConfig record = siteConfigRepository.findByKey(key);
         if (record == null) {
             record = new SiteConfig();
-            record.setKey(VERIFY_KEY);
+            record.setKey(key);
         }
         record.setValue(mapper.writeValueAsString(config));
         siteConfigRepository.save(record);

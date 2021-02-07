@@ -16,6 +16,7 @@ import com.chaoip.ipproxy.service.SiteConfigService;
 import com.chaoip.ipproxy.util.config.AliPayConfig;
 import com.chaoip.ipproxy.util.config.SmsConfig;
 import com.chaoip.ipproxy.util.config.VerifyConfig;
+import com.chaoip.ipproxy.util.config.WechatConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -129,17 +130,17 @@ public class ManageController {
 
     // 以下为读写配置的方法
     @GetMapping("config/sms")
-    public SmsConfig smsConfig() throws JsonProcessingException {
+    public SmsConfig smsConfig() throws Exception {
         return siteConfigService.getSmsConfig();
     }
 
     @GetMapping("config/alipay")
-    public AliPayConfig aliPayConfig() throws JsonProcessingException {
+    public AliPayConfig aliPayConfig() throws Exception {
         return siteConfigService.getAliPayConfig();
     }
 
     @GetMapping("config/verify")
-    public VerifyConfig verifyConfig() throws JsonProcessingException {
+    public VerifyConfig verifyConfig() throws Exception {
         return siteConfigService.getVerifyConfig();
     }
 
@@ -162,6 +163,16 @@ public class ManageController {
         return true;
     }
 
+    @GetMapping("config/wechatpay")
+    public WechatConfig wechatConfig() throws Exception {
+        return siteConfigService.getWechatConfig();
+    }
+
+    @PostMapping("config/wechatpay")
+    public boolean wechatConfig(@RequestBody WechatConfig config) throws JsonProcessingException {
+        siteConfigService.saveWechatConfig(config);
+        return true;
+    }
 
     /**
      * 管理员充值

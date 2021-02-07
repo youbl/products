@@ -46,7 +46,7 @@ public class PayService {
      * @param name  账号
      * @return 订单
      */
-    public PayOrder addOrder(ChargeDto money, String name) throws AlipayApiException, JsonProcessingException {
+    public PayOrder addOrder(ChargeDto money, String name) throws Exception {
         PayOrder order = aliPayHelper.getPayUrl(name, money.getMoney(), money.getTitle(), money.getDescription());
         return save(order);
     }
@@ -80,7 +80,7 @@ public class PayService {
      */
     @Synchronized // 避免并发导致重复加钱
     @Transactional
-    public boolean queryOrderStatus(String orderNo) throws JsonProcessingException, AlipayApiException {
+    public boolean queryOrderStatus(String orderNo) throws Exception {
         PayOrder order = findByOrder(orderNo);
         if (order == null) {
             throw new RuntimeException("订单不存在: " + orderNo);
