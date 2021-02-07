@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AssetclassRepository extends JpaRepository<Assetclass, Integer> {
+    Assetclass findByAdmin(String admin);
 }

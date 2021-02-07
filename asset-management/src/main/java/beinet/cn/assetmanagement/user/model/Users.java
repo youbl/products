@@ -1,11 +1,13 @@
 package beinet.cn.assetmanagement.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 // <groupId>org.hibernate.validator</groupId><artifactId>hibernate-validator</artifactId>
@@ -63,6 +65,17 @@ public class Users {
 
     @Column(columnDefinition = "datetime COMMENT '最后修改时间'", insertable = false, updatable = false)
     private java.time.LocalDateTime lastModificationTime;
+
+    /**
+     * 是否管理员
+     *
+     * @return 是否
+     */
+    @Transient
+    @JsonIgnore
+    public boolean isAdmin() {
+        return !StringUtils.isEmpty(roles) && roles.contains("ADMIN");
+    }
 
     public UsersDto mapTo() {
         UsersDto result = new UsersDto();

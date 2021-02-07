@@ -40,13 +40,14 @@
                         <el-menu-item index="2-2" @click.native="switchTab(22)">资产领用</el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
-                <el-submenu index="3" v-if="isAdmin">
+                <el-submenu index="3" v-if="isAdmin || classId > 0">
                     <template slot="title"><i class="el-icon-setting"></i>后台管理</template>
                     <el-menu-item-group>
-                        <el-menu-item index="3-1" @click.native="switchTab(31)">部门维护</el-menu-item>
-                        <el-menu-item index="3-2" @click.native="switchTab(32)">用户管理</el-menu-item>
-                        <el-menu-item index="3-3" @click.native="switchTab(33)">分类管理</el-menu-item>
-                        <el-menu-item index="3-4" @click.native="switchTab(34)">资产管理</el-menu-item>
+                        <el-menu-item index="3-1" @click.native="switchTab(31)" v-if="isAdmin">部门维护</el-menu-item>
+                        <el-menu-item index="3-2" @click.native="switchTab(32)" v-if="isAdmin">用户管理</el-menu-item>
+                        <el-menu-item index="3-3" @click.native="switchTab(33)" v-if="isAdmin">分类管理</el-menu-item>
+                        <el-menu-item index="3-4" @click.native="switchTab(34)" v-if="isAdmin || classId > 0">资产管理
+                        </el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
             </el-menu>
@@ -80,6 +81,7 @@
             return {
                 showTab: 11,
                 user: {},
+                classId: 0,
                 allPage: {
                     11: '/profile/user.html',       // 个人信息页面
                     12: '/profile/pwd.html',        // 修改密码页面
@@ -93,7 +95,7 @@
             }
         },
         created: function () {
-            this.getCurrentUser();
+            this.getCurrentUser().then(this.getAdminClass);
             this.adjustAllIframe();
         },
         computed: {
@@ -112,6 +114,12 @@
                     if (!this.user) {
                         this.goLogin();
                     }
+                }).catch(error => this.ajaxError(error));
+            },
+            getAdminClass: function () {
+                let url = '/assetClassByUser';
+                return axios.get(url).then(response => {
+                    this.classId = response.data;
                 }).catch(error => this.ajaxError(error));
             },
             goLogin: function () {

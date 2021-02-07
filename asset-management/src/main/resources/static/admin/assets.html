@@ -37,6 +37,11 @@
                              :width="dataAtt[key].width"
                              v-if="dataAtt[key].show">
             </el-table-column>
+
+            <el-table-column label="资产分类" width="100">
+                <template slot-scope="scope">{{getClassName(scope.row.classId)}}</template>
+            </el-table-column>
+
             <el-table-column label="">
                 <template slot-scope="scope">
                     <el-button size="mini" type="primary" plain
@@ -170,6 +175,9 @@
                 }).catch(error => this.ajaxError(error));
             },
             loadAssets: function () {
+                if (this.classList.length <= 0) {
+                    return;
+                }
                 let url = '/assets';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
@@ -180,6 +188,14 @@
                     }
                     this.dataList = response.data;
                 }).catch(error => this.ajaxError(error));
+            },
+            getClassName: function (classId) {
+                for (let i = 0, j = this.classList.length; i < j; i++) {
+                    let item = this.classList[i];
+                    if (item.id === classId) {
+                        return item.className;
+                    }
+                }
             },
             showEdit: function (idx, data) {
                 this.openEditDialog = true;

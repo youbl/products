@@ -2,25 +2,38 @@ package beinet.cn.assetmanagement.assets.service;
 
 import beinet.cn.assetmanagement.assets.model.Assets;
 import beinet.cn.assetmanagement.assets.repository.AssetsRepository;
+import beinet.cn.assetmanagement.user.model.Users;
+import beinet.cn.assetmanagement.user.service.UsersService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class AssetsService {
     private final AssetsRepository assetsRepository;
     private final AssetclassService assetclassService;
+    private final UsersService usersService;
 
     public AssetsService(AssetsRepository assetsRepository,
-                         AssetclassService assetclassService) {
+                         AssetclassService assetclassService,
+                         UsersService usersService) {
         this.assetsRepository = assetsRepository;
         this.assetclassService = assetclassService;
+        this.usersService = usersService;
     }
 
-    public List<Assets> findAll() {
-        return assetsRepository.findAll();
+    public List<Assets> findAll(String account) {
+        Users user = usersService.findByAccount(account, true);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+        if (user.isAdmin()) {
+            return assetsRepository.findAll();
+        }
+        return assetsRepository.findAllByAccount(user.getUserName());
     }
 
     public Assets findById(Integer id) {

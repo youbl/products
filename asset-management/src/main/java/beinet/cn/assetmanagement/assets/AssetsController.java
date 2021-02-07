@@ -3,6 +3,7 @@ package beinet.cn.assetmanagement.assets;
 import beinet.cn.assetmanagement.assets.model.Assets;
 import beinet.cn.assetmanagement.assets.model.AssetsDto;
 import beinet.cn.assetmanagement.assets.service.AssetsService;
+import beinet.cn.assetmanagement.security.AuthDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,8 +20,8 @@ public class AssetsController {
     }
 
     @GetMapping("assets")
-    public List<Assets> findAll() {
-        return assetsService.findAll();
+    public List<Assets> findAll(AuthDetails details) {
+        return assetsService.findAll(details.getAccount());
     }
 
     @GetMapping("asset")
