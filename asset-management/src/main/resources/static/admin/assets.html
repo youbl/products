@@ -16,6 +16,7 @@
     </style>
 </head>
 <body>
+<script type="text/javascript" src="/res/qrcode.min.js"></script>
 <div id="divApp" style="text-align: center;width: 95%;">
     <h1 style="text-align: center">
         资产管理
@@ -46,6 +47,9 @@
                 <template slot-scope="scope">
                     <el-button size="mini" type="primary" plain
                                @click="showEdit(scope.$index, scope.row)">编辑
+                    </el-button>
+                    <el-button size="mini" type="sucess" plain
+                               @click="showQrCode(scope.$index, scope.row)">二维码
                     </el-button>
                 </template>
             </el-table-column>
@@ -103,6 +107,9 @@
             <el-button @click="hideEditDialog">取 消</el-button>
         </div>
     </el-dialog>
+    <el-dialog title="资产二维码" :visible.sync="openQrCodeDialog" style="width: 600px;">
+        <div id="divQrCode" name="divQrCodeName" class="divQrCodeCss"></div>
+    </el-dialog>
 </div>
 <script type="text/javascript">
     const vueApp = new Vue({
@@ -123,7 +130,7 @@
                     state: {width: 10, title: '状态', show: false},
                     place: {width: 10, title: '库存位置', show: false},
                     creationTime: {width: 170, title: '创建时间', show: true},
-                    lastModificationTime: {width: 170, title: '更新时间', show: true},
+                    lastModificationTime: {width: 170, title: '更新时间', show: false},
                 },
                 openEditDialog: false,
                 editData: {
@@ -136,12 +143,24 @@
                     state: 0,
                     place: '',
                 },
+
+                openQrCodeDialog: false,   // 是否弹出二维码框
+                qrCode: null,
             }
         },
         created: function () {
             this.getCurrentUser()
                 .then(this.loadClasses)
                 .then(this.loadAssets);
+
+            this.showQrCode(0, null);
+            this.$nextTick(function () {
+                this.openQrCodeDialog = false; // 让div渲染一下后再关闭
+                // let div = document.getElementById("divQrCode");
+                // let divName = document.getElementsByName('divQrCodeName');
+                // let divCss = document.getElementsByClassName('divQrCodeCss');
+                // alert(div + ':' + divName.length + ':' + divCss.length)
+            });
         },
         computed: {
             isAdmin: function () {
@@ -208,6 +227,18 @@
             hideEditDialog: function () {
                 this.openEditDialog = false;
                 this.editData = {};
+            },
+            showQrCode: function (idx, data) {
+                this.openQrCodeDialog = true;
+                if (data) {
+                    // https://github.com/davidshimjs/qrcodejs
+                    if (this.qrCode === null) {
+                        this.qrCode = new QRCode(document.getElementById('divQrCode'), data.code);
+                    } else {
+                        this.qrCode.clear(); // clear the code.
+                        this.qrCode.makeCode(data.code); // make another code.
+                    }
+                }
             },
             saveData: function (form) {
                 this.$refs[form].validate(valid => {
