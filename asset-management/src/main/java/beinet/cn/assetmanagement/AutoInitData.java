@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class AutoInitData implements CommandLineRunner {
 
     // 首次启动时的，默认用户名密码
-    private static final String ADMIN = "admin";
+    public static final String ADMIN = "admin";
     private static final String PASSWORD = "123456";
     private static final String FIRST_DEPART = "研发部";
 

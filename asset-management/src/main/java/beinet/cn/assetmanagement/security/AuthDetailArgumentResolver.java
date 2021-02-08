@@ -34,11 +34,11 @@ public class AuthDetailArgumentResolver implements HandlerMethodArgumentResolver
 
         // 调用者的信息
         ret.setUserAgent(webRequest.getHeader("user-agent"));
-        ret.setAccount("匿名");
 
         Principal principal = webRequest.getUserPrincipal();
         if (principal != null) {
-            ret.setAccount(principal.getName());
+            BeinetUserDetail detail = (BeinetUserDetail) ((DirectLoginFilter.DirectAuth) principal).getPrincipal();
+            ret.setUser(detail.getUser());
         }
 
         return ret;

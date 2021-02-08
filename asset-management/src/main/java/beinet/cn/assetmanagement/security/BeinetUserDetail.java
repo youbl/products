@@ -40,6 +40,10 @@ public class BeinetUserDetail implements UserDetails {
         roles = authorities;
     }
 
+    public Users getUser() {
+        return user;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;

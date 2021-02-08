@@ -1,5 +1,6 @@
 package beinet.cn.assetmanagement.security;
 
+import beinet.cn.assetmanagement.user.model.Users;
 import lombok.Data;
 
 /**
@@ -11,8 +12,11 @@ import lombok.Data;
  */
 @Data
 public class AuthDetails {
-    private String account;
-    private String role;
+    private Users user;
 
     private String userAgent;
+
+    public String getAccount() {
+        return user == null ? "匿名" : user.getAccount();
+    }
 }

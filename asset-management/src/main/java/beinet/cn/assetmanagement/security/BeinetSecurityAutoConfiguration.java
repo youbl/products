@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -37,10 +39,13 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
 
     private final ValidcodeService validcodeService;
     private final AuthenticationFailureHandler failureHandler;
+    private final UsersService usersService;
 
-    public BeinetSecurityAutoConfiguration(ValidcodeService validcodeService) {
+    public BeinetSecurityAutoConfiguration(ValidcodeService validcodeService,
+                                           UsersService usersService) {
         this.validcodeService = validcodeService;
         this.failureHandler = new BeinetHandleFail();
+        this.usersService = usersService;
     }
 
     @Bean
@@ -49,7 +54,7 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
     }
 
     @Bean
-    public BeinetUserService createUserDetailService(UsersService usersService) {
+    public BeinetUserService createUserDetailService() {
         return new BeinetUserService(usersService);
     }
 
@@ -100,10 +105,20 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 .anyRequest().authenticated();      // 其它所有请求都要求登录后访问，但是不限制角色
 
         // 在用户名密码校验之前，检查图形验证码是否正确
-        ValidCodeFilter filter = new ValidCodeFilter(validcodeService, failureHandler);
+        OncePerRequestFilter filter = new ValidCodeFilter(validcodeService, failureHandler);
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+
+        // 直接登录的过滤器
+        filter = new DirectLoginFilter(usersService);
+        http.addFilterBefore(filter, ValidCodeFilter.class);
+        //http.addFilterAfter(filter, BasicAuthenticationFilter.class);
     }
 
+    // 添加直接url登录的支持
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(new DirectLoginFilter.DirectAuthenticationProvider());
+    }
 
     @Configuration
     static class WebMvcConfig implements WebMvcConfigurer {

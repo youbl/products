@@ -4,6 +4,7 @@ import beinet.cn.assetmanagement.user.model.PasswordDto;
 import beinet.cn.assetmanagement.user.model.Users;
 import beinet.cn.assetmanagement.user.model.UsersDto;
 import beinet.cn.assetmanagement.user.repository.UsersRepository;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -13,12 +14,22 @@ import java.util.List;
 @Service
 public class UsersService {
     private final UsersRepository usersRepository;
-    private final PasswordEncoder passwordEncoder;
+    // ObjectProvider 用于避免循环依赖
+    private final ObjectProvider<PasswordEncoder> passwordEncoderProvider;
+    private PasswordEncoder passwordEncoder;
 
     public UsersService(UsersRepository usersRepository,
-                        PasswordEncoder passwordEncoder) {
+                        ObjectProvider<PasswordEncoder> passwordEncoder) {
         this.usersRepository = usersRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.passwordEncoderProvider = passwordEncoder;
+    }
+
+    private PasswordEncoder getPwdEncoder() {
+        if (passwordEncoder == null) {
+            passwordEncoder = passwordEncoderProvider.getIfAvailable();
+            assert passwordEncoder != null;
+        }
+        return passwordEncoder;
     }
 
     public List<Users> findAll() {
@@ -39,7 +50,7 @@ public class UsersService {
 
     public void resetPassword(int id) {
         Users result = usersRepository.findById(id).orElseThrow(() -> new RuntimeException("指定id未找到用户:" + id));
-        result.setPassword(passwordEncoder.encode("123456"));
+        result.setPassword(getPwdEncoder().encode("123456"));
         save(result);
     }
 
@@ -64,10 +75,10 @@ public class UsersService {
         if (user == null) {
             throw new RuntimeException("指定的账号不存在:" + currentAccount);
         }
-        if (!passwordEncoder.matches(dto.getPasswordOld(), user.getPassword())) {
+        if (!getPwdEncoder().matches(dto.getPasswordOld(), user.getPassword())) {
             throw new RuntimeException("输入的旧密码不匹配: " + currentAccount);
         }
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setPassword(getPwdEncoder().encode(dto.getPassword()));
         save(user);
     }
 
@@ -77,7 +88,7 @@ public class UsersService {
         }
         if (StringUtils.isEmpty(currentAccount) || currentAccount.equals("匿名")) {
             // 注册
-            item.setPassword(passwordEncoder.encode(item.getPassword()));
+            item.setPassword(getPwdEncoder().encode(item.getPassword()));
             Users newUser = item.mapTo();
             newUser.setRoles("USER");
             return save(newUser);
@@ -100,7 +111,7 @@ public class UsersService {
             user.setState(item.getState());
         } else {
             user = item.mapTo();
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setPassword(getPwdEncoder().encode(user.getPassword()));
         }
         return save(user);
     }
