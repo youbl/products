@@ -4,10 +4,9 @@ import beinet.cn.assetmanagement.assets.model.Assets;
 import beinet.cn.assetmanagement.assets.model.AssetsDto;
 import beinet.cn.assetmanagement.assets.service.AssetsService;
 import beinet.cn.assetmanagement.security.AuthDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,4 +36,14 @@ public class AssetsController {
         return assetsService.save(item.mapTo());
     }
 
+    /**
+     * 扫码接口，不需要登录
+     *
+     * @param code 二维码
+     * @return 资产
+     */
+    @GetMapping("/assetCode/{code}")
+    public Assets findByCode(@PathVariable String code) {
+        return assetsService.findByCode(code);
+    }
 }

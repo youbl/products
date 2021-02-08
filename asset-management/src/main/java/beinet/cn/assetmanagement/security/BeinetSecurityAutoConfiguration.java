@@ -5,6 +5,7 @@ import beinet.cn.assetmanagement.user.service.ValidcodeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -97,9 +98,11 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 .antMatchers("/static/**", "/res/**", "/error/**", "/img/**").permitAll()     // res根路径及子目录请求，不限制访问
                 .antMatchers("/favicon.ico").permitAll()        // ico不限制访问
                 .antMatchers("/login/**").permitAll()           // login相关页面请求，不限制访问
-                .antMatchers("/departments").permitAll()        // 注册页面需要获取部门列表
-                .antMatchers("/validcode/img/**").permitAll()   // 验证码请求，不限制访问
-                .antMatchers("/**/*.html/**").permitAll()       // html，不限制访问
+                .antMatchers(HttpMethod.GET, "/departments").permitAll()        // 注册页面需要获取部门列表
+                .antMatchers(HttpMethod.GET, "/validcode/img/**").permitAll()   // 验证码请求，不限制访问
+                .antMatchers("/**/*.html/**").permitAll()                       // html，不限制访问
+                .antMatchers(HttpMethod.GET, "/assetCode/**").permitAll()       // 扫码访问接口，不限制访问
+                .antMatchers(HttpMethod.GET, "/assetClass/**").permitAll()      // 扫码访问接口，不限制访问
                 //.antMatchers("/admin/**").hasRole("ADMIN") // 管理页面请求，要求ADMIN角色才能访问
                 //.antMatchers("/manage/**").hasRole("ADMIN")// 管理页面请求，要求ADMIN角色才能访问
                 .anyRequest().authenticated();      // 其它所有请求都要求登录后访问，但是不限制角色

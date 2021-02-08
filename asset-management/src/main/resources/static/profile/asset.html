@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>固定资产管理系统</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/elemeIndex.js"></script>
+    <script type="text/javascript" src="/res/qs.min.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .noborder input {
+            border: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div id="divApp" style="text-align: center;width: 95%;">
+    <el-form :model="editData" ref="editForm" style="width:500px">
+        <el-form-item label="资产编号" label-width="200px">
+            <el-input v-model="editData.code" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="资产分类" label-width="200px" prop="classId" style="text-align: left">
+            <el-input v-model="editData.className" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="资产名称" label-width="200px">
+            <el-input v-model="editData.assetName" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="资产说明" label-width="200px">
+            <el-input v-model="editData.description" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="购买时间" label-width="200px" style="text-align: left">
+            <el-input v-model="editData.buyTime" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="购买价格" label-width="200px">
+            <el-input v-model="editData.price" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="库房位置" label-width="200px">
+            <el-input v-model="editData.place" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="资产状态" label-width="200px" prop="state" style="text-align: left">
+            <el-input v-model="editData.stateName" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="入库时间" label-width="200px" prop="state" style="text-align: left">
+            <el-input v-model="editData.creationTime" class="noborder"></el-input>
+        </el-form-item>
+</div>
+<script type="text/javascript">
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                assetCode: '',
+                editData: {},
+            }
+        },
+        created: function () {
+            this.assetCode = getQueryString('code');
+            if (!this.assetCode) {
+                return alert('二维码Code不能为空');
+            }
+            this.getAssetByCode()
+                .then(this.getAssetClass);
+        },
+        methods: {
+            getAssetByCode: function () {
+                let url = '/assetCode/' + this.assetCode;
+                return axios.get(url).then(response => {
+                    if (!response || !response.data) {
+                        return alert('未找到资产');
+                    }
+                    response.data.className = '';
+                    response.data.stateName = this.getAssetState(response.data.state);
+                    this.editData = response.data;
+                    this.editData.price = this.editData.price / 100;
+                }).catch(error => this.ajaxError(error));
+            },
+            getAssetClass: function () {
+                if (this.editData.classId) {
+                    let url = '/assetClass?id=' + this.editData.classId;
+                    return axios.get(url).then(response => {
+                        if (!response || !response.data) {
+                            return alert('未找到资产分类');
+                        }
+                        this.editData.className = response.data.className;
+                    }).catch(error => this.ajaxError(error));
+                }
+            },
+            getAssetState: function (state) {
+                switch (state) {
+                    case 0 :
+                        return '库存';
+                    case 1 :
+                        return '借出';
+                    case 2 :
+                        return '故障';
+                    case 3 :
+                        return '报废';
+                }
+                return '未知';
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (msg && msg === 'Unauthorized') {
+                        this.goLogin();
+                    } else {
+                        alert(msg ? msg : '出错了');
+                    }
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+
+    /**
+     * 获取url里的变量值
+     * @param {string} name 变量名
+     * @return {string} 变量值
+     */
+    function getQueryString(name) {
+        if (typeof (name) !== 'string') {
+            return '';
+        }
+        name = name.trim();
+        if (name.length === 0) {
+            return '';
+        }
+        let localSearch = location.search.toLocaleLowerCase();
+        name = name.toLowerCase() + '=';
+        let tmpName = '?' + name;
+        let idx = localSearch.indexOf(tmpName);
+        if (idx < 0) {
+            tmpName = '&' + name;
+            idx = localSearch.indexOf(tmpName);
+            if (idx < 0) {
+                return '';
+            }
+        }
+        name = tmpName;
+        let tmp = location.search.substr(idx + name.length);
+        idx = tmp.indexOf('&');
+        if (idx === 0)
+            return '';
+        let ret;
+        if (idx < 0) {
+            ret = tmp;
+        } else {
+            ret = tmp.substr(0, idx);
+        }
+        return decodeURIComponent(ret.trim());
+    }
+</script>
+</body>
+</html>

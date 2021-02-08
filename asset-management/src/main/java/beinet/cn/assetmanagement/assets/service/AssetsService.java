@@ -40,6 +40,13 @@ public class AssetsService {
         return assetsRepository.findById(id).orElse(null);
     }
 
+    public Assets findByCode(String code) {
+        if (StringUtils.isEmpty(code)) {
+            return null;
+        }
+        return assetsRepository.findByCode(code);
+    }
+
     public Assets save(Assets item) {
         if (item == null) {
             return null;

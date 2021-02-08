@@ -20,4 +20,6 @@ public interface AssetsRepository extends JpaRepository<Assets, Integer> {
             "order by a.id desc",
             nativeQuery = true)
     List<Assets> findAllByAccount(String adminUserName);
+
+    Assets findByCode(String code);
 }

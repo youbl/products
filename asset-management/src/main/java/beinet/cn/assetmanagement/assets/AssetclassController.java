@@ -5,10 +5,7 @@ import beinet.cn.assetmanagement.assets.model.AssetclassDto;
 import beinet.cn.assetmanagement.assets.service.AssetclassService;
 import beinet.cn.assetmanagement.security.AuthDetails;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,8 +22,8 @@ public class AssetclassController {
         return assetclassService.findAll();
     }
 
-    @GetMapping("assetClass")
-    public Assetclass findById(Integer id) {
+    @GetMapping("/assetClass")
+    public Assetclass findById(@RequestParam Integer id) {
         return assetclassService.findById(id);
     }
 

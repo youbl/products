@@ -232,11 +232,12 @@
                 this.openQrCodeDialog = true;
                 if (data) {
                     // https://github.com/davidshimjs/qrcodejs
+                    let qrCodeUrl = location.protocol + '//' + location.host + '/profile/asset.html?code=' + data.code;
                     if (this.qrCode === null) {
-                        this.qrCode = new QRCode(document.getElementById('divQrCode'), data.code);
+                        this.qrCode = new QRCode(document.getElementById('divQrCode'), qrCodeUrl);
                     } else {
                         this.qrCode.clear(); // clear the code.
-                        this.qrCode.makeCode(data.code); // make another code.
+                        this.qrCode.makeCode(qrCodeUrl); // make another code.
                     }
                 }
             },
