@@ -5,6 +5,7 @@ import beinet.cn.assetmanagement.user.service.ValidcodeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -38,15 +40,22 @@ import java.util.Map;
 public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     static final String LOGIN_PAGE = "/login/index.html";
 
+    private boolean autoLogin;
+
     private final ValidcodeService validcodeService;
     private final AuthenticationFailureHandler failureHandler;
     private final UsersService usersService;
+    private final Environment environment;
 
     public BeinetSecurityAutoConfiguration(ValidcodeService validcodeService,
-                                           UsersService usersService) {
+                                           UsersService usersService,
+                                           Environment environment) {
         this.validcodeService = validcodeService;
         this.failureHandler = new BeinetHandleFail();
         this.usersService = usersService;
+        this.environment = environment;
+        String tmp = environment.getProperty("beinet.autologin");
+        this.autoLogin = !StringUtils.isEmpty(tmp) && tmp.equals("true");
     }
 
     @Bean
@@ -112,15 +121,21 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
         // 直接登录的过滤器
-        filter = new DirectLoginFilter(usersService);
-        http.addFilterBefore(filter, ValidCodeFilter.class);
-        //http.addFilterAfter(filter, BasicAuthenticationFilter.class);
+        if (!this.autoLogin) {
+            filter = new DirectLoginFilter(usersService);
+            http.addFilterBefore(filter, ValidCodeFilter.class);
+            //http.addFilterAfter(filter, BasicAuthenticationFilter.class);
+        }
     }
 
     // 添加直接url登录的支持
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(new DirectLoginFilter.DirectAuthenticationProvider());
+        if (this.autoLogin) {
+            auth.authenticationProvider(new DirectLoginFilter.DirectAuthenticationProvider());
+        } else {
+            super.configure(auth);
+        }
     }
 
     @Configuration

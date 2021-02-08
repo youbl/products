@@ -36,10 +36,12 @@ public class AuthDetailArgumentResolver implements HandlerMethodArgumentResolver
         ret.setUserAgent(webRequest.getHeader("user-agent"));
 
         Principal principal = webRequest.getUserPrincipal();
-        if (principal != null) {
-            BeinetUserDetail detail = (BeinetUserDetail) ((DirectLoginFilter.DirectAuth) principal).getPrincipal();
-            ret.setUser(detail.getUser());
-        }
+        assert principal != null;
+        ret.setAccount(principal.getName());
+//        if (principal instanceof DirectLoginFilter.DirectAuth) {
+//            BeinetUserDetail detail = (BeinetUserDetail) ((DirectLoginFilter.DirectAuth) principal).getPrincipal();
+//            ret.setUser(detail.getUser());
+//        }
 
         return ret;
     }

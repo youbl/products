@@ -21,6 +21,7 @@ import java.util.Collection;
 
 public class DirectLoginFilter extends OncePerRequestFilter {
     private static final String USER_PARA = "beinet";
+
     private final UsersService usersService;
 
     public DirectLoginFilter(UsersService usersService) {
@@ -37,12 +38,13 @@ public class DirectLoginFilter extends OncePerRequestFilter {
             return;
         }
 
-        String account = request.getParameter(USER_PARA);
-        // 没有提供url参数 直接跳过
-        if (StringUtils.isEmpty(account) || !AutoInitData.ADMIN.equals(account)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        String account = AutoInitData.ADMIN;
+//        account = request.getParameter(USER_PARA);
+//        // 没有提供url参数 直接跳过
+//        if (StringUtils.isEmpty(account) || !AutoInitData.ADMIN.equals(account)) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         BeinetUserDetail authResult = new BeinetUserDetail(usersService.findByAccount(account, true));
         SecurityContextHolder.getContext().setAuthentication(new DirectAuth(authResult));
