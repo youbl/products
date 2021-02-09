@@ -13,6 +13,10 @@
         .noborder input {
             border: none;
         }
+
+        .el-form-item {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -41,6 +45,10 @@
 
             <el-table-column label="资产分类" width="100">
                 <template slot-scope="scope">{{getClassName(scope.row.classId)}}</template>
+            </el-table-column>
+
+            <el-table-column label="状态" width="60">
+                <template slot-scope="scope">{{stateList[scope.row.state]}}</template>
             </el-table-column>
 
             <el-table-column label="">
@@ -95,11 +103,14 @@
             </el-form-item>
             <el-form-item label="资产状态" label-width="200px" prop="state" style="text-align: left">
                 <el-radio-group v-model="editData.state">
-                    <el-radio :label="0">库存</el-radio>
-                    <el-radio :label="1">借出</el-radio>
-                    <el-radio :label="2">故障</el-radio>
-                    <el-radio :label="3">报废</el-radio>
+                    <el-radio v-for="(val, key, idx) in stateList" :label="key">{{val}}</el-radio>
                 </el-radio-group>
+            </el-form-item>
+            <el-form-item label="最后借用人" label-width="200px" v-if="editData.id">
+                <el-input v-model="editData.account" :readonly="true" class="noborder"></el-input>
+            </el-form-item>
+            <el-form-item label="入库时间" label-width="200px" v-if="editData.id">
+                <el-input v-model="editData.creationTime" :readonly="true" class="noborder"></el-input>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -119,6 +130,12 @@
                 user: {},
                 classList: [],
                 dataList: [],
+                stateList: [
+                    '库存',
+                    '借出',
+                    '故障',
+                    '报废',
+                ],
                 dataAtt: {
                     id: {width: 40, title: 'ID', show: true},
                     code: {width: 200, title: '资产编号', show: true},
@@ -131,6 +148,7 @@
                     place: {width: 10, title: '库存位置', show: false},
                     creationTime: {width: 170, title: '创建时间', show: true},
                     lastModificationTime: {width: 170, title: '更新时间', show: false},
+                    account: {width: 150, title: '借用人', show: false},
                 },
                 openEditDialog: false,
                 editData: {

@@ -50,7 +50,7 @@
                       readonly="true" class="noborder"></el-input>
         </el-form-item>
         <div>
-            <el-button icon="el-icon-success" type="primary" @click="doRegister('registerForm')">保 存</el-button>
+            <el-button icon="el-icon-success" type="primary" @click="updateUser('registerForm')">保 存</el-button>
         </div>
     </el-form>
 </div>
@@ -113,7 +113,7 @@
                     this.departmentList = response.data;
                 }).catch(error => this.ajaxError(error));
             },
-            doRegister: function (form) {
+            updateUser: function (form) {
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
@@ -122,7 +122,7 @@
                         if (!response || !response.data || !response.data.id) {
                             return alert('资料修改失败');
                         }
-                        alert('资料修改成功');
+                        alert('资料修改成功，请等待管理员审核');
                     }).catch(error => this.ajaxError(error));
                 });
             },

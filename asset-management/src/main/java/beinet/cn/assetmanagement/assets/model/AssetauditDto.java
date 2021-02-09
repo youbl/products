@@ -22,6 +22,8 @@ public class AssetauditDto {
 
     private int state;
 
+    private String auditReason;
+
     private java.time.LocalDateTime creationTime;
 
     private java.time.LocalDateTime lastModificationTime;
@@ -36,6 +38,7 @@ public class AssetauditDto {
         result.setAssetCode(this.getAssetCode());
         result.setAccount(this.getAccount());
         result.setState(this.getState());
+        result.setAuditReason(this.getAuditReason());
         result.setCreationTime(this.getCreationTime());
         result.setLastModificationTime(this.getLastModificationTime());
         return result;

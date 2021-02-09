@@ -31,7 +31,7 @@ public class Assetaudit {
     private String subtype;
 
     @Size(max = 100)
-    @Column(columnDefinition = "varchar(100) COMMENT '审核说明'")
+    @Column(columnDefinition = "varchar(100) COMMENT '申请说明'")
     private String description;
 
     @Column(columnDefinition = "int(11) COMMENT '资产分类id'")
@@ -47,6 +47,10 @@ public class Assetaudit {
 
     @Column(columnDefinition = "int(11) COMMENT '审核状态'")
     private int state;
+
+    @Size(max = 100)
+    @Column(columnDefinition = "varchar(100) COMMENT '审核意见'")
+    private String auditReason;
 
     @Column(columnDefinition = "datetime COMMENT '创建时间'", insertable = false, updatable = false)
     private java.time.LocalDateTime creationTime;
@@ -64,6 +68,7 @@ public class Assetaudit {
         result.setAssetCode(this.getAssetCode());
         result.setAccount(this.getAccount());
         result.setState(this.getState());
+        result.setAuditReason(this.getAuditReason());
         result.setCreationTime(this.getCreationTime());
         result.setLastModificationTime(this.getLastModificationTime());
         return result;

@@ -124,6 +124,9 @@ public class UsersService {
         user.setUserName(item.getUserName());
         user.setDepartment(item.getDepartment());
         user.setCode(item.getCode());
+        if (!user.isAdmin()) {
+            user.setState(0); // 修改资料要重新审核
+        }
         return save(user);
     }
 
