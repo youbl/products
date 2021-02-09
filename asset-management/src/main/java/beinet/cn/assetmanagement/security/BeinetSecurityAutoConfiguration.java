@@ -121,7 +121,7 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
         // 直接登录的过滤器
-        if (!this.autoLogin) {
+        if (this.autoLogin) {
             filter = new DirectLoginFilter(usersService);
             http.addFilterBefore(filter, ValidCodeFilter.class);
             //http.addFilterAfter(filter, BasicAuthenticationFilter.class);
