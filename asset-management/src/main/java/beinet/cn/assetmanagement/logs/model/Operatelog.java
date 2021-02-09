@@ -26,12 +26,16 @@ public class Operatelog {
     @Column(columnDefinition = "varchar(20) COMMENT '关联资产'")
     private String code;
 
-    @Column(columnDefinition = "int(11) COMMENT '关联用户'")
-    private int userId;
+    @Column(columnDefinition = "varchar(50) COMMENT '关联用户'")
+    private String account;
 
     @Size(max = 20)
     @Column(columnDefinition = "varchar(20) COMMENT '日志类型'")
     private String type;
+
+    @Size(max = 20)
+    @Column(columnDefinition = "varchar(20) COMMENT '子类型'")
+    private String subType;
 
     @Size(max = 500)
     @Column(columnDefinition = "varchar(500) COMMENT '说明'")
@@ -47,8 +51,9 @@ public class Operatelog {
         OperatelogDto result = new OperatelogDto();
         result.setId(this.getId());
         result.setCode(this.getCode());
-        result.setUserId(this.getUserId());
+        result.setAccount(this.getAccount());
         result.setType(this.getType());
+        result.setSubType(this.getSubType());
         result.setDescription(this.getDescription());
         result.setOperator(this.getOperator());
         result.setCreationTime(this.getCreationTime());

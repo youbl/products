@@ -2,10 +2,9 @@ package beinet.cn.assetmanagement.logs;
 
 import beinet.cn.assetmanagement.logs.model.Operatelog;
 import beinet.cn.assetmanagement.logs.service.OperatelogService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import beinet.cn.assetmanagement.security.AuthDetails;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,14 +22,17 @@ public class OperatelogController {
     }
 
     @GetMapping("operatelog")
-    public Operatelog findById(Integer id) {
+    public Operatelog findById(@RequestParam Integer id) {
         return operatelogService.findById(id);
     }
 
     @PostMapping("operatelog")
-    public Operatelog save(@RequestBody Operatelog item) {
+    public Operatelog save(@RequestBody Operatelog item, AuthDetails details) {
         if (item == null) {
             return null;
+        }
+        if (StringUtils.isEmpty(item.getAccount())) {
+            item.setAccount(details.getAccount());
         }
         return operatelogService.save(item);
     }

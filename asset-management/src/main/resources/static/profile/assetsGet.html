@@ -18,49 +18,38 @@
 <body>
 <div id="divApp" style="text-align: center;width: 1000px;">
     <h1 style="text-align: center">
-        资产分类管理
+        资产领用
     </h1>
-
-    <template>
-        <div style="text-align: left">
-            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增</el-button>
-            <el-button icon="el-icon-edit" @click="location.reload()">刷新</el-button>
-        </div>
-        <el-table
-                :data="dataList"
-                stripe
-                border
-                style="width: 100%">
-            <el-table-column v-for="(value, key, index) in dataList[0]"
-                             :prop="key"
-                             :label="dataAtt[key].title"
-                             :width="dataAtt[key].width"
-                             v-if="dataAtt[key].show">
-            </el-table-column>
-            <el-table-column label="">
-                <template slot-scope="scope">
-                    <el-button size="mini" type="primary" plain
-                               @click="showEdit(scope.$index, scope.row)">编辑
-                    </el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-    </template>
-
-    <el-dialog title="分类编辑" :visible.sync="openEditDialog">
-        <el-form :model="editData" ref="editForm" style="width:500px">
-            <el-form-item label="分类名称" label-width="200px">
-                <el-input v-model="editData.className" placeholder="请输入分类名称"></el-input>
-            </el-form-item>
-            <el-form-item label="分类说明" label-width="200px">
-                <el-input v-model="editData.description" placeholder="请输入分类说明"></el-input>
-            </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-            <el-button icon="el-icon-success" type="primary" @click="saveData('editForm')">保 存</el-button>
-            <el-button @click="hideEditDialog">取 消</el-button>
-        </div>
-    </el-dialog>
+    <el-form :model="editData" ref="editForm" style="width:500px">
+        <el-form-item label="领用原因" label-width="200px" style="text-align: left;">
+            <el-select v-model="editData.subType" filterable placeholder="请选择领用原因">
+                <el-option label="请选择领用原因" value=""></el-option>
+                <el-option
+                        v-for="item in getTypeList"
+                        :label="item.description"
+                        :value="item.code">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="资产分类" label-width="200px" prop="classId" style="text-align: left">
+            <el-select v-model="editData.classId" filterable placeholder="请选择资产分类">
+                <el-option label="请选择资产分类" value=""></el-option>
+                <el-option
+                        v-for="item in classList"
+                        :label="item.className"
+                        :value="item.id">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="领用说明" label-width="200px">
+            <el-input type="textarea"
+                      :autosize="{ minRows: 5, maxRows: 20}"
+                      v-model="editData.description" placeholder="请输入领用说明"></el-input>
+        </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer" style="text-align: center; width:400px;">
+        <el-button icon="el-icon-success" type="primary" @click="saveData('editForm')">保 存</el-button>
+    </div>
 </div>
 <script type="text/javascript">
     const vueApp = new Vue({
@@ -68,23 +57,20 @@
         data: function () {
             return {
                 user: {},
-                dataList: [],
-                dataAtt: {
-                    id: {width: 40, title: 'ID', show: true},
-                    className: {width: 200, title: '分类名称', show: true},
-                    description: {width: 250, title: '分类说明', show: true},
-                    creationTime: {width: 180, title: '创建时间', show: true},
-                    lastModificationTime: {width: 180, title: '更新时间', show: true},
-                },
-                openEditDialog: false,
+                getTypeList: [],
+                classList: [],
                 editData: {
-                    className: '',
+                    type: 'assetGet',
+                    subType: '',
+                    classId: '',
                     description: '',
                 },
             }
         },
         created: function () {
-            this.getCurrentUser().then(this.loadClasses);
+            this.getCurrentUser()
+                .then(this.loadConfigs)
+                .then(this.loadClasses);
         },
         computed: {},
         methods: {
@@ -97,38 +83,33 @@
                     }
                 }).catch(error => this.ajaxError(error));
             },
+            loadConfigs: function () {
+                let url = '/configses/assetGet';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    this.getTypeList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
             loadClasses: function () {
                 let url = '/assetClasses';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;
                     }
-                    this.dataList = response.data;
+                    this.classList = response.data;
                 }).catch(error => this.ajaxError(error));
-            },
-            showEdit: function (idx, data) {
-                this.openEditDialog = true;
-                if (data) {
-                    this.editData = data;
-                } else {
-                    this.editData = {};
-                }
-            },
-            hideEditDialog: function () {
-                this.openEditDialog = false;
-                this.editData = {};
             },
             saveData: function (form) {
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
-                    let url = '/assetClass';
+                    let url = '/assetaudit';
                     return axios.post(url, this.editData).then(response => {
                         if (!response || !response.data || !response.data.id) {
                             return alert('保存失败');
                         }
-                        this.hideEditDialog();
-                        this.loadClasses();
                         alert('保存成功');
                     }).catch(error => this.ajaxError(error));
                 });

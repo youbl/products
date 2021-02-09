@@ -5,43 +5,37 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Data
-public class AssetsDto {
+public class AssetauditDto {
     private int id;
 
-    private String code;
+    private String type;
 
-    private String assetName;
-
-    private int classId;
+    private String subtype;
 
     private String description;
 
-    private java.time.LocalDateTime buyTime;
+    private int classId;
 
-    private int price;
-
-    private int state;
-
-    private String place;
+    private String assetCode;
 
     private String account;
+
+    private int state;
 
     private java.time.LocalDateTime creationTime;
 
     private java.time.LocalDateTime lastModificationTime;
 
-    public Assets mapTo() {
-        Assets result = new Assets();
+    public Assetaudit mapTo() {
+        Assetaudit result = new Assetaudit();
         result.setId(this.getId());
-        result.setCode(this.getCode());
-        result.setAssetName(this.getAssetName());
+        result.setType(this.getType());
+        result.setSubtype(this.getSubtype());
         result.setClassId(this.getClassId());
         result.setDescription(this.getDescription());
-        result.setBuyTime(this.getBuyTime());
-        result.setPrice(this.getPrice());
-        result.setState(this.getState());
-        result.setPlace(this.getPlace());
+        result.setAssetCode(this.getAssetCode());
         result.setAccount(this.getAccount());
+        result.setState(this.getState());
         result.setCreationTime(this.getCreationTime());
         result.setLastModificationTime(this.getLastModificationTime());
         return result;

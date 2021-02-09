@@ -41,6 +41,14 @@
                 </el-option>
             </el-select>
         </el-form-item>
+        <el-form-item label="员工状态" label-width="200px" prop="account">
+            <el-input :value="getStateName(user.state)"
+                      readonly="true" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="注册时间" label-width="200px" prop="account">
+            <el-input v-model="user.creationTime" maxlength="30"
+                      readonly="true" class="noborder"></el-input>
+        </el-form-item>
         <div>
             <el-button icon="el-icon-success" type="primary" @click="doRegister('registerForm')">保 存</el-button>
         </div>
@@ -120,6 +128,17 @@
             },
             goLogin: function () {
                 top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
+            },
+            getStateName: function (state) {
+                switch (state) {
+                    case 0:
+                        return '待审核';
+                    case 1:
+                        return '禁用';
+                    case 8:
+                        return '已审核';
+                }
+                return '未知';
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {

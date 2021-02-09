@@ -52,6 +52,10 @@ public class Assets {
     @Column(columnDefinition = "varchar(50) COMMENT '库存位置编号'")
     private String place;
 
+    @Size(max = 50)
+    @Column(columnDefinition = "varchar(50) COMMENT '保管人'")
+    private String account;
+
     @Column(columnDefinition = "datetime COMMENT '创建时间'", insertable = false, updatable = false)
     private java.time.LocalDateTime creationTime;
 
@@ -69,6 +73,7 @@ public class Assets {
         result.setPrice(this.getPrice());
         result.setState(this.getState());
         result.setPlace(this.getPlace());
+        result.setAccount(this.getAccount());
         result.setCreationTime(this.getCreationTime());
         result.setLastModificationTime(this.getLastModificationTime());
         return result;

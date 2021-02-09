@@ -5,32 +5,23 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Data
-public class OperatelogDto {
+public class ConfigsDto {
     private int id;
-
-    private String code;
-
-    private String account;
 
     private String type;
 
-    private String subType;
+    private String code;
 
     private String description;
 
-    private int operator;
-
     private java.time.LocalDateTime creationTime;
 
-    public Operatelog mapTo() {
-        Operatelog result = new Operatelog();
+    public Configs mapTo() {
+        Configs result = new Configs();
         result.setId(this.getId());
-        result.setCode(this.getCode());
-        result.setAccount(this.getAccount());
         result.setType(this.getType());
-        result.setSubType(this.getSubType());
+        result.setCode(this.getCode());
         result.setDescription(this.getDescription());
-        result.setOperator(this.getOperator());
         result.setCreationTime(this.getCreationTime());
         return result;
     }
