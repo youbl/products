@@ -10,8 +10,12 @@
 
     <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
     <style>
-        .noborder input {
-            border: none;
+        .noborder input, textarea {
+            border: none !important;
+        }
+
+        .el-form-item {
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -37,18 +41,22 @@
             <el-table-column prop="description" label="领用说明" width="400"></el-table-column>
             <el-table-column prop="creationTime" label="申请时间" width="160" align="center"></el-table-column>
             <el-table-column prop="stateName" label="审核状态" width="80" align="center"></el-table-column>
-            <el-table-column label="" width="120" align="center">
+            <el-table-column label="" width="150" align="center">
                 <template slot-scope="scope">
                     <el-button size="mini" type="primary" plain
                                @click="viewAudit(scope.$index, scope.row)">查看
+                    </el-button>
+                    <el-button size="mini" type="danger" plain
+                               v-show="scope.row.state === 0"
+                               @click="cancelAudit(scope.$index, scope.row)">作废
                     </el-button>
                 </template>
             </el-table-column>
         </el-table>
     </template>
 
-    <el-dialog title="资产申领" :visible.sync="openEditDialog">
-        <el-form :model="editData" :rules="rulesEdit" ref="editForm" style="width:500px">
+    <el-dialog title="资产申领" :visible.sync="openEditDialog" style="width:1200px">
+        <el-form :model="editData" :rules="rulesEdit" ref="editForm">
             <el-form-item label="申请原因" label-width="200px" prop="subtype" style="text-align: left;">
                 <el-select v-model="editData.subtype" filterable placeholder="请选择领用原因">
                     <el-option label="请选择领用原因" value=""></el-option>
@@ -90,8 +98,8 @@
         </div>
     </el-dialog>
 
-    <el-dialog title="资产申领详情" :visible.sync="openViewDialog">
-        <el-form :model="viewData" style="width:500px">
+    <el-dialog title="资产申领详情" :visible.sync="openViewDialog" style="width:1200px">
+        <el-form :model="viewData">
             <el-form-item label="申请原因" label-width="200px" style="text-align: left;">
                 <el-input v-model="viewData.typeName" class="noborder" readonly></el-input>
             </el-form-item>
@@ -99,7 +107,7 @@
                 <el-input v-model="viewData.className" class="noborder" readonly></el-input>
             </el-form-item>
             <el-form-item label="领用说明" label-width="200px" style="text-align: left">
-                <el-input type="textarea" class="noborder" readonly :rows="5"
+                <el-input type="textarea" class="noborder" readonly autosize
                           v-model="viewData.description"></el-input>
             </el-form-item>
             <el-form-item label="归还时间" label-width="200px" style="text-align: left">
@@ -108,13 +116,16 @@
             <el-form-item label="审核状态" label-width="200px" style="text-align: left">
                 <el-input v-model="viewData.stateName" class="noborder" readonly></el-input>
             </el-form-item>
-            <el-form-item label="审核人" label-width="200px" style="text-align: left">
+            <el-form-item label="审核人" label-width="200px" style="text-align: left"
+                          v-show="viewData.state === 1 || viewData.state === 8">
                 <el-input v-model="viewData.auditUser" class="noborder" readonly></el-input>
             </el-form-item>
-            <el-form-item label="审核说明" label-width="200px" style="text-align: left">
+            <el-form-item label="审核说明" label-width="200px" style="text-align: left"
+                          v-show="viewData.state === 1 || viewData.state === 8">
                 <el-input v-model="viewData.auditReason" class="noborder" readonly></el-input>
             </el-form-item>
-            <el-form-item label="关联资产" label-width="200px" style="text-align: left">
+            <el-form-item label="关联资产" label-width="200px" style="text-align: left"
+                          v-show="viewData.state === 8">
                 <el-input v-model="viewData.auditReason" class="noborder" readonly></el-input>
             </el-form-item>
         </el-form>
@@ -248,6 +259,8 @@
                         return '待审核';
                     case 1:
                         return '审核拒绝';
+                    case 2:
+                        return '作废';
                     case 8:
                         return '审核通过';
                 }
@@ -290,6 +303,15 @@
             viewAudit: function (idx, data) {
                 this.openViewDialog = true;
                 this.viewData = data;
+            },
+            cancelAudit: function (idx, data) {
+                this.$confirm("确认要作废该申请吗?").then(() => {
+                    let url = '/assetaudit/cancel/' + data.id;
+                    return axios.post(url, this.editData).then(response => {
+                        alert('作废成功');
+                        this.loadAudites();
+                    }).catch(error => this.ajaxError(error));
+                });
             },
             showEdit: function () {
                 this.openEditDialog = true;

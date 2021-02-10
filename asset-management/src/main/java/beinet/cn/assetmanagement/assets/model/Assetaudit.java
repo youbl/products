@@ -44,7 +44,7 @@ public class Assetaudit {
     @Column(columnDefinition = "varchar(50) COMMENT '申请人'")
     private String account;
 
-    @Column(columnDefinition = "int(11) COMMENT '审核状态'")
+    @Column(columnDefinition = "int(11) COMMENT '审核状态,0待审核,1拒绝,2作废,8通过'")
     private int state;
 
     @Size(max = 20)

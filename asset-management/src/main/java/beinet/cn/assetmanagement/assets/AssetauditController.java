@@ -44,4 +44,8 @@ public class AssetauditController {
         return assetauditService.save(item.mapTo());
     }
 
+    @PostMapping("/assetaudit/cancel/{id}")
+    public void cancelAudit(@PathVariable int id, AuthDetails details) {
+        assetauditService.cancelAudit(id, details.getAccount());
+    }
 }

@@ -2,8 +2,10 @@ package beinet.cn.assetmanagement.assets.service;
 
 import beinet.cn.assetmanagement.assets.model.Assetaudit;
 import beinet.cn.assetmanagement.assets.repository.AssetauditRepository;
+import beinet.cn.assetmanagement.security.AuthDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,4 +36,19 @@ public class AssetauditService {
         return assetauditRepository.save(item);
     }
 
+    public void cancelAudit(int id, String account) {
+        if (id <= 0) {
+            return;
+        }
+        Assetaudit audit = findById(id);
+        if (audit == null || audit.getState() != 0) {
+            throw new RuntimeException("指定的审批不存在，或已审批:" + id);
+        }
+        if (!audit.getAccount().equals(account)) {
+            throw new RuntimeException("指定的审批不是你发起的:" + id);
+        }
+        audit.setState(2);
+        save(audit);
+
+    }
 }
