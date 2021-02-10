@@ -16,7 +16,9 @@ public class AssetauditDto {
 
     private int classId;
 
-    private String assetCode;
+    private String auditUser;
+
+    private java.time.LocalDateTime returnTime;
 
     private String account;
 
@@ -35,7 +37,8 @@ public class AssetauditDto {
         result.setSubtype(this.getSubtype());
         result.setClassId(this.getClassId());
         result.setDescription(this.getDescription());
-        result.setAssetCode(this.getAssetCode());
+        result.setAuditUser(this.getAuditUser());
+        result.setReturnTime(this.getReturnTime());
         result.setAccount(this.getAccount());
         result.setState(this.getState());
         result.setAuditReason(this.getAuditReason());

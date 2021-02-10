@@ -235,11 +235,10 @@
 
             showEdit: function (idx, data) {
                 this.openEditDialog = true;
-                if (data) {
-                    this.editData = data;
-                } else {
-                    this.editData = this.getNewData();
+                if (!data) {
+                    data = this.getNewData();
                 }
+                Vue.set(this, 'editData', data);
             },
             hideEditDialog: function () {
                 this.openEditDialog = false;

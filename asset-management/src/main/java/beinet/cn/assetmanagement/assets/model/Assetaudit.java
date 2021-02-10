@@ -37,9 +37,8 @@ public class Assetaudit {
     @Column(columnDefinition = "int(11) COMMENT '资产分类id'")
     private int classId;
 
-    @Size(max = 20)
-    @Column(columnDefinition = "varchar(20) COMMENT '资产编号'")
-    private String assetCode;
+    @Column(columnDefinition = "datetime COMMENT '退库时间'")
+    private java.time.LocalDateTime returnTime;
 
     @Size(max = 50)
     @Column(columnDefinition = "varchar(50) COMMENT '申请人'")
@@ -47,6 +46,10 @@ public class Assetaudit {
 
     @Column(columnDefinition = "int(11) COMMENT '审核状态'")
     private int state;
+
+    @Size(max = 20)
+    @Column(columnDefinition = "varchar(20) COMMENT '审核人'")
+    private String auditUser;
 
     @Size(max = 100)
     @Column(columnDefinition = "varchar(100) COMMENT '审核意见'")
@@ -65,7 +68,8 @@ public class Assetaudit {
         result.setSubtype(this.getSubtype());
         result.setClassId(this.getClassId());
         result.setDescription(this.getDescription());
-        result.setAssetCode(this.getAssetCode());
+        result.setReturnTime(this.getReturnTime());
+        result.setAuditUser(this.getAuditUser());
         result.setAccount(this.getAccount());
         result.setState(this.getState());
         result.setAuditReason(this.getAuditReason());

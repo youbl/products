@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>固定资产管理系统</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/elemeIndex.js"></script>
+    <script type="text/javascript" src="/res/qs.min.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .noborder input {
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div id="divApp" style="text-align: center;width: 98%;">
+    <h1 style="text-align: center">
+        资产领用
+    </h1>
+
+    <template>
+        <div style="text-align: left">
+            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增申请</el-button>
+            <el-button icon="el-icon-edit" @click="location.reload()">刷新</el-button>
+        </div>
+        <el-table
+                :data="dataList"
+                stripe
+                border
+                style="width: 100%">
+            <el-table-column prop="id" label="ID" width="40" align="center"></el-table-column>
+            <el-table-column prop="typeName" label="申请原因" width="120" align="center"></el-table-column>
+            <el-table-column prop="className" label="申请资产分类" width="120" align="center"></el-table-column>
+            <el-table-column prop="description" label="领用说明" width="400"></el-table-column>
+            <el-table-column prop="creationTime" label="申请时间" width="160" align="center"></el-table-column>
+            <el-table-column prop="stateName" label="审核状态" width="80" align="center"></el-table-column>
+            <el-table-column label="" width="120" align="center">
+                <template slot-scope="scope">
+                    <el-button size="mini" type="primary" plain
+                               @click="viewAudit(scope.$index, scope.row)">查看
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+
+    <el-dialog title="资产申领" :visible.sync="openEditDialog">
+        <el-form :model="editData" :rules="rulesEdit" ref="editForm" style="width:500px">
+            <el-form-item label="申请原因" label-width="200px" prop="subtype" style="text-align: left;">
+                <el-select v-model="editData.subtype" filterable placeholder="请选择领用原因">
+                    <el-option label="请选择领用原因" value=""></el-option>
+                    <el-option
+                            v-for="item in getTypeList"
+                            :label="item.description"
+                            :value="item.code">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="资产分类" label-width="200px" prop="classId" style="text-align: left">
+                <el-select v-model="editData.classId" filterable placeholder="请选择资产分类">
+                    <el-option label="请选择资产分类" value=""></el-option>
+                    <el-option
+                            v-for="item in classList"
+                            :label="item.className"
+                            :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="领用说明" label-width="200px" prop="description" style="text-align: left">
+                <el-input type="textarea"
+                          :autosize="{ minRows: 5, maxRows: 20}"
+                          v-model="editData.description" placeholder="请输入领用说明"></el-input>
+            </el-form-item>
+            <el-form-item label="预计归还" label-width="200px" prop="returnTime" style="text-align: left">
+                <el-date-picker v-model="editData.returnTime" type="date" :picker-options="pickerOptions"
+                                placeholder="请选择预计归还日期">
+                </el-date-picker>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer" style="text-align: center; width:400px;">
+            <el-button icon="el-icon-success" type="primary"
+                       :disabled="user.state !== 8"
+                       @click="saveData('editForm')">保 存
+            </el-button>
+            <span style="color:red; font-weight: bold;" v-show="user.state !== 8">你的状态：{{getUserStateName(user.state)}}，不能发起申请</span>
+            <el-button @click="hideEditDialog">取 消</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="资产申领详情" :visible.sync="openViewDialog">
+        <el-form :model="viewData" style="width:500px">
+            <el-form-item label="申请原因" label-width="200px" style="text-align: left;">
+                <el-input v-model="viewData.typeName" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="资产分类" label-width="200px" style="text-align: left">
+                <el-input v-model="viewData.className" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="领用说明" label-width="200px" style="text-align: left">
+                <el-input type="textarea" class="noborder" readonly :rows="5"
+                          v-model="viewData.description"></el-input>
+            </el-form-item>
+            <el-form-item label="归还时间" label-width="200px" style="text-align: left">
+                <el-input v-model="viewData.returnTime" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="审核状态" label-width="200px" style="text-align: left">
+                <el-input v-model="viewData.stateName" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="审核人" label-width="200px" style="text-align: left">
+                <el-input v-model="viewData.auditUser" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="审核说明" label-width="200px" style="text-align: left">
+                <el-input v-model="viewData.auditReason" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="关联资产" label-width="200px" style="text-align: left">
+                <el-input v-model="viewData.auditReason" class="noborder" readonly></el-input>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+</div>
+<script type="text/javascript">
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                user: {},
+
+                dataList: [],
+                openViewDialog: false,
+                viewData: {},
+
+                openEditDialog: false,
+
+                getTypeList: [],
+                classList: [],
+                editData: {},
+                rulesEdit: {
+                    subtype: [
+                        {required: true, message: '原因必选', trigger: 'blur'},
+                    ],
+                    classId: [
+                        {required: true, message: '分类必选', trigger: 'blur'},
+                        // {pattern: /^1\d{10}$/, message: '手机号格式有误'},
+                    ],
+                    description: [
+                        {required: true, message: '领用说明不能为空', trigger: 'blur'},
+                        {min: 10, max: 100, message: '领用说明的长度为10~100个字', trigger: 'blur'},
+                    ],
+                    returnTime: [
+                        {required: true, message: '预计归还日期必选', trigger: 'blur'},
+                    ],
+                },
+                pickerOptions: {
+                    disabledDate(time) {
+                        return time.getTime() < Date.now();
+                    },
+                    shortcuts: [{
+                        text: '明天',
+                        onClick(picker) {
+                            const date = new Date();
+                            date.setTime(date.getTime() + 3600 * 1000 * 24);
+                            picker.$emit('pick', date);
+                        }
+                    }, {
+                        text: '一周后',
+                        onClick(picker) {
+                            const date = new Date();
+                            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
+                            picker.$emit('pick', date);
+                        }
+                    }, {
+                        text: '长期领用',
+                        onClick(picker) {
+                            const date = new Date(9999, 11, 31);
+                            picker.$emit('pick', date);
+                        }
+                    }]
+                },
+            }
+        },
+        created: function () {
+            this.getCurrentUser()
+                .then(this.loadConfigs)
+                .then(this.loadClasses)
+                .then(this.loadAudites);
+        },
+        computed: {},
+        methods: {
+            getCurrentUser: function () {
+                let url = '/login/currentUser';
+                return axios.get(url).then(response => {
+                    this.user = response.data;
+                    if (!this.user) {
+                        return this.goLogin();
+                    }
+                }).catch(error => this.ajaxError(error));
+            },
+
+            loadConfigs: function () {
+                let url = '/configses/assetGet';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    this.getTypeList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadClasses: function () {
+                let url = '/assetClasses';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    this.classList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadAudites: function () {
+                let url = '/assetaudits';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    for (let i = 0, j = response.data.length; i < j; i++) {
+                        let item = response.data[i];
+                        item.stateName = this.getStateName(item.state);
+                        item.className = this.getClassName(item.classId);
+                        item.typeName = this.getTypeName(item.subtype);
+                    }
+                    this.dataList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            getUserStateName: function (state) {
+                switch (state) {
+                    case 0:
+                        return '待审核';
+                    case 1:
+                        return '禁用';
+                    case 8:
+                        return '启用';
+                }
+                return state;
+            },
+            getStateName: function (state) {
+                switch (state) {
+                    case 0:
+                        return '待审核';
+                    case 1:
+                        return '审核拒绝';
+                    case 8:
+                        return '审核通过';
+                }
+                return state;
+            },
+            getTypeName: function (code) {
+                for (let i = 0; i < this.getTypeList.length; i++) {
+                    if (this.getTypeList[i].code === code) {
+                        return this.getTypeList[i].description;
+                    }
+                }
+                return code;
+            },
+            getClassName: function (id) {
+                for (let i = 0; i < this.classList.length; i++) {
+                    if (this.classList[i].id === id) {
+                        return this.classList[i].className;
+                    }
+                }
+                return id;
+            },
+            saveData: function (form) {
+                this.$refs[form].validate(valid => {
+                    if (!valid)
+                        return false;
+                    let url = '/assetaudit';
+                    return axios.post(url, this.editData).then(response => {
+                        if (!response || !response.data || !response.data.id) {
+                            return alert('保存失败');
+                        }
+                        alert('保存成功');
+                        this.hideEditDialog();
+                        this.loadAudites();
+                    }).catch(error => this.ajaxError(error));
+                });
+            },
+            goLogin: function () {
+                top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
+            },
+            viewAudit: function (idx, data) {
+                this.openViewDialog = true;
+                this.viewData = data;
+            },
+            showEdit: function () {
+                this.openEditDialog = true;
+                let data = {
+                    type: 'assetGet',
+                };
+                Vue.set(this, 'editData', data);
+            },
+            hideEditDialog: function () {
+                this.openEditDialog = false;
+                this.editData = {};
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (msg && msg === 'Unauthorized') {
+                        this.goLogin();
+                    } else {
+                        alert(msg ? msg : '出错了');
+                    }
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>

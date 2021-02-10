@@ -51,7 +51,9 @@
         <el-form :model="editData" ref="editForm" style="width:500px">
             <el-form-item label="配置类型" label-width="200px" style="text-align: left;">
                 <el-select v-model="editData.type" filterable placeholder="请选择配置类型">
-                    <el-option label="资产领用类型" value="assetGet"></el-option>
+                    <el-option label="资产领用-assetGet" value="assetGet"></el-option>
+                    <el-option label="资产退库-assetReturn" value="assetReturn"></el-option>
+                    <el-option label="资产报废-assetScrap" value="assetScrap"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="配置键值" label-width="200px">
@@ -111,12 +113,12 @@
             },
             showEdit: function (idx, data) {
                 this.openEditDialog = true;
-                if (data) {
-                    this.editData = data;
-                } else {
-                    this.editData = {};
-                    this.editData.type = 'assetGet';
+                if (!data) {
+                    data = {
+                        type: 'assetGet'
+                    };
                 }
+                Vue.set(this, 'editData', data);
             },
             hideEditDialog: function () {
                 this.openEditDialog = false;

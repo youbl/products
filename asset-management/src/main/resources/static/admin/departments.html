@@ -77,10 +77,7 @@
                     lastModificationTime: {width: 180, title: '更新时间', show: true},
                 },
                 openEditDialog: false,
-                editData: {
-                    departmentName: '',
-                    description: '',
-                },
+                editData: {},
             }
         },
         created: function () {
@@ -108,11 +105,10 @@
             },
             showEdit: function (idx, data) {
                 this.openEditDialog = true;
-                if (data) {
-                    this.editData = data;
-                } else {
-                    this.editData = {};
+                if (!data) {
+                    data = {};
                 }
+                Vue.set(this, 'editData', data);
             },
             hideEditDialog: function () {
                 this.openEditDialog = false;

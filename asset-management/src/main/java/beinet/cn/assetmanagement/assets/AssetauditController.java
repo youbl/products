@@ -17,8 +17,8 @@ public class AssetauditController {
     }
 
     @GetMapping("/assetaudits")
-    public List<Assetaudit> findAll() {
-        return assetauditService.findAll();
+    public List<Assetaudit> findAll(AuthDetails details) {
+        return assetauditService.findAll(details.getAccount());
     }
 
     @GetMapping("/assetaudit")
@@ -26,12 +26,21 @@ public class AssetauditController {
         return assetauditService.findById(id);
     }
 
+    /**
+     * 设置id为0，以确保只能新增审核
+     *
+     * @param item
+     * @param details
+     * @return
+     */
     @PostMapping("/assetaudit")
     public Assetaudit save(@RequestBody AssetauditDto item, AuthDetails details) {
         if (item == null) {
             return null;
         }
         item.setAccount(details.getAccount());
+        item.setState(0);
+        item.setId(0);
         return assetauditService.save(item.mapTo());
     }
 

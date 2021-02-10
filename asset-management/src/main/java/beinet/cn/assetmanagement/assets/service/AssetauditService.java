@@ -3,7 +3,9 @@ package beinet.cn.assetmanagement.assets.service;
 import beinet.cn.assetmanagement.assets.model.Assetaudit;
 import beinet.cn.assetmanagement.assets.repository.AssetauditRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -14,8 +16,11 @@ public class AssetauditService {
         this.assetauditRepository = assetauditRepository;
     }
 
-    public List<Assetaudit> findAll() {
-        return assetauditRepository.findAll();
+    public List<Assetaudit> findAll(String account) {
+        if (StringUtils.isEmpty(account) || account.equals("匿名")) {
+            return new ArrayList<>();
+        }
+        return assetauditRepository.findAllByAccountOrderByIdDesc(account);
     }
 
     public Assetaudit findById(Integer id) {
