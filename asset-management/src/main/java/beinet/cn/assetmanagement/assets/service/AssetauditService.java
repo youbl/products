@@ -3,6 +3,7 @@ package beinet.cn.assetmanagement.assets.service;
 import beinet.cn.assetmanagement.assets.model.Assetaudit;
 import beinet.cn.assetmanagement.assets.model.AssetauditDetail;
 import beinet.cn.assetmanagement.assets.model.AssetauditDto;
+import beinet.cn.assetmanagement.assets.model.Assets;
 import beinet.cn.assetmanagement.assets.repository.AssetauditDetailRepository;
 import beinet.cn.assetmanagement.assets.repository.AssetauditRepository;
 import beinet.cn.assetmanagement.security.AuthDetails;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AssetauditService {
@@ -47,7 +49,7 @@ public class AssetauditService {
     }
 
     public void cancelAudit(int id, String account) {
-        Assetaudit audit = findById(id, account);
+        Assetaudit audit = findById(id, account, true);
         audit.setState(2);
         save(audit);
     }
@@ -57,7 +59,10 @@ public class AssetauditService {
         if (item.getState() != 1 && item.getState() != 8) {
             throw new RuntimeException("审核状态设置有误:" + item.getState());
         }
-        Assetaudit audit = findById(item.getId(), item.getAccount());
+        if (item.getState() == 8 && (item.getAssetCodes() == null || item.getAssetCodes().length == 0)) {
+            throw new RuntimeException("审核通过时，必须分配资产");
+        }
+        Assetaudit audit = findById(item.getId(), item.getAccount(), true);
         audit.setState(item.getState());
         audit.setAuditUser(item.getAuditUser());
         audit.setAuditReason(item.getAuditReason());
@@ -79,16 +84,33 @@ public class AssetauditService {
     }
 
     public List<AssetauditDetail> findAllDetails(int auditId, String account) {
-        Assetaudit audit = findById(auditId, account);
-        return assetauditDetailRepository.findAllByAuditIdOrderById(audit.getId());
+        Assetaudit audit = findById(auditId, account, false);
+        List<AssetauditDetail> result = assetauditDetailRepository.findAllByAuditIdOrderById(audit.getId());
+        fillAssetName(result);
+        return result;
     }
 
-    Assetaudit findById(int id, String account) {
+    private void fillAssetName(List<AssetauditDetail> result) {
+        if (result == null || result.isEmpty()) {
+            return;
+        }
+        List<String> codeArr = result.stream().map(AssetauditDetail::getCode).collect(Collectors.toList());
+        for (Assets assets : assetsService.findByCodeArr(codeArr)) {
+            for (AssetauditDetail detail : result) {
+                if (detail.getCode().equals(assets.getCode())) {
+                    detail.setAssetName(assets.getAssetName());
+                    break;
+                }
+            }
+        }
+    }
+
+    Assetaudit findById(int id, String account, boolean mustNotAudit) {
         if (id <= 0) {
             throw new RuntimeException("id不合法:" + id);
         }
         Assetaudit audit = findById(id);
-        if (audit == null || audit.getState() != 0) {
+        if (audit == null || (mustNotAudit && audit.getState() != 0)) {
             throw new RuntimeException("指定的审批不存在，或已审批:" + id);
         }
         if (!audit.getAccount().equals(account)) {

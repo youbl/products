@@ -24,7 +24,8 @@ public class AssetauditController {
 
     @GetMapping("/assetauditDetails/{auditId}")
     public List<AssetauditDetail> findAll(@PathVariable int auditId, AuthDetails details) {
-        return assetauditService.findAllDetails(auditId, details.getAccount());
+        List<AssetauditDetail> result = assetauditService.findAllDetails(auditId, details.getAccount());
+        return result;
     }
 
     @GetMapping("/assetaudit")

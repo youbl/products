@@ -53,7 +53,7 @@
     </template>
 
     <el-dialog title="资产申领详情" :visible.sync="openViewDialog" style="width:1200px">
-        <el-form :model="auditData" :rules="rulesAudit" ref="auditForm">
+        <el-form :model="auditData" :rules="viewData.state === 0?rulesAudit:null" ref="auditForm">
             <el-form-item label="申请人" label-width="200px" style="text-align: left;">
                 <el-input v-model="viewData.userName" class="noborder" readonly></el-input>
             </el-form-item>
@@ -98,9 +98,11 @@
                 <el-input v-model="auditData.auditReason"
                           v-show="viewData.state === 0"></el-input>
             </el-form-item>
-            <el-form-item label="分配资产" prop="codeArr" label-width="200px" style="text-align: left"
+            <el-form-item label="分配资产" :prop="auditData.state===8?'assetCodes':''" label-width="200px"
+                          style="text-align: left"
                           v-show="viewData.state === 8 || auditData.state === 8">
-                <el-select v-model="auditData.codeArr" multiple placeholder="请选择资产" style="width:100%;">
+                <el-select v-model="auditData.assetCodes" multiple placeholder="请选择资产" style="width:100%;"
+                           :disabled="viewData.state === 8">
                     <el-option
                             v-for="item in searchAssets"
                             :key="item.code"
@@ -110,7 +112,7 @@
                 </el-select>
             </el-form-item>
         </el-form>
-        <div slot="footer" class="dialog-footer">
+        <div slot="footer" class="dialog-footer" v-show="viewData.state === 0">
             <el-button icon="el-icon-success" type="primary" @click="saveData('auditForm')">提 交</el-button>
             <el-button @click="hideViewDialog">取 消</el-button>
         </div>
@@ -137,20 +139,21 @@
                     id: 0,
                     state: 0,
                     auditReason: '',
-                    codeArr: [],
+                    assetCodes: [],
                 },
                 rulesAudit: {
                     id: [
                         {pattern: /^[1-9]\d*$/, message: '没有ID'},
                     ],
                     state: [
+                        {required: true, message: '状态不能为空', trigger: 'blur'},
                         {pattern: /^[18]$/, message: '审核状态必选', trigger: 'change'},
                     ],
                     auditReason: [
                         {required: true, message: '审核说明不能为空', trigger: 'blur'},
                         {min: 2, max: 100, message: '审核说明的长度为2~100个字', trigger: 'blur'},
                     ],
-                    codeArr: [
+                    assetCodes: [
                         {type: 'array', required: true, message: '请至少选择一个资产', trigger: 'blur'}
                     ],
                 },
@@ -230,7 +233,7 @@
             },
 
             loadAuditDetails: function (id) {
-                this.auditData.codeArr = [];
+                this.auditData.assetCodes = [];
                 let url = '/assetauditDetails/' + id;
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
@@ -238,7 +241,7 @@
                     }
                     for (let i = 0, j = response.data.length; i < j; i++) {
                         let item = response.data[i];
-                        this.auditData.codeArr.push(item.code);
+                        this.auditData.assetCodes.push(item.code + ':' + item.assetName);
                     }
                 }).catch(error => this.ajaxError(error));
             },
@@ -303,9 +306,6 @@
 
                     let url = '/assetaudit/audit';
                     return axios.post(url, this.auditData).then(response => {
-                        if (!response || !response.data || !response.data.id) {
-                            return alert('保存失败');
-                        }
                         alert('保存成功');
                         this.hideViewDialog();
                         this.loadAudites();
@@ -322,7 +322,7 @@
                 this.auditData.id = data.id;
                 this.auditData.account = data.account;
                 this.auditData.state = 0;
-                this.auditData.codeArr = [];
+                this.auditData.assetCodes = [];
                 if (data.state === 8) {
                     this.loadAuditDetails(data.id);
                 }
@@ -330,15 +330,6 @@
             hideViewDialog: function () {
                 this.openViewDialog = false;
                 this.auditData.id = 0;
-            },
-            cancelAudit: function (idx, data) {
-                this.$confirm("确认要作废该申请吗?").then(() => {
-                    let url = '/assetaudit/cancel/' + data.id;
-                    return axios.post(url, this.editData).then(response => {
-                        alert('作废成功');
-                        this.loadAudites();
-                    }).catch(error => this.ajaxError(error));
-                });
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {

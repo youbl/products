@@ -22,4 +22,6 @@ public interface AssetsRepository extends JpaRepository<Assets, Integer> {
     List<Assets> findAllByAccount(String adminUserName);
 
     Assets findByCode(String code);
+
+    List<Assets> findAllByCodeIn(List<String> codes);
 }

@@ -55,6 +55,13 @@ public class AssetsService {
         return assetsRepository.findByCode(code);
     }
 
+    public List<Assets> findByCodeArr(List<String> codeArr) {
+        if (codeArr == null || codeArr.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return assetsRepository.findAllByCodeIn(codeArr);
+    }
+
     public Assets save(Assets item) {
         if (item == null) {
             return null;

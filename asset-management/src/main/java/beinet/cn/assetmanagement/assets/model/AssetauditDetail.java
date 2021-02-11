@@ -24,7 +24,6 @@ public class AssetauditDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Size(max = 20)
     @Column(columnDefinition = "int(11) COMMENT '审核表主键'")
     private int auditId;
 
@@ -35,4 +34,6 @@ public class AssetauditDetail {
     @Column(columnDefinition = "datetime COMMENT '创建时间'", insertable = false, updatable = false)
     private java.time.LocalDateTime creationTime;
 
+    @Transient
+    private String assetName;
 }
