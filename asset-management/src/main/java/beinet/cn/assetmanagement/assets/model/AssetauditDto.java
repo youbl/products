@@ -26,6 +26,9 @@ public class AssetauditDto {
 
     private String auditReason;
 
+    // 审核分配的资产code
+    private String[] assetCodes;
+
     private java.time.LocalDateTime creationTime;
 
     private java.time.LocalDateTime lastModificationTime;

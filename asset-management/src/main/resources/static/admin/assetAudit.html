@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>固定资产管理系统</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/elemeIndex.js"></script>
+    <script type="text/javascript" src="/res/qs.min.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .noborder input, textarea {
+            border: none !important;
+        }
+
+        .el-form-item {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div id="divApp" style="text-align: center;width: 98%;">
+    <h1 style="text-align: center">
+        资产领用审核
+    </h1>
+
+    <template>
+        <div style="text-align: left">
+            <el-button icon="el-icon-edit" @click="location.reload()">刷新</el-button>
+        </div>
+        <el-table
+                :data="dataList"
+                stripe
+                border
+                style="width: 100%">
+            <el-table-column prop="id" label="ID" width="40" align="center"></el-table-column>
+            <el-table-column prop="userName" label="申请人" width="120" align="center"></el-table-column>
+            <el-table-column prop="typeName" label="申请原因" width="120" align="center"></el-table-column>
+            <el-table-column prop="className" label="申请资产分类" width="120" align="center"></el-table-column>
+            <el-table-column prop="description" label="领用说明" width="400"></el-table-column>
+            <el-table-column prop="creationTime" label="申请时间" width="160" align="center"></el-table-column>
+            <el-table-column prop="stateName" label="审核状态" width="80" align="center"></el-table-column>
+            <el-table-column label="" width="150" align="center">
+                <template slot-scope="scope">
+                    <el-button size="mini" :type="scope.row.state === 0?'danger':'primary'" plain
+                               @click="viewAudit(scope.$index, scope.row)">
+                        {{ scope.row.state === 0 ? '去审核' : '查看' }}
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+
+    <el-dialog title="资产申领详情" :visible.sync="openViewDialog" style="width:1200px">
+        <el-form :model="auditData" :rules="rulesAudit" ref="auditForm">
+            <el-form-item label="申请人" label-width="200px" style="text-align: left;">
+                <el-input v-model="viewData.userName" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="申请原因" label-width="200px" style="text-align: left;">
+                <el-input v-model="viewData.typeName" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="资产分类" label-width="200px" style="text-align: left">
+                <el-input v-model="viewData.className" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="领用说明" label-width="200px" style="text-align: left">
+                <el-input type="textarea" class="noborder" readonly autosize
+                          v-model="viewData.description"></el-input>
+            </el-form-item>
+            <el-form-item label="归还时间" label-width="200px" style="text-align: left">
+                <el-input v-model="viewData.returnTime" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="审核状态" prop="state" label-width="200px" style="text-align: left">
+                <!-- 其它显示 -->
+                <el-input v-model="viewData.stateName" class="noborder" readonly
+                          v-show="viewData.state !== 0"></el-input>
+                <!-- 待审核显示 -->
+                <el-radio-group v-model="auditData.state" v-show="viewData.state === 0">
+                    <el-radio :label="8">同意</el-radio>
+                    <el-radio :label="1">拒绝</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="审核人" label-width="200px" style="text-align: left"
+                          v-show="viewData.state !== 2">
+                <!-- 已审核显示 -->
+                <el-input v-model="viewData.auditName" class="noborder" readonly
+                          v-show="viewData.state === 1 || viewData.state === 8"></el-input>
+                <!-- 待审核显示 -->
+                <el-input v-model="user.userName" class="noborder" readonly
+                          v-show="viewData.state === 0"></el-input>
+            </el-form-item>
+            <el-form-item label="审核说明" prop="auditReason" label-width="200px" style="text-align: left"
+                          v-show="viewData.state !== 2">
+                <!-- 已审核显示 -->
+                <el-input v-model="viewData.auditReason" class="noborder" readonly
+                          v-show="viewData.state === 1 || viewData.state === 8"></el-input>
+                <!-- 待审核显示 -->
+                <el-input v-model="auditData.auditReason"
+                          v-show="viewData.state === 0"></el-input>
+            </el-form-item>
+            <el-form-item label="分配资产" prop="codeArr" label-width="200px" style="text-align: left"
+                          v-show="viewData.state === 8 || auditData.state === 8">
+                <el-select v-model="auditData.codeArr" multiple placeholder="请选择资产" style="width:100%;">
+                    <el-option
+                            v-for="item in searchAssets"
+                            :key="item.code"
+                            :label="item.code + ':' + item.assetName"
+                            :value="item.code">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button icon="el-icon-success" type="primary" @click="saveData('auditForm')">提 交</el-button>
+            <el-button @click="hideViewDialog">取 消</el-button>
+        </div>
+    </el-dialog>
+</div>
+<script type="text/javascript">
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                user: {},
+                userArr: [],
+
+                dataList: [],
+                openViewDialog: false,
+                viewData: {},
+
+                configTypeList: [],
+                classList: [],
+
+                searchAssets: [],
+
+                auditData: {
+                    id: 0,
+                    state: 0,
+                    auditReason: '',
+                    codeArr: [],
+                },
+                rulesAudit: {
+                    id: [
+                        {pattern: /^[1-9]\d*$/, message: '没有ID'},
+                    ],
+                    state: [
+                        {pattern: /^[18]$/, message: '审核状态必选', trigger: 'change'},
+                    ],
+                    auditReason: [
+                        {required: true, message: '审核说明不能为空', trigger: 'blur'},
+                        {min: 2, max: 100, message: '审核说明的长度为2~100个字', trigger: 'blur'},
+                    ],
+                    codeArr: [
+                        {type: 'array', required: true, message: '请至少选择一个资产', trigger: 'blur'}
+                    ],
+                },
+            }
+        },
+        created: function () {
+            this.getCurrentUser()
+                .then(this.loadUsers)
+                .then(this.loadConfigs)
+                .then(this.loadClasses)
+                .then(this.loadAudites)
+                .then(this.loadAssets);
+        },
+        computed: {},
+        methods: {
+            getCurrentUser: function () {
+                let url = '/login/currentUser';
+                return axios.get(url).then(response => {
+                    this.user = response.data;
+                    if (!this.user) {
+                        return this.goLogin();
+                    }
+                }).catch(error => this.ajaxError(error));
+            },
+            loadUsers: function () {
+                let url = '/users';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    this.userArr = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadConfigs: function () {
+                let url = '/configses/assetGet,assetReturn';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    this.configTypeList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadClasses: function () {
+                let url = '/assetClasses';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    this.classList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadAudites: function () {
+                let url = '/assetaudits';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    for (let i = 0, j = response.data.length; i < j; i++) {
+                        let item = response.data[i];
+                        item.userName = this.getUserName(item.account);
+                        item.auditName = this.getUserName(item.auditUser);
+                        item.stateName = this.getStateName(item.state);
+                        item.className = this.getClassName(item.classId);
+                        item.typeName = this.getTypeName(item.type, item.subtype);
+                    }
+                    this.dataList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadAssets: function () {
+                let url = '/assets?state=' + 0;
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    this.searchAssets = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+
+            loadAuditDetails: function (id) {
+                this.auditData.codeArr = [];
+                let url = '/assetauditDetails/' + id;
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    for (let i = 0, j = response.data.length; i < j; i++) {
+                        let item = response.data[i];
+                        this.auditData.codeArr.push(item.code);
+                    }
+                }).catch(error => this.ajaxError(error));
+            },
+
+            getUserName: function (account) {
+                if (!account) {
+                    return '';
+                }
+                for (let i = 0, j = this.userArr.length; i < j; i++) {
+                    let item = this.userArr[i];
+                    if (item.account === account) {
+                        return item.userName;
+                    }
+                }
+                return account;
+            },
+            getUserStateName: function (state) {
+                switch (state) {
+                    case 0:
+                        return '待审核';
+                    case 1:
+                        return '禁用';
+                    case 8:
+                        return '启用';
+                }
+                return state;
+            },
+            getStateName: function (state) {
+                switch (state) {
+                    case 0:
+                        return '待审核';
+                    case 1:
+                        return '审核拒绝';
+                    case 2:
+                        return '作废';
+                    case 8:
+                        return '审核通过';
+                }
+                return state;
+            },
+            getTypeName: function (type, code) {
+                for (let i = 0; i < this.configTypeList.length; i++) {
+                    let item = this.configTypeList[i];
+                    if (item.type === type && item.code === code) {
+                        return item.description;
+                    }
+                }
+                return code;
+            },
+            getClassName: function (id) {
+                for (let i = 0; i < this.classList.length; i++) {
+                    if (this.classList[i].id === id) {
+                        return this.classList[i].className;
+                    }
+                }
+                return id;
+            },
+            saveData: function (form) {
+                this.$refs[form].validate(valid => {
+                    if (!valid)
+                        return false;
+
+                    let url = '/assetaudit/audit';
+                    return axios.post(url, this.auditData).then(response => {
+                        if (!response || !response.data || !response.data.id) {
+                            return alert('保存失败');
+                        }
+                        alert('保存成功');
+                        this.hideViewDialog();
+                        this.loadAudites();
+                    }).catch(error => this.ajaxError(error));
+                });
+            },
+            goLogin: function () {
+                top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
+            },
+            viewAudit: function (idx, data) {
+                this.openViewDialog = true;
+                this.viewData = data;
+
+                this.auditData.id = data.id;
+                this.auditData.account = data.account;
+                this.auditData.state = 0;
+                this.auditData.codeArr = [];
+                if (data.state === 8) {
+                    this.loadAuditDetails(data.id);
+                }
+            },
+            hideViewDialog: function () {
+                this.openViewDialog = false;
+                this.auditData.id = 0;
+            },
+            cancelAudit: function (idx, data) {
+                this.$confirm("确认要作废该申请吗?").then(() => {
+                    let url = '/assetaudit/cancel/' + data.id;
+                    return axios.post(url, this.editData).then(response => {
+                        alert('作废成功');
+                        this.loadAudites();
+                    }).catch(error => this.ajaxError(error));
+                });
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (msg && msg === 'Unauthorized') {
+                        this.goLogin();
+                    } else {
+                        alert(msg ? msg : '出错了');
+                    }
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>

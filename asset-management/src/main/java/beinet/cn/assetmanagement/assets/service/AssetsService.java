@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AssetsService {
@@ -25,15 +26,22 @@ public class AssetsService {
         this.usersService = usersService;
     }
 
-    public List<Assets> findAll(String account) {
+    public List<Assets> findAll(Integer state, String account) {
         Users user = usersService.findByAccount(account, true);
         if (user == null) {
             return new ArrayList<>();
         }
+        List<Assets> result;
         if (user.isAdmin()) {
-            return assetsRepository.findAll();
+            result = assetsRepository.findAll();
+        } else {
+            result = assetsRepository.findAllByAccount(user.getUserName());
         }
-        return assetsRepository.findAllByAccount(user.getUserName());
+        if (state != null) {
+            result = result.stream().filter(assets -> assets.getState() == state).
+                    collect(Collectors.toList());
+        }
+        return result;
     }
 
     public Assets findById(Integer id) {
@@ -57,6 +65,18 @@ public class AssetsService {
         return assetsRepository.save(item);
     }
 
+    public void setAssetsUser(String code, String account) {
+        Assets assets = findByCode(code);
+        if (assets == null) {
+            throw new RuntimeException("指定的资产未找到:" + code);
+        }
+        if (assets.getState() != 0) {
+            throw new RuntimeException("该资产不可借:" + code);
+        }
+        assets.setState(1);
+        assets.setAccount(account);
+        save(assets);
+    }
 
     /**
      * 8位年月日 + 4位分类 + 6位序号

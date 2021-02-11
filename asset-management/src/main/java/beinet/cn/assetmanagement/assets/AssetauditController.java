@@ -1,6 +1,7 @@
 package beinet.cn.assetmanagement.assets;
 
 import beinet.cn.assetmanagement.assets.model.Assetaudit;
+import beinet.cn.assetmanagement.assets.model.AssetauditDetail;
 import beinet.cn.assetmanagement.assets.model.AssetauditDto;
 import beinet.cn.assetmanagement.assets.service.AssetauditService;
 import beinet.cn.assetmanagement.security.AuthDetails;
@@ -19,6 +20,11 @@ public class AssetauditController {
     @GetMapping("/assetaudits")
     public List<Assetaudit> findAll(AuthDetails details) {
         return assetauditService.findAll(details.getAccount());
+    }
+
+    @GetMapping("/assetauditDetails/{auditId}")
+    public List<AssetauditDetail> findAll(@PathVariable int auditId, AuthDetails details) {
+        return assetauditService.findAllDetails(auditId, details.getAccount());
     }
 
     @GetMapping("/assetaudit")
@@ -47,5 +53,14 @@ public class AssetauditController {
     @PostMapping("/assetaudit/cancel/{id}")
     public void cancelAudit(@PathVariable int id, AuthDetails details) {
         assetauditService.cancelAudit(id, details.getAccount());
+    }
+
+    @PostMapping("/assetaudit/audit")
+    public void doAudit(@RequestBody AssetauditDto item, AuthDetails details) {
+        if (item == null) {
+            return;
+        }
+        item.setAuditUser(details.getAccount());
+        assetauditService.doAudit(item);
     }
 }

@@ -24,7 +24,13 @@ public class ConfigsService {
         if (StringUtils.isEmpty(type)) {
             return new ArrayList<>();
         }
-        return configsRepository.findByTypeOrderById(type);
+        List<String> arrType = new ArrayList<>();
+        for (String item : type.split(",")) {
+            if (item.length() > 0) {
+                arrType.add(item);
+            }
+        }
+        return configsRepository.findByTypeInOrderByTypeAscCodeAsc(arrType);
     }
 
     public Configs findById(Integer id) {

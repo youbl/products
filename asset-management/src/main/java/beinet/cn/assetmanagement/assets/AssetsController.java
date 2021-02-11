@@ -19,8 +19,8 @@ public class AssetsController {
     }
 
     @GetMapping("assets")
-    public List<Assets> findAll(AuthDetails details) {
-        return assetsService.findAll(details.getAccount());
+    public List<Assets> findAll(@RequestParam(required = false) Integer state, AuthDetails details) {
+        return assetsService.findAll(state, details.getAccount());
     }
 
     @GetMapping("asset")
