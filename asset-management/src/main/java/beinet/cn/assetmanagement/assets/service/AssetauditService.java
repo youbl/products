@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,15 +31,54 @@ public class AssetauditService {
         this.assetsService = assetsService;
     }
 
-    public List<Assetaudit> findAll(String account) {
+    public List<Assetaudit> findAuditByType(String account, String type) {
         if (StringUtils.isEmpty(account) || account.equals("匿名")) {
             return new ArrayList<>();
         }
-        return assetauditRepository.findAllByAccountOrderByIdDesc(account);
+        if (StringUtils.isEmpty(type)) {
+            return new ArrayList<>();
+        }
+        List<String> arrType = new ArrayList<>();
+        for (String item : type.split(",")) {
+            if (item.length() > 0) {
+                arrType.add(item);
+            }
+        }
+        if (arrType.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return assetauditRepository.findAllByAccountAndTypeInOrderByIdDesc(account, arrType);
     }
 
     public Assetaudit findById(Integer id) {
         return assetauditRepository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public void newAudit(AssetauditDto dto) {
+        if (dto.getAssetCodes() == null || dto.getAssetCodes().length <= 0) {
+            throw new RuntimeException("退库资产列表为空");
+        }
+        for (String code : dto.getAssetCodes()) {
+            Assets assets = assetsService.findByCode(code);
+            if (assets == null) {
+                throw new RuntimeException("退库资产code不存在：" + code);
+            }
+            Assetaudit item = dto.mapTo();
+            item.setState(0);
+            item.setId(0);
+            item.setClassId(assets.getClassId());
+            if (item.getType().equals("assetReturn")) {
+                item.setReturnTime(LocalDateTime.now());
+            }
+            save(item);
+
+            AssetauditDetail detail = AssetauditDetail.builder()
+                    .auditId(item.getId())
+                    .code(code)
+                    .build();
+            assetauditDetailRepository.save(detail);
+        }
     }
 
     public Assetaudit save(Assetaudit item) {

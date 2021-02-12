@@ -19,7 +19,9 @@ public interface AssetsRepository extends JpaRepository<Assets, Integer> {
             "where a.classId=b.id and b.admin=?1 " +
             "order by a.id desc",
             nativeQuery = true)
-    List<Assets> findAllByAccount(String adminUserName);
+    List<Assets> findAllByAdminAccount(String adminUserName);
+
+    List<Assets> findAllByAccountAndStateOrderByAssetName(String account, int state);
 
     Assets findByCode(String code);
 

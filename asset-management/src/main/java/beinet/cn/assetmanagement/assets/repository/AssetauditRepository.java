@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface AssetauditRepository extends JpaRepository<Assetaudit, Integer> {
-    List<Assetaudit> findAllByAccountOrderByIdDesc(String account);
+    List<Assetaudit> findAllByAccountAndTypeInOrderByIdDesc(String account, List<String> type);
 }

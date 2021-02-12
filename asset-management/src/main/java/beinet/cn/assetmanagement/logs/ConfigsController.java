@@ -20,7 +20,7 @@ public class ConfigsController {
         return configsService.findAll();
     }
 
-    @GetMapping("configses/{type}")
+    @GetMapping("/configses/{type}")
     public List<Configs> findAll(@PathVariable String type) {
         return configsService.findAll(type);
     }

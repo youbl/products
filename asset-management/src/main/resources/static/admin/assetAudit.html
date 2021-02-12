@@ -10,7 +10,7 @@
 
     <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
     <style>
-        .noborder input, textarea {
+        .noborder input, .noborder textarea {
             border: none !important;
         }
 
@@ -52,10 +52,11 @@
         </el-table>
     </template>
 
-    <el-dialog title="资产申领详情" :visible.sync="openViewDialog" style="width:1200px">
+    <el-dialog title="资产申领详情" :visible.sync="openViewDialog" style="width:1200px" top="2vh">
         <el-form :model="auditData" :rules="viewData.state === 0?rulesAudit:null" ref="auditForm">
             <el-form-item label="申请人" label-width="200px" style="text-align: left;">
-                <el-input v-model="viewData.userName" class="noborder" readonly></el-input>
+                <el-input v-model="viewData.userName + '  ' + viewData.creationTime" class="noborder"
+                          readonly></el-input>
             </el-form-item>
             <el-form-item label="申请原因" label-width="200px" style="text-align: left;">
                 <el-input v-model="viewData.typeName" class="noborder" readonly></el-input>
@@ -101,7 +102,7 @@
             <el-form-item label="分配资产" :prop="auditData.state===8?'assetCodes':''" label-width="200px"
                           style="text-align: left"
                           v-show="viewData.state === 8 || auditData.state === 8">
-                <el-select v-model="auditData.assetCodes" multiple placeholder="请选择资产" style="width:100%;"
+                <el-select v-model="auditData.assetCodes" multiple filterable placeholder="请选择资产" style="width:100%;"
                            :disabled="viewData.state === 8">
                     <el-option
                             v-for="item in searchAssets"
@@ -206,7 +207,7 @@
                 }).catch(error => this.ajaxError(error));
             },
             loadAudites: function () {
-                let url = '/assetaudits';
+                let url = '/assetaudits/assetGet,assetReturn';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;
@@ -223,7 +224,7 @@
                 }).catch(error => this.ajaxError(error));
             },
             loadAssets: function () {
-                let url = '/assets?state=' + 0;
+                let url = '/assets?state=0';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;

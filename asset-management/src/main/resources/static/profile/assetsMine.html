@@ -13,17 +13,20 @@
         .noborder input {
             border: none;
         }
+
+        .el-form-item {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-<div id="divApp" style="text-align: center;width: 1000px;">
+<div id="divApp" style="text-align: center;width: 95%;">
     <h1 style="text-align: center">
-        资产分类管理
+        我的资产列表
     </h1>
 
     <template>
         <div style="text-align: left">
-            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增</el-button>
             <el-button icon="el-icon-edit" @click="location.reload()">刷新</el-button>
         </div>
         <el-table
@@ -37,30 +40,23 @@
                              :width="dataAtt[key].width"
                              v-if="dataAtt[key].show">
             </el-table-column>
+
+            <el-table-column label="资产分类" width="100">
+                <template slot-scope="scope">{{getClassName(scope.row.classId)}}</template>
+            </el-table-column>
+
             <el-table-column label="">
                 <template slot-scope="scope">
                     <el-button size="mini" type="primary" plain
-                               @click="showEdit(scope.$index, scope.row)">编辑
+                               @click="showDetail(scope.$index, scope.row)">详情
+                    </el-button>
+                    <el-button size="mini" type="warning" plain
+                               @click="showReturn(scope.$index, scope.row)">退库
                     </el-button>
                 </template>
             </el-table-column>
         </el-table>
     </template>
-
-    <el-dialog title="分类编辑" :visible.sync="openEditDialog">
-        <el-form :model="editData" ref="editForm" style="width:500px">
-            <el-form-item label="分类名称" label-width="200px">
-                <el-input v-model="editData.className" placeholder="请输入分类名称"></el-input>
-            </el-form-item>
-            <el-form-item label="分类说明" label-width="200px">
-                <el-input v-model="editData.description" placeholder="请输入分类说明"></el-input>
-            </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-            <el-button icon="el-icon-success" type="primary" @click="saveData('editForm')">保 存</el-button>
-            <el-button @click="hideEditDialog">取 消</el-button>
-        </div>
-    </el-dialog>
 </div>
 <script type="text/javascript">
     const vueApp = new Vue({
@@ -68,25 +64,41 @@
         data: function () {
             return {
                 user: {},
+                classList: [],
                 dataList: [],
+                stateList: [
+                    '库存',
+                    '借出',
+                    '故障',
+                    '报废',
+                ],
                 dataAtt: {
                     id: {width: 40, title: 'ID', show: true},
-                    className: {width: 200, title: '分类名称', show: true},
-                    description: {width: 250, title: '分类说明', show: true},
-                    creationTime: {width: 180, title: '创建时间', show: true},
-                    lastModificationTime: {width: 180, title: '更新时间', show: true},
-                },
-                openEditDialog: false,
-                editData: {
-                    className: '',
-                    description: '',
+                    code: {width: 200, title: '资产编号', show: true},
+                    assetName: {width: 200, title: '资产名称', show: true},
+                    classId: {width: 10, title: '资产分类ID', show: false},
+                    description: {width: 250, title: '资产说明', show: true},
+                    buyTime: {width: 170, title: '购买时间', show: false},
+                    price: {width: 100, title: '购买价格', show: true},
+                    state: {width: 10, title: '状态', show: false},
+                    place: {width: 10, title: '库存位置', show: false},
+                    creationTime: {width: 170, title: '入库时间', show: true},
+                    lastModificationTime: {width: 170, title: '更新时间', show: false},
+                    account: {width: 150, title: '借用人', show: false},
+                    accountTime: {width: 170, title: '借用时间', show: true},
                 },
             }
         },
         created: function () {
-            this.getCurrentUser().then(this.loadClasses);
+            this.getCurrentUser()
+                .then(this.loadClasses)
+                .then(this.loadAssets);
         },
-        computed: {},
+        computed: {
+            isAdmin: function () {
+                return this.user && this.user.roles && this.user.roles.indexOf('ADMIN') >= 0;
+            },
+        },
         methods: {
             getCurrentUser: function () {
                 let url = '/login/currentUser';
@@ -101,37 +113,45 @@
                 let url = '/assetClasses';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
+                        return alert('未配置资产分类');
+                    }
+                    if (!this.isAdmin) {
+                        for (let i = response.data.length - 1; i >= 0; i--) {
+                            if (response.data[i].admin !== this.user.userName) {
+                                response.data.splice(i, 1);
+                            }
+                        }
+                    }
+                    this.classList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadAssets: function () {
+                if (this.classList.length <= 0) {
+                    return;
+                }
+                let url = '/assets/mine';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
                         return;
+                    }
+                    for (let i = 0; i < response.data.length; i++) {
+                        response.data[i].price = (response.data[i].price / 100.0).toString();
                     }
                     this.dataList = response.data;
                 }).catch(error => this.ajaxError(error));
             },
-            showEdit: function (idx, data) {
-                this.openEditDialog = true;
-                if (data) {
-                    this.editData = data;
-                } else {
-                    this.editData = {};
+            getClassName: function (classId) {
+                for (let i = 0, j = this.classList.length; i < j; i++) {
+                    let item = this.classList[i];
+                    if (item.id === classId) {
+                        return item.className;
+                    }
                 }
             },
-            hideEditDialog: function () {
-                this.openEditDialog = false;
-                this.editData = {};
+            showDetail: function (idx, data) {
+                window.open('/profile/asset.html?code=' + data.code);
             },
-            saveData: function (form) {
-                this.$refs[form].validate(valid => {
-                    if (!valid)
-                        return false;
-                    let url = '/assetClass';
-                    return axios.post(url, this.editData).then(response => {
-                        if (!response || !response.data || !response.data.id) {
-                            return alert('保存失败');
-                        }
-                        this.hideEditDialog();
-                        this.loadClasses();
-                        alert('保存成功');
-                    }).catch(error => this.ajaxError(error));
-                });
+            showReturn: function (idx, data) {
             },
             goLogin: function () {
                 top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
@@ -148,6 +168,12 @@
                 } else {
                     console.log(JSON.stringify(error));
                     alert('未知错误');
+                }
+            },
+            testtt: function () {
+                let item = this.dataList[0];
+                for (const att in item) {
+                    console.log(att + "---" + this.dataAtt[att].show);
                 }
             },
         },

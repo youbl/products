@@ -14,6 +14,8 @@ public class AssetsDto {
 
     private int classId;
 
+    private String className;
+
     private String description;
 
     private java.time.LocalDateTime buyTime;
@@ -25,6 +27,10 @@ public class AssetsDto {
     private String place;
 
     private String account;
+
+    private java.time.LocalDateTime accountTime;
+
+    private String userName;
 
     private java.time.LocalDateTime creationTime;
 
@@ -42,6 +48,7 @@ public class AssetsDto {
         result.setState(this.getState());
         result.setPlace(this.getPlace());
         result.setAccount(this.getAccount());
+        result.setAccountTime(this.getAccountTime());
         result.setCreationTime(this.getCreationTime());
         result.setLastModificationTime(this.getLastModificationTime());
         return result;

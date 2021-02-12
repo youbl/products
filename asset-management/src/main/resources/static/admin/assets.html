@@ -53,6 +53,9 @@
 
             <el-table-column label="">
                 <template slot-scope="scope">
+                    <el-button size="mini" plain
+                               @click="showDetail(scope.$index, scope.row)">详情
+                    </el-button>
                     <el-button size="mini" type="primary" plain
                                @click="showEdit(scope.$index, scope.row)">编辑
                     </el-button>
@@ -149,6 +152,7 @@
                     creationTime: {width: 170, title: '创建时间', show: true},
                     lastModificationTime: {width: 170, title: '更新时间', show: false},
                     account: {width: 150, title: '借用人', show: false},
+                    accountTime: {width: 170, title: '借用时间', show: false},
                 },
                 openEditDialog: false,
                 editData: {},
@@ -224,6 +228,9 @@
                         return item.className;
                     }
                 }
+            },
+            showDetail: function (idx, data) {
+                window.open('/profile/asset.html?code=' + data.code);
             },
             showEdit: function (idx, data) {
                 this.openEditDialog = true;

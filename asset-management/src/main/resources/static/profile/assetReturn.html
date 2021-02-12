@@ -22,12 +22,12 @@
 <body>
 <div id="divApp" style="text-align: center;width: 98%;">
     <h1 style="text-align: center">
-        我的资产申请列表
+        我的资产退库列表
     </h1>
 
     <template>
         <div style="text-align: left">
-            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增申请</el-button>
+            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增退库申请</el-button>
             <el-button icon="el-icon-edit" @click="location.reload()">刷新</el-button>
         </div>
         <el-table
@@ -37,8 +37,8 @@
                 style="width: 100%">
             <el-table-column prop="id" label="ID" width="40" align="center"></el-table-column>
             <el-table-column prop="typeName" label="申请原因" width="120" align="center"></el-table-column>
-            <el-table-column prop="className" label="申请资产分类" width="120" align="center"></el-table-column>
-            <el-table-column prop="description" label="领用说明" width="400"></el-table-column>
+            <el-table-column prop="className" label="退库资产分类" width="120" align="center"></el-table-column>
+            <el-table-column prop="description" label="退库说明" width="400"></el-table-column>
             <el-table-column prop="creationTime" label="申请时间" width="160" align="center"></el-table-column>
             <el-table-column prop="stateName" label="审核状态" width="80" align="center"></el-table-column>
             <el-table-column label="" width="150" align="center">
@@ -55,50 +55,46 @@
         </el-table>
     </template>
 
-    <el-dialog title="资产申领" :visible.sync="openEditDialog" style="width:1200px">
+    <el-dialog title="资产退库申请" :visible.sync="openEditDialog" style="width:1200px">
         <el-form :model="editData" :rules="rulesEdit" ref="editForm">
-            <el-form-item label="申请原因" label-width="200px" prop="subtype" style="text-align: left;">
-                <el-select v-model="editData.subtype" filterable placeholder="请选择领用原因">
-                    <el-option label="请选择领用原因" value=""></el-option>
+            <el-form-item label="退库原因" label-width="200px" prop="subtype" style="text-align: left;">
+                <el-select v-model="editData.subtype" filterable placeholder="请选择退库原因">
+                    <el-option label="请选择退库原因" value=""></el-option>
                     <el-option
-                            v-for="item in getTypeList"
+                            v-for="item in returnTypeList"
                             :label="item.description"
                             :value="item.code">
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="资产分类" label-width="200px" prop="classId" style="text-align: left">
-                <el-select v-model="editData.classId" filterable placeholder="请选择资产分类">
-                    <el-option label="请选择资产分类" value=""></el-option>
-                    <el-option
-                            v-for="item in classList"
-                            :label="item.className"
-                            :value="item.id">
-                    </el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="领用说明" label-width="200px" prop="description" style="text-align: left">
+            <el-form-item label="退库说明" label-width="200px" prop="description" style="text-align: left">
                 <el-input type="textarea"
                           :autosize="{ minRows: 5, maxRows: 20}"
-                          v-model="editData.description" placeholder="请输入领用说明"></el-input>
+                          v-model="editData.description" placeholder="请输入退库说明"></el-input>
             </el-form-item>
-            <el-form-item label="预计归还" label-width="200px" prop="returnTime" style="text-align: left">
-                <el-date-picker v-model="editData.returnTime" type="date" :picker-options="pickerOptions"
-                                placeholder="请选择预计归还日期">
-                </el-date-picker>
+            <el-form-item label="退库资产" label-width="200px" prop="assetCodes" style="text-align: left">
+                <el-select v-model="editData.assetCodes" multiple filterable placeholder="请选择要退库的资产"
+                           style="width:100%">
+                    <el-option label="请选择要退库的资产" value=""></el-option>
+                    <el-option
+                            v-for="item in myAssetList"
+                            :label="item.code + ':' + item.assetName"
+                            :value="item.code">
+                    </el-option>
+                </el-select>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer" style="text-align: center; width:400px;">
             <el-button icon="el-icon-success" type="primary"
                        :disabled="user.state !== 8"
-                       @click="saveData('editForm')">保 存
+                       @click="saveData('editForm')">提 交
             </el-button>
             <span style="color:red; font-weight: bold;" v-show="user.state !== 8">你的状态：{{getUserStateName(user.state)}}，不能发起申请</span>
             <el-button @click="hideEditDialog">取 消</el-button>
         </div>
     </el-dialog>
 
-    <el-dialog title="资产申领详情" :visible.sync="openViewDialog" style="width:1200px">
+    <el-dialog title="资产退库详情" :visible.sync="openViewDialog" style="width:1200px">
         <el-form :model="viewData">
             <el-form-item label="申请原因" label-width="200px" style="text-align: left;">
                 <el-input v-model="viewData.typeName" class="noborder" readonly></el-input>
@@ -124,10 +120,6 @@
                           v-show="viewData.state === 1 || viewData.state === 8">
                 <el-input v-model="viewData.auditReason" class="noborder" readonly></el-input>
             </el-form-item>
-            <el-form-item label="关联资产" label-width="200px" style="text-align: left"
-                          v-show="viewData.state === 8">
-                <el-input v-for="item in assetCodes" v-model="item" class="noborder" readonly></el-input>
-            </el-form-item>
         </el-form>
     </el-dialog>
 </div>
@@ -141,54 +133,25 @@
                 dataList: [],
                 openViewDialog: false,
                 viewData: {},
-                assetCodes: [],
+                classList: [],
+                myAssetList: [],
 
                 openEditDialog: false,
 
-                getTypeList: [],
-                classList: [],
+                returnTypeList: [],
+
                 editData: {},
                 rulesEdit: {
                     subtype: [
                         {required: true, message: '原因必选', trigger: 'blur'},
                     ],
-                    classId: [
-                        {required: true, message: '分类必选', trigger: 'blur'},
-                        // {pattern: /^1\d{10}$/, message: '手机号格式有误'},
-                    ],
                     description: [
-                        {required: true, message: '领用说明不能为空', trigger: 'blur'},
-                        {min: 10, max: 100, message: '领用说明的长度为10~100个字', trigger: 'blur'},
+                        {required: true, message: '说明不能为空', trigger: 'blur'},
+                        {min: 4, max: 100, message: '说明的长度为4~100个字', trigger: 'blur'},
                     ],
-                    returnTime: [
-                        {required: true, message: '预计归还日期必选', trigger: 'blur'},
+                    assetCodes: [
+                        {type: 'array', required: true, message: '请至少选择一个资产', trigger: 'blur'}
                     ],
-                },
-                pickerOptions: {
-                    disabledDate(time) {
-                        return time.getTime() < Date.now();
-                    },
-                    shortcuts: [{
-                        text: '明天',
-                        onClick(picker) {
-                            const date = new Date();
-                            date.setTime(date.getTime() + 3600 * 1000 * 24);
-                            picker.$emit('pick', date);
-                        }
-                    }, {
-                        text: '一周后',
-                        onClick(picker) {
-                            const date = new Date();
-                            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
-                            picker.$emit('pick', date);
-                        }
-                    }, {
-                        text: '长期领用',
-                        onClick(picker) {
-                            const date = new Date(9999, 11, 31);
-                            picker.$emit('pick', date);
-                        }
-                    }]
                 },
             }
         },
@@ -209,14 +172,14 @@
                     }
                 }).catch(error => this.ajaxError(error));
             },
-
+            // 加载退库原因code列表
             loadConfigs: function () {
-                let url = '/configses/assetGet';
+                let url = '/configses/assetReturn';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;
                     }
-                    this.getTypeList = response.data;
+                    this.returnTypeList = response.data;
                 }).catch(error => this.ajaxError(error));
             },
             loadClasses: function () {
@@ -228,8 +191,9 @@
                     this.classList = response.data;
                 }).catch(error => this.ajaxError(error));
             },
+            // 加载当前用户的退库申请列表
             loadAudites: function () {
-                let url = '/assetaudits/assetGet';
+                let url = '/assetaudits/assetReturn';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;
@@ -268,9 +232,9 @@
                 return state;
             },
             getTypeName: function (code) {
-                for (let i = 0; i < this.getTypeList.length; i++) {
-                    if (this.getTypeList[i].code === code) {
-                        return this.getTypeList[i].description;
+                for (let i = 0; i < this.returnTypeList.length; i++) {
+                    if (this.returnTypeList[i].code === code) {
+                        return this.returnTypeList[i].description;
                     }
                 }
                 return code;
@@ -282,6 +246,48 @@
                     }
                 }
                 return id;
+            },
+            goLogin: function () {
+                top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
+            },
+            viewAudit: function (idx, data) {
+                this.openViewDialog = true;
+                this.viewData = data;
+            },
+            cancelAudit: function (idx, data) {
+                this.$confirm("确认要作废该申请吗?").then(() => {
+                    let url = '/assetaudit/cancel/' + data.id;
+                    return axios.post(url, this.editData).then(response => {
+                        alert('作废成功');
+                        this.loadAudites();
+                    }).catch(error => this.ajaxError(error));
+                });
+            },
+            showEdit: function () {
+                if (this.myAssetList.length <= 0) {
+                    this.loadMyAssets();
+                }
+                this.openEditDialog = true;
+                let data = {
+                    type: 'assetReturn',
+                    assetCodes: [],
+                };
+                Vue.set(this, 'editData', data);
+            },
+            hideEditDialog: function () {
+                this.openEditDialog = false;
+            },
+            loadMyAssets: function () {
+                if (this.classList.length <= 0) {
+                    return;
+                }
+                let url = '/assets/mine';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    this.myAssetList = response.data;
+                }).catch(error => this.ajaxError(error));
             },
             saveData: function (form) {
                 this.$refs[form].validate(valid => {
@@ -297,51 +303,6 @@
                         this.loadAudites();
                     }).catch(error => this.ajaxError(error));
                 });
-            },
-            goLogin: function () {
-                top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
-            },
-            viewAudit: function (idx, data) {
-                this.openViewDialog = true;
-                this.viewData = data;
-
-                this.assetCodes = [];
-                if (data.state === 8) {
-                    this.loadAuditDetails(data.id);
-                }
-            },
-            loadAuditDetails: function (id) {
-                this.assetCodes = [];
-                let url = '/assetauditDetails/' + id;
-                return axios.get(url).then(response => {
-                    if (!response || !response.data || !response.data.length) {
-                        return;
-                    }
-                    for (let i = 0, j = response.data.length; i < j; i++) {
-                        let item = response.data[i];
-                        this.assetCodes.push(item.code + ':' + item.assetName);
-                    }
-                }).catch(error => this.ajaxError(error));
-            },
-            cancelAudit: function (idx, data) {
-                this.$confirm("确认要作废该申请吗?").then(() => {
-                    let url = '/assetaudit/cancel/' + data.id;
-                    return axios.post(url, this.editData).then(response => {
-                        alert('作废成功');
-                        this.loadAudites();
-                    }).catch(error => this.ajaxError(error));
-                });
-            },
-            showEdit: function () {
-                this.openEditDialog = true;
-                let data = {
-                    type: 'assetGet',
-                };
-                Vue.set(this, 'editData', data);
-            },
-            hideEditDialog: function () {
-                this.openEditDialog = false;
-                this.editData = {};
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {

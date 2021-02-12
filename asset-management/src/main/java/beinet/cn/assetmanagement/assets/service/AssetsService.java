@@ -1,12 +1,15 @@
 package beinet.cn.assetmanagement.assets.service;
 
+import beinet.cn.assetmanagement.assets.model.Assetclass;
 import beinet.cn.assetmanagement.assets.model.Assets;
+import beinet.cn.assetmanagement.assets.model.AssetsDto;
 import beinet.cn.assetmanagement.assets.repository.AssetsRepository;
 import beinet.cn.assetmanagement.user.model.Users;
 import beinet.cn.assetmanagement.user.service.UsersService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,13 +38,22 @@ public class AssetsService {
         if (user.isAdmin()) {
             result = assetsRepository.findAll();
         } else {
-            result = assetsRepository.findAllByAccount(user.getUserName());
+            result = assetsRepository.findAllByAdminAccount(user.getUserName());
         }
         if (state != null) {
             result = result.stream().filter(assets -> assets.getState() == state).
                     collect(Collectors.toList());
         }
         return result;
+    }
+
+    public List<Assets> findByCurrentUser(String account) {
+        Users user = usersService.findByAccount(account, true);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+        // 1表示借出
+        return assetsRepository.findAllByAccountAndStateOrderByAssetName(account, 1);
     }
 
     public Assets findById(Integer id) {
@@ -53,6 +65,27 @@ public class AssetsService {
             return null;
         }
         return assetsRepository.findByCode(code);
+    }
+
+    public AssetsDto findDtoByCode(String code) {
+        Assets assets = findByCode(code);
+        if (assets == null) {
+            return null;
+        }
+        AssetsDto ret = assets.mapTo();
+        Assetclass assetclass = assetclassService.findById(ret.getClassId());
+        if (assetclass != null) {
+            ret.setClassName(assetclass.getClassName());
+        } else {
+            ret.setClassName(String.valueOf(ret.getClassId()));
+        }
+        if (StringUtils.hasText(ret.getAccount())) {
+            Users user = usersService.findByAccount(ret.getAccount(), false);
+            if (user != null) {
+                ret.setUserName(user.getUserName());
+            }
+        }
+        return ret;
     }
 
     public List<Assets> findByCodeArr(List<String> codeArr) {
@@ -82,6 +115,7 @@ public class AssetsService {
         }
         assets.setState(1);
         assets.setAccount(account);
+        assets.setAccountTime(LocalDateTime.now());
         save(assets);
     }
 

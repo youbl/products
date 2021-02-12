@@ -44,7 +44,11 @@
             <el-input v-model="editData.stateName" class="noborder"></el-input>
         </el-form-item>
         <el-form-item label="最后借用人" label-width="200px" prop="account" style="text-align: left">
-            <el-input v-model="editData.account" class="noborder"></el-input>
+            <el-input v-model="editData.account + ' ' + editData.userName" class="noborder"></el-input>
+        </el-form-item>
+        <el-form-item label="最后借用时间" label-width="200px" prop="account" style="text-align: left"
+                      v-show="editData.account">
+            <el-input v-model="editData.accountTime" class="noborder"></el-input>
         </el-form-item>
         <el-form-item label="入库时间" label-width="200px" prop="state" style="text-align: left">
             <el-input v-model="editData.creationTime" class="noborder"></el-input>
@@ -64,8 +68,7 @@
             if (!this.assetCode) {
                 return alert('二维码Code不能为空');
             }
-            this.getAssetByCode()
-                .then(this.getAssetClass);
+            this.getAssetByCode();
         },
         methods: {
             getAssetByCode: function () {
@@ -74,22 +77,10 @@
                     if (!response || !response.data) {
                         return alert('未找到资产');
                     }
-                    response.data.className = '';
                     response.data.stateName = this.getAssetState(response.data.state);
                     this.editData = response.data;
                     this.editData.price = this.editData.price / 100;
                 }).catch(error => this.ajaxError(error));
-            },
-            getAssetClass: function () {
-                if (this.editData.classId) {
-                    let url = '/assetClass?id=' + this.editData.classId;
-                    return axios.get(url).then(response => {
-                        if (!response || !response.data) {
-                            return alert('未找到资产分类');
-                        }
-                        this.editData.className = response.data.className;
-                    }).catch(error => this.ajaxError(error));
-                }
             },
             getAssetState: function (state) {
                 switch (state) {

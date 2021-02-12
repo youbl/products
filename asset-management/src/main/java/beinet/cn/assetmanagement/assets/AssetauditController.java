@@ -7,6 +7,7 @@ import beinet.cn.assetmanagement.assets.service.AssetauditService;
 import beinet.cn.assetmanagement.security.AuthDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,9 +18,9 @@ public class AssetauditController {
         this.assetauditService = assetauditService;
     }
 
-    @GetMapping("/assetaudits")
-    public List<Assetaudit> findAll(AuthDetails details) {
-        return assetauditService.findAll(details.getAccount());
+    @GetMapping("/assetaudits/{auditType}")
+    public List<Assetaudit> findAll(@PathVariable String auditType, AuthDetails details) {
+        return assetauditService.findAuditByType(details.getAccount(), auditType);
     }
 
     @GetMapping("/assetauditDetails/{auditId}")
@@ -41,14 +42,12 @@ public class AssetauditController {
      * @return
      */
     @PostMapping("/assetaudit")
-    public Assetaudit save(@RequestBody AssetauditDto item, AuthDetails details) {
+    public void save(@RequestBody AssetauditDto item, AuthDetails details) {
         if (item == null) {
-            return null;
+            return;
         }
         item.setAccount(details.getAccount());
-        item.setState(0);
-        item.setId(0);
-        return assetauditService.save(item.mapTo());
+        assetauditService.newAudit(item);
     }
 
     @PostMapping("/assetaudit/cancel/{id}")

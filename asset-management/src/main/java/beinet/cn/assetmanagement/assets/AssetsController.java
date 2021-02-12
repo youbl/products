@@ -23,6 +23,11 @@ public class AssetsController {
         return assetsService.findAll(state, details.getAccount());
     }
 
+    @GetMapping("assets/mine")
+    public List<Assets> findByCurrentUser(AuthDetails details) {
+        return assetsService.findByCurrentUser(details.getAccount());
+    }
+
     @GetMapping("asset")
     public Assets findById(Integer id) {
         return assetsService.findById(id);
@@ -43,7 +48,7 @@ public class AssetsController {
      * @return 资产
      */
     @GetMapping("/assetCode/{code}")
-    public Assets findByCode(@PathVariable String code) {
-        return assetsService.findByCode(code);
+    public AssetsDto findByCode(@PathVariable String code) {
+        return assetsService.findDtoByCode(code);
     }
 }

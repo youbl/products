@@ -44,7 +44,8 @@
                     <el-menu-item-group>
                         <el-menu-item index="2-1" @click.native="switchTab(21)">我的资产</el-menu-item>
                         <el-menu-item index="2-2" @click.native="switchTab(22)">资产领用</el-menu-item>
-                        <el-menu-item index="2-3" @click.native="switchTab(23)" v-if="isAdmin || classId > 0">资产审核
+                        <el-menu-item index="2-3" @click.native="switchTab(23)">资产退库</el-menu-item>
+                        <el-menu-item index="2-4" @click.native="switchTab(24)" v-if="isAdmin || classId > 0">资产审核
                         </el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
@@ -96,7 +97,8 @@
                     12: '/profile/pwd.html',        // 修改密码页面
                     21: '/profile/assetsMine.html', // 我的资产页面
                     22: '/profile/assetAudit.html', // 资产借用页面
-                    23: '/admin/assetAudit.html',   // 资产借用审核页面
+                    23: '/profile/assetReturn.html',// 资产借用页面
+                    24: '/admin/assetAudit.html',   // 资产借用审核页面
                     31: '/admin/departments.html',  // 部门列表管理页面
                     32: '/admin/users.html',        // 用户列表管理页面
                     33: '/admin/assetsClass.html',  // 资产分类管理页面
