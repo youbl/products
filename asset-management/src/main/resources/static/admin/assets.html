@@ -76,7 +76,6 @@
 
             <el-form-item label="资产分类" label-width="200px" prop="classId" style="text-align: left">
                 <el-select v-model="editData.classId" filterable placeholder="请选择资产分类">
-                    <el-option label="请选择资产分类" value=""></el-option>
                     <el-option
                             v-for="item in classList"
                             :label="item.className"
@@ -109,8 +108,20 @@
                     <el-radio v-for="(val, key, idx) in stateList" :label="key">{{val}}</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="最后借用人" label-width="200px" v-if="editData.id">
-                <el-input v-model="editData.account" :readonly="true" class="noborder"></el-input>
+            <el-form-item label="最后借用人" label-width="200px">
+                <el-select v-model="editData.account" filterable placeholder="请选择最后借用人" style="width:100%;">
+                    <el-option
+                            v-for="item in userArr"
+                            :key="item.account"
+                            :label="item.account + ':' + item.userName"
+                            :value="item.account">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="最后借用时间" label-width="200px" v-if="editData.account" style="text-align: left;">
+                <el-date-picker v-model="editData.accountTime" type="datetime"
+                                placeholder="最后借用时间">
+                </el-date-picker>
             </el-form-item>
             <el-form-item label="入库时间" label-width="200px" v-if="editData.id">
                 <el-input v-model="editData.creationTime" :readonly="true" class="noborder"></el-input>
@@ -131,6 +142,7 @@
         data: function () {
             return {
                 user: {},
+                userArr: {},
                 classList: [],
                 dataList: [],
                 stateList: [
@@ -163,6 +175,7 @@
         },
         created: function () {
             this.getCurrentUser()
+                .then(this.loadUsers)
                 .then(this.loadClasses)
                 .then(this.loadAssets);
 
@@ -188,6 +201,15 @@
                     if (!this.user) {
                         return this.goLogin();
                     }
+                }).catch(error => this.ajaxError(error));
+            },
+            loadUsers: function () {
+                let url = '/users';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    this.userArr = response.data;
                 }).catch(error => this.ajaxError(error));
             },
             loadClasses: function () {

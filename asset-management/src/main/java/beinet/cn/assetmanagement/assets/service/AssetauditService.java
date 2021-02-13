@@ -22,19 +22,63 @@ public class AssetauditService {
     private final AssetauditRepository assetauditRepository;
     private final AssetauditDetailRepository assetauditDetailRepository;
     private final AssetsService assetsService;
+    private final AssetclassService assetclassService;
 
     public AssetauditService(AssetauditRepository assetauditRepository,
                              AssetauditDetailRepository assetauditDetailRepository,
-                             AssetsService assetsService) {
+                             AssetsService assetsService,
+                             AssetclassService assetclassService) {
         this.assetauditRepository = assetauditRepository;
         this.assetauditDetailRepository = assetauditDetailRepository;
         this.assetsService = assetsService;
+        this.assetclassService = assetclassService;
     }
 
+    /**
+     * 管理员或分类管理员，查找他们负责的审批
+     *
+     * @param account 分类管理员账号
+     * @param type    要查找的审批类型
+     * @return 列表
+     */
+    public List<Assetaudit> findForAdmin(String account, String type) {
+        if (StringUtils.isEmpty(account) || account.equals("匿名")) {
+            return new ArrayList<>();
+        }
+        int adminClassId = assetclassService.findByAccountAdmin(account);
+        if (adminClassId == 0) {
+            return new ArrayList<>(); // 没有管理权限
+        }
+        List<String> arrType = getTypes(type);
+        if (arrType.isEmpty()) {
+            return new ArrayList<>();
+        }
+        // 超级管理员
+        if (adminClassId == -1) {
+            return assetauditRepository.findAllByTypeInOrderByIdDesc(arrType);
+        }
+        return assetauditRepository.findAllByClassIdAndTypeInOrderByIdDesc(adminClassId, arrType);
+    }
+
+    /**
+     * 查找用户发起的审批
+     *
+     * @param account 分类管理员账号
+     * @param type    要查找的审批类型
+     * @return 列表
+     */
     public List<Assetaudit> findAuditByType(String account, String type) {
         if (StringUtils.isEmpty(account) || account.equals("匿名")) {
             return new ArrayList<>();
         }
+        List<String> arrType = getTypes(type);
+        if (arrType.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return assetauditRepository.findAllByAccountAndTypeInOrderByIdDesc(account, arrType);
+    }
+
+    private List<String> getTypes(String type) {
         if (StringUtils.isEmpty(type)) {
             return new ArrayList<>();
         }
@@ -44,10 +88,7 @@ public class AssetauditService {
                 arrType.add(item);
             }
         }
-        if (arrType.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return assetauditRepository.findAllByAccountAndTypeInOrderByIdDesc(account, arrType);
+        return arrType;
     }
 
     public Assetaudit findById(Integer id) {
@@ -56,10 +97,27 @@ public class AssetauditService {
 
     @Transactional
     public void newAudit(AssetauditDto dto) {
+        switch (dto.getType()) {
+            case "assetGet":
+                processNewAssetGet(dto);
+                break;
+            case "assetReturn":
+                processNewAssetReturn(dto);
+                break;
+        }
+    }
+
+    private void processNewAssetGet(AssetauditDto dto) {
+        Assetaudit item = dto.mapTo();
+        item.setState(0);
+        item.setId(0);
+        save(item);
+    }
+
+    private void processNewAssetReturn(AssetauditDto dto) {
         if (dto.getAssetCodes() == null || dto.getAssetCodes().length <= 0) {
             throw new RuntimeException("退库资产列表为空");
         }
-
         // 简单处理，每个资产生成一条审核（后续应该改成每种分类一个审核）
         for (String code : dto.getAssetCodes()) {
             Assets assets = assetsService.findByCode(code);
@@ -70,9 +128,7 @@ public class AssetauditService {
             item.setState(0);
             item.setId(0);
             item.setClassId(assets.getClassId());
-            if (item.getType().equals("assetReturn")) {
-                item.setReturnTime(LocalDateTime.now());
-            }
+            item.setReturnTime(LocalDateTime.now());
             save(item);
 
             AssetauditDetail detail = AssetauditDetail.builder()
@@ -162,9 +218,11 @@ public class AssetauditService {
         }
     }
 
-    public List<AssetauditDetail> findAllDetails(int auditId, String account) {
-        Assetaudit audit = findById(auditId, account, false);
-        List<AssetauditDetail> result = assetauditDetailRepository.findAllByAuditIdOrderById(audit.getId());
+    public List<AssetauditDetail> findAllDetails(int auditId) {
+        if (auditId <= 0) {
+            throw new RuntimeException("auditId不合法:" + auditId);
+        }
+        List<AssetauditDetail> result = assetauditDetailRepository.findAllByAuditIdOrderById(auditId);
         fillAssetName(result);
         return result;
     }

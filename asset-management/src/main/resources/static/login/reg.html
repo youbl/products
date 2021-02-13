@@ -34,7 +34,6 @@
         </el-form-item>
         <el-form-item label="所属部门" label-width="200px" prop="department" style="text-align: left">
             <el-select v-model="register.department" filterable placeholder="请选择部门">
-                <el-option label="请选择部门" value=""></el-option>
                 <el-option
                         v-for="item in departmentList"
                         :label="item.departmentName"

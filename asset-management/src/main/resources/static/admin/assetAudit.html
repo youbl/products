@@ -217,7 +217,7 @@
                 }).catch(error => this.ajaxError(error));
             },
             loadAudites: function () {
-                let url = '/assetaudits/assetGet,assetReturn';
+                let url = '/assetaudits/admin/assetGet,assetReturn';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;

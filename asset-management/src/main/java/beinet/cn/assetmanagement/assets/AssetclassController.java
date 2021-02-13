@@ -42,7 +42,7 @@ public class AssetclassController {
      * @param details 当前登录用户
      * @return id或0
      */
-    @GetMapping("assetClassByUser")
+    @GetMapping("/assetClassByUser")
     public int getClassId(AuthDetails details) {
         return assetclassService.findByAccountAdmin(details.getAccount());
     }

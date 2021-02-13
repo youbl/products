@@ -57,7 +57,6 @@
             </el-form-item>
             <el-form-item label="分类管理员" label-width="200px" prop="department" style="text-align: left">
                 <el-select v-model="editData.admin" filterable placeholder="请选择分类管理员">
-                    <el-option label="请选择分类管理员" value=""></el-option>
                     <el-option
                             v-for="item in userList"
                             :label="item.userName"

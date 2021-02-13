@@ -47,10 +47,19 @@ public class AssetclassService {
         return assetclass.getTotalAmount();
     }
 
+    /**
+     * 查找指定账号管理的分类
+     *
+     * @param account 账号
+     * @return 分类id, 0表示没有管理权限，-1表示管理全部分类
+     */
     public int findByAccountAdmin(String account) {
         Users user = usersService.findByAccount(account, true);
-        if (user == null || user.isAdmin()) {
+        if (user == null) {
             return 0;
+        }
+        if (user.isAdmin()) {
+            return -1;
         }
         Assetclass css = assetclassRepository.findByAdmin(user.getUserName());
         return css == null ? 0 : css.getId();

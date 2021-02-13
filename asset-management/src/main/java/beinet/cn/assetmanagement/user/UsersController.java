@@ -27,7 +27,7 @@ public class UsersController {
         return usersService.findByAccount(details.getAccount(), true);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN')")// 分类管理员的资产审核需要名字
     @GetMapping("/users")
     public List<Users> findAll() {
         return usersService.findAll();

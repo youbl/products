@@ -59,7 +59,6 @@
         <el-form :model="editData" :rules="rulesEdit" ref="editForm">
             <el-form-item label="申请原因" label-width="200px" prop="subtype" style="text-align: left;">
                 <el-select v-model="editData.subtype" filterable placeholder="请选择领用原因">
-                    <el-option label="请选择领用原因" value=""></el-option>
                     <el-option
                             v-for="item in getTypeList"
                             :label="item.description"
@@ -69,7 +68,6 @@
             </el-form-item>
             <el-form-item label="资产分类" label-width="200px" prop="classId" style="text-align: left">
                 <el-select v-model="editData.classId" filterable placeholder="请选择资产分类">
-                    <el-option label="请选择资产分类" value=""></el-option>
                     <el-option
                             v-for="item in classList"
                             :label="item.className"
@@ -93,8 +91,10 @@
                        :disabled="user.state !== 8"
                        @click="saveData('editForm')">保 存
             </el-button>
-            <span style="color:red; font-weight: bold;" v-show="user.state !== 8">你的状态：{{getUserStateName(user.state)}}，不能发起申请</span>
             <el-button @click="hideEditDialog">取 消</el-button>
+            <div style="color:red; font-weight: bold;" v-show="user.state !== 8">
+                你的状态：{{getUserStateName(user.state)}}，不能发起申请
+            </div>
         </div>
     </el-dialog>
 
@@ -289,9 +289,6 @@
                         return false;
                     let url = '/assetaudit';
                     return axios.post(url, this.editData).then(response => {
-                        if (!response || !response.data || !response.data.id) {
-                            return alert('保存失败');
-                        }
                         alert('保存成功');
                         this.hideEditDialog();
                         this.loadAudites();

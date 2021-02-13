@@ -59,7 +59,6 @@
         <el-form :model="editData" :rules="rulesEdit" ref="editForm">
             <el-form-item label="退库原因" label-width="200px" prop="subtype" style="text-align: left;">
                 <el-select v-model="editData.subtype" filterable placeholder="请选择退库原因">
-                    <el-option label="请选择退库原因" value=""></el-option>
                     <el-option
                             v-for="item in returnTypeList"
                             :label="item.description"
@@ -75,7 +74,6 @@
             <el-form-item label="退库资产" label-width="200px" prop="assetCodes" style="text-align: left">
                 <el-select v-model="editData.assetCodes" multiple filterable placeholder="请选择要退库的资产"
                            style="width:100%">
-                    <el-option label="请选择要退库的资产" value=""></el-option>
                     <el-option
                             v-for="item in myAssetList"
                             :label="item.code + ':' + item.assetName"
@@ -89,8 +87,10 @@
                        :disabled="user.state !== 8"
                        @click="saveData('editForm')">提 交
             </el-button>
-            <span style="color:red; font-weight: bold;" v-show="user.state !== 8">你的状态：{{getUserStateName(user.state)}}，不能发起申请</span>
             <el-button @click="hideEditDialog">取 消</el-button>
+            <div style="color:red; font-weight: bold;" v-show="user.state !== 8">
+                你的状态：{{getUserStateName(user.state)}}，不能发起申请
+            </div>
         </div>
     </el-dialog>
 

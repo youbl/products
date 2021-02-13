@@ -23,9 +23,14 @@ public class AssetauditController {
         return assetauditService.findAuditByType(details.getAccount(), auditType);
     }
 
+    @GetMapping("/assetaudits/admin/{auditType}")
+    public List<Assetaudit> findForAdmin(@PathVariable String auditType, AuthDetails details) {
+        return assetauditService.findForAdmin(details.getAccount(), auditType);
+    }
+
     @GetMapping("/assetauditDetails/{auditId}")
-    public List<AssetauditDetail> findAll(@PathVariable int auditId, AuthDetails details) {
-        List<AssetauditDetail> result = assetauditService.findAllDetails(auditId, details.getAccount());
+    public List<AssetauditDetail> findAll(@PathVariable int auditId) {
+        List<AssetauditDetail> result = assetauditService.findAllDetails(auditId);
         return result;
     }
 
