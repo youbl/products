@@ -36,6 +36,7 @@
                 style="width: 100%">
             <el-table-column prop="id" label="ID" width="40" align="center"></el-table-column>
             <el-table-column prop="userName" label="申请人" width="120" align="center"></el-table-column>
+            <el-table-column prop="auditName" label="申请类别" width="120" align="center"></el-table-column>
             <el-table-column prop="typeName" label="申请原因" width="120" align="center"></el-table-column>
             <el-table-column prop="className" label="申请资产分类" width="120" align="center"></el-table-column>
             <el-table-column prop="description" label="领用说明" width="400"></el-table-column>
@@ -58,17 +59,25 @@
                 <el-input v-model="viewData.userName + '  ' + viewData.creationTime" class="noborder"
                           readonly></el-input>
             </el-form-item>
+            <el-form-item label="申请类别" label-width="200px" style="text-align: left;">
+                <el-input v-model="viewData.auditName" class="noborder" readonly></el-input>
+            </el-form-item>
             <el-form-item label="申请原因" label-width="200px" style="text-align: left;">
                 <el-input v-model="viewData.typeName" class="noborder" readonly></el-input>
             </el-form-item>
             <el-form-item label="资产分类" label-width="200px" style="text-align: left">
                 <el-input v-model="viewData.className" class="noborder" readonly></el-input>
             </el-form-item>
-            <el-form-item label="领用说明" label-width="200px" style="text-align: left">
+            <el-form-item label="申请说明" label-width="200px" style="text-align: left">
                 <el-input type="textarea" class="noborder" readonly autosize
                           v-model="viewData.description"></el-input>
             </el-form-item>
-            <el-form-item label="归还时间" label-width="200px" style="text-align: left">
+            <el-form-item label="退库资产" label-width="200px" style="text-align: left"
+                          v-show="viewData.type === 'assetReturn'">
+                <el-input v-for="item in auditData.assetCodes" v-model="item" class="noborder" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="归还时间" label-width="200px" style="text-align: left"
+                          v-show="viewData.type === 'assetGet'">
                 <el-input v-model="viewData.returnTime" class="noborder" readonly></el-input>
             </el-form-item>
             <el-form-item label="审核状态" prop="state" label-width="200px" style="text-align: left">
@@ -99,9 +108,10 @@
                 <el-input v-model="auditData.auditReason"
                           v-show="viewData.state === 0"></el-input>
             </el-form-item>
-            <el-form-item label="分配资产" :prop="auditData.state===8?'assetCodes':''" label-width="200px"
+            <el-form-item label="分配资产" :prop="(viewData.type==='assetGet' && auditData.state===8)?'assetCodes':''"
+                          label-width="200px"
                           style="text-align: left"
-                          v-show="viewData.state === 8 || auditData.state === 8">
+                          v-show="viewData.type==='assetGet' && (viewData.state === 8 || auditData.state === 8)">
                 <el-select v-model="auditData.assetCodes" multiple filterable placeholder="请选择资产" style="width:100%;"
                            :disabled="viewData.state === 8">
                     <el-option
@@ -218,6 +228,7 @@
                         item.auditName = this.getUserName(item.auditUser);
                         item.stateName = this.getStateName(item.state);
                         item.className = this.getClassName(item.classId);
+                        item.auditName = this.getAuditName(item.type);
                         item.typeName = this.getTypeName(item.type, item.subtype);
                     }
                     this.dataList = response.data;
@@ -283,6 +294,17 @@
                 }
                 return state;
             },
+            getAuditName: function (type) {
+                switch (type) {
+                    case 'assetGet':
+                        return '领用资产';
+                    case 'assetReturn':
+                        return '资产退库';
+                    case 'assetScrap':
+                        return '资产报废';
+                }
+                return type;
+            },
             getTypeName: function (type, code) {
                 for (let i = 0; i < this.configTypeList.length; i++) {
                     let item = this.configTypeList[i];
@@ -324,7 +346,7 @@
                 this.auditData.account = data.account;
                 this.auditData.state = 0;
                 this.auditData.assetCodes = [];
-                if (data.state === 8) {
+                if (data.type === 'assetReturn' || (data.type === 'assetGet' && data.state === 8)) {
                     this.loadAuditDetails(data.id);
                 }
             },

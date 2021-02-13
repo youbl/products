@@ -59,6 +59,8 @@ public class AssetauditService {
         if (dto.getAssetCodes() == null || dto.getAssetCodes().length <= 0) {
             throw new RuntimeException("退库资产列表为空");
         }
+
+        // 简单处理，每个资产生成一条审核（后续应该改成每种分类一个审核）
         for (String code : dto.getAssetCodes()) {
             Assets assets = assetsService.findByCode(code);
             if (assets == null) {
@@ -81,7 +83,7 @@ public class AssetauditService {
         }
     }
 
-    public Assetaudit save(Assetaudit item) {
+    private Assetaudit save(Assetaudit item) {
         if (item == null) {
             return null;
         }
@@ -99,27 +101,64 @@ public class AssetauditService {
         if (item.getState() != 1 && item.getState() != 8) {
             throw new RuntimeException("审核状态设置有误:" + item.getState());
         }
-        if (item.getState() == 8 && (item.getAssetCodes() == null || item.getAssetCodes().length == 0)) {
-            throw new RuntimeException("审核通过时，必须分配资产");
-        }
         Assetaudit audit = findById(item.getId(), item.getAccount(), true);
+        switch (audit.getType()) {
+            case "assetGet":
+                processAssetGetBefore(item);
+                break;
+        }
+
         audit.setState(item.getState());
         audit.setAuditUser(item.getAuditUser());
         audit.setAuditReason(item.getAuditReason());
         save(audit);
 
-        if (audit.getState() == 8) {
+        switch (audit.getType()) {
+            case "assetGet":
+                processAssetGetAfter(item);
+                break;
+            case "assetReturn":
+                processAssetReturnAfter(item);
+                break;
+        }
+    }
+
+    // 领用审核通过前
+    private void processAssetGetBefore(AssetauditDto item) {
+        if (item.getState() == 8 && (item.getAssetCodes() == null || item.getAssetCodes().length == 0)) {
+            throw new RuntimeException("审核通过时，必须分配资产");
+        }
+    }
+
+    // 领用审核通过后
+    private void processAssetGetAfter(AssetauditDto item) {
+        if (item.getState() == 8) {
             for (String code : item.getAssetCodes()) {
                 // 保存分配的资产
                 AssetauditDetail detail = AssetauditDetail.builder()
                         .code(code)
-                        .auditId(audit.getId())
+                        .auditId(item.getId())
                         .build();
                 assetauditDetailRepository.save(detail);
 
                 // 更新资产状态和归属人
-                assetsService.setAssetsUser(code, audit.getAccount());
+                assetsService.setAssetsUser(code, item.getAccount());
             }
+        }
+    }
+
+    // 退库审核通过后
+    private void processAssetReturnAfter(AssetauditDto item) {
+        if (item.getState() != 8) {
+            return;
+        }
+        List<AssetauditDetail> result = assetauditDetailRepository.findAllByAuditIdOrderById(item.getId());
+        if (result.isEmpty()) {
+            throw new RuntimeException("未找到要退库的资产");
+        }
+        for (AssetauditDetail detail : result) {
+            // 更新资产状态和归属人为空
+            assetsService.setAssetsUser(detail.getCode(), null);
         }
     }
 

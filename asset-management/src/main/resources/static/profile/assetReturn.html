@@ -96,18 +96,18 @@
 
     <el-dialog title="资产退库详情" :visible.sync="openViewDialog" style="width:1200px">
         <el-form :model="viewData">
-            <el-form-item label="申请原因" label-width="200px" style="text-align: left;">
+            <el-form-item label="退库原因" label-width="200px" style="text-align: left;">
                 <el-input v-model="viewData.typeName" class="noborder" readonly></el-input>
             </el-form-item>
             <el-form-item label="资产分类" label-width="200px" style="text-align: left">
                 <el-input v-model="viewData.className" class="noborder" readonly></el-input>
             </el-form-item>
-            <el-form-item label="领用说明" label-width="200px" style="text-align: left">
+            <el-form-item label="退库说明" label-width="200px" style="text-align: left">
                 <el-input type="textarea" class="noborder" readonly autosize
                           v-model="viewData.description"></el-input>
             </el-form-item>
-            <el-form-item label="归还时间" label-width="200px" style="text-align: left">
-                <el-input v-model="viewData.returnTime" class="noborder" readonly></el-input>
+            <el-form-item label="退库资产" label-width="200px" style="text-align: left">
+                <el-input v-for="item in assetCodes" v-model="item" class="noborder" readonly></el-input>
             </el-form-item>
             <el-form-item label="审核状态" label-width="200px" style="text-align: left">
                 <el-input v-model="viewData.stateName" class="noborder" readonly></el-input>
@@ -133,6 +133,8 @@
                 dataList: [],
                 openViewDialog: false,
                 viewData: {},
+                assetCodes: [],
+
                 classList: [],
                 myAssetList: [],
 
@@ -253,6 +255,20 @@
             viewAudit: function (idx, data) {
                 this.openViewDialog = true;
                 this.viewData = data;
+                this.loadAuditDetails(data.id);
+            },
+            loadAuditDetails: function (id) {
+                this.assetCodes = [];
+                let url = '/assetauditDetails/' + id;
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    for (let i = 0, j = response.data.length; i < j; i++) {
+                        let item = response.data[i];
+                        this.assetCodes.push(item.code + ':' + item.assetName);
+                    }
+                }).catch(error => this.ajaxError(error));
             },
             cancelAudit: function (idx, data) {
                 this.$confirm("确认要作废该申请吗?").then(() => {
@@ -295,9 +311,6 @@
                         return false;
                     let url = '/assetaudit';
                     return axios.post(url, this.editData).then(response => {
-                        if (!response || !response.data || !response.data.id) {
-                            return alert('保存失败');
-                        }
                         alert('保存成功');
                         this.hideEditDialog();
                         this.loadAudites();
