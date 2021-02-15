@@ -4,6 +4,7 @@ import beinet.cn.assetmanagement.security.BeinetSecurityAutoConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,7 +30,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = RuntimeException.class)
     public void RuntimeExceptionHandler(HttpServletResponse response, RuntimeException exp) throws IOException {
-        BeinetSecurityAutoConfiguration.outputDenyMsg(response, exp.getMessage());
+        String msg = exp == null ? "没有异常明细" : exp.getMessage();
+        if (StringUtils.isEmpty(msg)) {
+            msg = exp.getClass().getName();
+        }
+        BeinetSecurityAutoConfiguration.outputDenyMsg(response, msg);
     }
 
     @ExceptionHandler(value = Exception.class)

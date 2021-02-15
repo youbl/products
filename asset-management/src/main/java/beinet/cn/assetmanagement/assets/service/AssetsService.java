@@ -6,9 +6,11 @@ import beinet.cn.assetmanagement.assets.model.AssetsDto;
 import beinet.cn.assetmanagement.assets.repository.AssetsRepository;
 import beinet.cn.assetmanagement.user.model.Users;
 import beinet.cn.assetmanagement.user.service.UsersService;
+import beinet.cn.assetmanagement.utils.ExcelOperator;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -21,12 +23,16 @@ public class AssetsService {
     private final AssetclassService assetclassService;
     private final UsersService usersService;
 
+    private final ExcelOperator excelOperator;
+
     public AssetsService(AssetsRepository assetsRepository,
                          AssetclassService assetclassService,
-                         UsersService usersService) {
+                         UsersService usersService,
+                         ExcelOperator excelOperator) {
         this.assetsRepository = assetsRepository;
         this.assetclassService = assetclassService;
         this.usersService = usersService;
+        this.excelOperator = excelOperator;
     }
 
     public List<Assets> findAll(Integer state, String account) {
@@ -152,5 +158,15 @@ public class AssetsService {
                 String.format("%06d", assetclassService.updateAndGetAmount(item.getClassId()));
 
         return code;
+    }
+
+    public void doImport(InputStream inputStream) throws Exception {
+        List<List<String>> rows = excelOperator.readExcel(inputStream);
+        if (rows == null || rows.size() <= 1) {
+            throw new RuntimeException("数据为空，或只有标题行");
+        }
+        Assets assets = Assets.builder()
+
+                .build();
     }
 }

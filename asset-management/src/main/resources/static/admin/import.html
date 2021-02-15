@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>固定资产管理系统</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/elemeIndex.js"></script>
+    <script type="text/javascript" src="/res/qs.min.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .noborder input {
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div id="divApp" style="text-align: center;width: 98%;">
+    <el-upload
+            action="/asset/import"
+            :limit="1"
+            :file-list="fileList"
+            :before-upload="beforeUploadCheck">
+        <el-button size="small" slot="trigger" type="primary">上传要导入的数据</el-button>
+        <el-button size="small" @click="downTemplate">下载数据模板</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传xls/xlsx文件，且不超过500kb</div>
+    </el-upload>
+    <div style="width: 0px; height: 0px">
+        <iframe name="downFrm" style="width: 0px; height: 0px"></iframe>
+    </div>
+</div>
+<script type="text/javascript">
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                fileList: [],
+            }
+        },
+        created: function () {
+        },
+        computed: {},
+        methods: {
+            beforeUploadCheck: function (xlsFile) {
+                let name = xlsFile.name.toLowerCase();
+                if (!name.endsWith('.xls') && !name.endsWith('.xlsx')) {
+                    alert('只允许Excel文件');
+                    return false;
+                }
+                let isBigger2M = xlsFile.size / 1024 / 1024 >= 2;
+                if (isBigger2M) {
+                    alert('只允许2M以内大小');
+                    return false;
+                }
+                return true;
+            },
+            downTemplate: function () {
+                window.open('/template/assets.xlsx', 'downFrm'); // 直接静态文件下载
+                // window.open('/assets/template', 'downFrm'); // Controller方式下载
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (msg && msg === 'Unauthorized') {
+                        this.goLogin();
+                    } else {
+                        alert(msg ? msg : '出错了');
+                    }
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>

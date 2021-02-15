@@ -104,7 +104,7 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 .accessDeniedHandler(new BeinetHandleAccessDenied())            // 指定登录用户访问无权限url的异常处理器
                 .and()
                 .authorizeRequests()                // 开始指定请求授权
-                .antMatchers("/static/**", "/res/**", "/error/**", "/img/**").permitAll()     // res根路径及子目录请求，不限制访问
+                .antMatchers("/static/**", "/res/**", "/error/**", "/img/**", "/template/**").permitAll()     // res根路径及子目录请求，不限制访问
                 .antMatchers("/favicon.ico").permitAll()        // ico不限制访问
                 .antMatchers("/login/**").permitAll()           // login相关页面请求，不限制访问
                 .antMatchers(HttpMethod.GET, "/departments").permitAll()        // 注册页面需要获取部门列表

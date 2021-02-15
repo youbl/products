@@ -4,11 +4,17 @@ import beinet.cn.assetmanagement.assets.model.Assets;
 import beinet.cn.assetmanagement.assets.model.AssetsDto;
 import beinet.cn.assetmanagement.assets.service.AssetsService;
 import beinet.cn.assetmanagement.security.AuthDetails;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 public class AssetsController {
@@ -50,5 +56,49 @@ public class AssetsController {
     @GetMapping("/assetCode/{code}")
     public AssetsDto findByCode(@PathVariable String code) {
         return assetsService.findDtoByCode(code);
+    }
+
+    @PostMapping("/asset/import")
+    public void importAssets(@RequestParam MultipartFile file) throws Exception {
+        if (file == null || file.getSize() <= 100) {
+            throw new RuntimeException("空文件上传了");
+        }
+        String uploadFileName = file.getOriginalFilename();
+        if (StringUtils.isEmpty(uploadFileName)) {
+            throw new RuntimeException("文件名为空");
+        }
+        uploadFileName = uploadFileName.toLowerCase(Locale.ROOT);
+        if (!uploadFileName.endsWith(".xls") && !uploadFileName.endsWith(".xlsx")) {
+            throw new RuntimeException("只允许excel扩展名");
+        }
+        if (file.getSize() > 1024 * 1024 * 2) {
+            throw new RuntimeException("文件不允许超出2M");
+        }
+
+        assetsService.doImport(file.getInputStream());
+    }
+
+    /**
+     * 读取指定的模板文件内容，并提供下载
+     * 注：没必要，直接用 /template/assets.xlsx 下载就好了
+     *
+     * @param response 响应流
+     * @throws IOException 异常
+     */
+    @GetMapping("/assets/template")
+    public void getTemplate(HttpServletResponse response) throws IOException {
+        String filename = "assets.xlsx";
+        Resource resource = new ClassPathResource("static/template/" + filename);
+        byte[] buffer;
+        // this.getClass().getResourceAsStream("/template/assets.xlsx")
+        try (InputStream is = resource.getInputStream()) {
+            buffer = new byte[is.available()];
+            is.read(buffer);
+        }
+
+//        response.reset();
+//        response.setContentType("bin");
+        response.addHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+        response.getOutputStream().write(buffer);
     }
 }

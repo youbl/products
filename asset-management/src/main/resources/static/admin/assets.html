@@ -17,6 +17,10 @@
         .el-form-item {
             margin-bottom: 10px;
         }
+
+        .el-dialog__header {
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -28,9 +32,11 @@
 
     <template>
         <div style="text-align: left">
-            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增</el-button>
-            <el-button icon="el-icon-edit" @click="location.reload()">刷新</el-button>
+            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增资产</el-button>
+            <el-button type="info" icon="el-icon-upload" @click="showImport">导入资产</el-button>
+            <el-button @click="location.reload()">刷新</el-button>
         </div>
+        <br>
         <el-table
                 :data="dataList"
                 stripe
@@ -132,8 +138,12 @@
             <el-button @click="hideEditDialog">取 消</el-button>
         </div>
     </el-dialog>
-    <el-dialog title="资产二维码" :visible.sync="openQrCodeDialog" style="width: 600px;">
+    <el-dialog :title="qrCodeTitle + '二维码'" :visible.sync="openQrCodeDialog" style="width: 600px;">
         <div id="divQrCode" name="divQrCodeName" class="divQrCodeCss"></div>
+    </el-dialog>
+    <el-dialog title="资产批量导入" :visible.sync="openImportDialog">
+        <iframe :src="importUrl" width="100%" height="95%" scrolling="auto"
+                frameborder="0"></iframe>
     </el-dialog>
 </div>
 <script type="text/javascript">
@@ -171,6 +181,10 @@
 
                 openQrCodeDialog: false,   // 是否弹出二维码框
                 qrCode: null,
+                qrCodeTitle: '',
+
+                openImportDialog: false, // 弹出导入对话框
+                importUrl: '',
             }
         },
         created: function () {
@@ -268,6 +282,7 @@
             showQrCode: function (idx, data) {
                 this.openQrCodeDialog = true;
                 if (data) {
+                    this.qrCodeTitle = data.assetName;
                     // https://github.com/davidshimjs/qrcodejs
                     let qrCodeUrl = location.protocol + '//' + location.host + '/profile/asset.html?code=' + data.code;
                     if (this.qrCode === null) {
@@ -294,6 +309,10 @@
                         alert('保存成功');
                     }).catch(error => this.ajaxError(error));
                 });
+            },
+            showImport: function () {
+                this.openImportDialog = true;
+                this.importUrl = '/admin/import.html?type=1';
             },
             goLogin: function () {
                 top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
