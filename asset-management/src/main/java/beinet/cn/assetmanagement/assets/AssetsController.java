@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @RestController
 public class AssetsController {
@@ -59,7 +60,7 @@ public class AssetsController {
     }
 
     @PostMapping("/asset/import")
-    public void importAssets(@RequestParam MultipartFile file) throws Exception {
+    public List<String> importAssets(@RequestParam MultipartFile file) throws Exception {
         if (file == null || file.getSize() <= 100) {
             throw new RuntimeException("空文件上传了");
         }
@@ -75,7 +76,7 @@ public class AssetsController {
             throw new RuntimeException("文件不允许超出2M");
         }
 
-        assetsService.doImport(file.getInputStream());
+        return assetsService.doImport(file.getInputStream());
     }
 
     /**

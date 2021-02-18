@@ -21,11 +21,16 @@
             action="/asset/import"
             :limit="1"
             :file-list="fileList"
-            :before-upload="beforeUploadCheck">
+            :before-upload="beforeUploadCheck"
+            :on-success="uploadOK"
+            :show-file-list="false">
         <el-button size="small" slot="trigger" type="primary">上传要导入的数据</el-button>
         <el-button size="small" @click="downTemplate">下载数据模板</el-button>
         <div slot="tip" class="el-upload__tip">只能上传xls/xlsx文件，且不超过500kb</div>
     </el-upload>
+    <div v-show="result.length">
+        <div v-for="item in result" style="text-align: left">{{item}}</div>
+    </div>
     <div style="width: 0px; height: 0px">
         <iframe name="downFrm" style="width: 0px; height: 0px"></iframe>
     </div>
@@ -36,6 +41,7 @@
         data: function () {
             return {
                 fileList: [],
+                result: [],
             }
         },
         created: function () {
@@ -54,6 +60,13 @@
                     return false;
                 }
                 return true;
+            },
+            uploadOK: function (response, file, fileList) {
+                this.result = [];
+                if (!response || !response.length) {
+                    return alert('导入出错');
+                }
+                this.result = response;
             },
             downTemplate: function () {
                 window.open('/template/assets.xlsx', 'downFrm'); // 直接静态文件下载

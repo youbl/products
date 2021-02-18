@@ -6,15 +6,17 @@ import beinet.cn.assetmanagement.assets.model.AssetsDto;
 import beinet.cn.assetmanagement.assets.repository.AssetsRepository;
 import beinet.cn.assetmanagement.user.model.Users;
 import beinet.cn.assetmanagement.user.service.UsersService;
+import beinet.cn.assetmanagement.utils.DateTimeHelper;
 import beinet.cn.assetmanagement.utils.ExcelOperator;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +26,28 @@ public class AssetsService {
     private final UsersService usersService;
 
     private final ExcelOperator excelOperator;
+
+    private static final Map<String, String> templateMap = new HashMap<>();
+    private static final Map<String, Integer> assetStateMap = new HashMap<>();
+
+    static {
+        // 导入模板的标题，与Entity字段映射关系
+        templateMap.put("资产分类", "classId");
+        templateMap.put("资产名称", "assetName");
+        templateMap.put("资产说明", "description");
+        templateMap.put("购买时间", "buyTime");
+        templateMap.put("购买价格", "price");
+        templateMap.put("库房位置", "place");
+        templateMap.put("资产状态", "state");
+        templateMap.put("最后借用人", "account");
+        templateMap.put("最后借用时间", "accountTime");
+
+        // 状态模板
+        assetStateMap.put("库存", 0);
+        assetStateMap.put("借出", 1);
+        assetStateMap.put("故障", 2);
+        assetStateMap.put("报废", 3);
+    }
 
     public AssetsService(AssetsRepository assetsRepository,
                          AssetclassService assetclassService,
@@ -98,7 +122,7 @@ public class AssetsService {
         if (codeArr == null || codeArr.isEmpty()) {
             return new ArrayList<>();
         }
-        return findByCodeArr(codeArr.toArray(new String[codeArr.size()]));
+        return findByCodeArr(codeArr.toArray(new String[0]));
     }
 
     public List<Assets> findByCodeArr(String[] codeArr) {
@@ -150,23 +174,132 @@ public class AssetsService {
     /**
      * 8位年月日 + 4位分类 + 6位序号
      *
-     * @return
+     * @return 序列号
      */
     public String getCode(Assets item) {
-        String code = item.getBuyTime().format(DateTimeFormatter.ofPattern("yyyyMMdd")) +
+        return item.getBuyTime().format(DateTimeFormatter.ofPattern("yyyyMMdd")) +
                 String.format("%04d", item.getClassId()) +
                 String.format("%06d", assetclassService.updateAndGetAmount(item.getClassId()));
-
-        return code;
     }
 
-    public void doImport(InputStream inputStream) throws Exception {
+    @Transactional
+    public List<String> doImport(InputStream inputStream) throws Exception {
         List<List<String>> rows = excelOperator.readExcel(inputStream);
         if (rows == null || rows.size() <= 1) {
             throw new RuntimeException("数据为空，或只有标题行");
         }
-        Assets assets = Assets.builder()
 
-                .build();
+        List<String> result = new ArrayList<>();
+
+        Map<String, Integer> colMap = null;
+        int idx = 0;
+        int successNum = 0;
+        for (List<String> row : rows) {
+            idx++;
+            if (idx == 1 || colMap == null) {
+                // 第一行是标题，要用于映射
+                colMap = getColIndexMap(row);
+                continue;
+            }
+            String assetName = getItemValue(row, colMap, "assetName");
+            String className = getItemValue(row, colMap, "classId");
+            if (assetName.length() <= 0 && className.length() <= 0) {
+                continue;
+            }
+
+            // 资产名必填
+            if (assetName.length() <= 0) {
+                result.add("第" + idx + "行：资产名称必填");
+                continue;
+            }
+            int classId = getClassId(className);
+            if (classId <= 0) {
+                result.add("第" + idx + "行：资产分类不存在:" + className);
+                continue;
+            }
+            String stateName = getItemValue(row, colMap, "state");
+            int state = getState(stateName);
+            if (state < 0) {
+                result.add("第" + idx + "行：状态设置有误:" + stateName);
+                continue;
+            }
+            Assets assets = Assets.builder()
+                    .classId(classId)
+                    .assetName(assetName)
+                    .description(getItemValue(row, colMap, "description"))
+                    .buyTime(convertToTime(getItemValue(row, colMap, "buyTime")))
+                    .price(convertToInt(getItemValue(row, colMap, "price")))
+                    .place(getItemValue(row, colMap, "place"))
+                    .state(state)
+                    .account(getItemValue(row, colMap, "account"))
+                    .accountTime(convertToTime(getItemValue(row, colMap, "accountTime")))
+                    .build();
+            try {
+                save(assets);
+                successNum++;
+            } catch (Exception exp) {
+                result.add("第" + idx + "行：添加错误:" + exp.getMessage());
+            }
+        }
+        result.add(0, "成功导入条数：" + successNum);
+        return result;
+    }
+
+    // 获取字段与Excel的列的映射关系
+    private Map<String, Integer> getColIndexMap(List<String> titles) {
+        Map<String, Integer> ret = new HashMap<>();
+        for (int i = 0, j = titles.size(); i < j; i++) {
+            String title = titles.get(i);
+            // 存在重复列时，以第一次出现的列为准
+            if (ret.containsKey(title)) {
+                continue;
+            }
+            String colName = templateMap.get(title);
+            ret.put(colName, i);
+        }
+        return ret;
+    }
+
+    private String getItemValue(List<String> rowValues, Map<String, Integer> colMap, String colName) {
+        Integer idx = colMap.get(colName);
+        if (idx == null || idx < 0 || idx >= rowValues.size()) {
+            return "";
+        }
+        String ret = rowValues.get(idx);
+        if (ret == null) {
+            return "";
+        }
+        return ret.trim();
+    }
+
+    private int getClassId(String val) {
+        if (StringUtils.isEmpty(val)) {
+            return 0;
+        }
+        Assetclass assetclass = assetclassService.findByName(val);
+        return assetclass == null ? 0 : assetclass.getId();
+    }
+
+    private LocalDateTime convertToTime(String val) {
+        if (val.length() <= 0) {
+            return DateTimeHelper.MIN;
+        }
+        String dateStr = DateTimeHelper.formatExcelDate(Double.parseDouble(val));
+        return DateTimeHelper.toDateTime(dateStr);
+    }
+
+    private int convertToInt(String val) {
+        if (StringUtils.isEmpty(val)) {
+            return 0;
+        }
+        return (int) Double.parseDouble(val) * 100;
+    }
+
+    private int getState(String val) {
+        Integer ret = assetStateMap.get(val);
+        if (ret == null) {
+            return -1;
+        }
+        return ret;
     }
 }

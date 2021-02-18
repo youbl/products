@@ -29,6 +29,10 @@ public class AssetclassService {
         return assetclassRepository.findById(id).orElse(null);
     }
 
+    public Assetclass findByName(String name) {
+        return assetclassRepository.findByClassName(name);
+    }
+
     public Assetclass save(Assetclass item) {
         if (item == null) {
             return null;
