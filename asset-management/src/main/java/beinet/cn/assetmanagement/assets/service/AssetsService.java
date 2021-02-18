@@ -182,6 +182,45 @@ public class AssetsService {
                 String.format("%06d", assetclassService.updateAndGetAmount(item.getClassId()));
     }
 
+
+    public List<List<String>> getExcelData(String account) {
+        List<Assets> result = findAll(null, account);
+        List<List<String>> excelData = new ArrayList<>();
+
+        List<String> titleRow = new ArrayList<>();
+        excelData.add(titleRow);
+        // 添加标题
+        titleRow.add("资产分类");
+        titleRow.add("资产名称");
+        titleRow.add("资产说明");
+        titleRow.add("购买时间");
+        titleRow.add("购买价格");
+        titleRow.add("库房位置");
+        titleRow.add("资产状态");
+        titleRow.add("最后借用人");
+        titleRow.add("最后借用时间");
+        titleRow.add("入库时间");
+        titleRow.add("资产编号");
+
+        for (Assets assets : result) {
+            List<String> row = new ArrayList<>();
+            excelData.add(row);
+
+            row.add(getClassName(assets.getClassId()));
+            row.add(assets.getAssetName());
+            row.add(assets.getDescription());
+            row.add(assets.getBuyTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            row.add(String.valueOf(assets.getPrice() / 100d));
+            row.add(assets.getPlace());
+            row.add(getStateName(assets.getState()));
+            row.add(getNameByAccount(assets.getAccount()));
+            row.add(assets.getAccountTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            row.add(assets.getCreationTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            row.add(assets.getCode());
+        }
+        return excelData;
+    }
+
     @Transactional
     public List<String> doImport(InputStream inputStream) throws Exception {
         List<List<String>> rows = excelOperator.readExcel(inputStream);
@@ -223,6 +262,16 @@ public class AssetsService {
                 result.add("第" + idx + "行：状态设置有误:" + stateName);
                 continue;
             }
+            String userName = getItemValue(row, colMap, "account");
+            String account = "";
+            if (userName.length() > 0) {
+                account = getAccountByName(userName);
+                if (StringUtils.isEmpty(account)) {
+                    result.add("第" + idx + "行：借用人姓名找不到对应的账号:" + userName);
+                    continue;
+                }
+            }
+
             Assets assets = Assets.builder()
                     .classId(classId)
                     .assetName(assetName)
@@ -231,7 +280,7 @@ public class AssetsService {
                     .price(convertToInt(getItemValue(row, colMap, "price")))
                     .place(getItemValue(row, colMap, "place"))
                     .state(state)
-                    .account(getItemValue(row, colMap, "account"))
+                    .account(account)
                     .accountTime(convertToTime(getItemValue(row, colMap, "accountTime")))
                     .build();
             try {
@@ -272,12 +321,36 @@ public class AssetsService {
         return ret.trim();
     }
 
+    private String getAccountByName(String userName) {
+        if (StringUtils.isEmpty(userName)) {
+            return "";
+        }
+        Users user = usersService.findByUserName(userName, false);
+        return user == null ? "" : user.getAccount();
+    }
+
+    private String getNameByAccount(String account) {
+        if (StringUtils.isEmpty(account)) {
+            return "";
+        }
+        Users user = usersService.findByAccount(account, false);
+        return user == null ? "" : user.getUserName();
+    }
+
     private int getClassId(String val) {
         if (StringUtils.isEmpty(val)) {
             return 0;
         }
         Assetclass assetclass = assetclassService.findByName(val);
         return assetclass == null ? 0 : assetclass.getId();
+    }
+
+    private String getClassName(int classId) {
+        if (classId <= 0) {
+            return String.valueOf(classId);
+        }
+        Assetclass assetclass = assetclassService.findById(classId);
+        return assetclass == null ? String.valueOf(classId) : assetclass.getClassName();
     }
 
     private LocalDateTime convertToTime(String val) {
@@ -301,5 +374,14 @@ public class AssetsService {
             return -1;
         }
         return ret;
+    }
+
+    private String getStateName(int val) {
+        for (Map.Entry<String, Integer> entry : assetStateMap.entrySet()) {
+            if (entry.getValue().equals(val)) {
+                return entry.getKey();
+            }
+        }
+        return String.valueOf(val);
     }
 }

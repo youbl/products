@@ -4,6 +4,7 @@ import beinet.cn.assetmanagement.assets.model.Assets;
 import beinet.cn.assetmanagement.assets.model.AssetsDto;
 import beinet.cn.assetmanagement.assets.service.AssetsService;
 import beinet.cn.assetmanagement.security.AuthDetails;
+import beinet.cn.assetmanagement.utils.ExcelOperator;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
@@ -13,21 +14,32 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 @RestController
 public class AssetsController {
     private final AssetsService assetsService;
+    private final ExcelOperator excelOperator;
 
-    public AssetsController(AssetsService assetsService) {
+    public AssetsController(AssetsService assetsService,
+                            ExcelOperator excelOperator) {
         this.assetsService = assetsService;
+        this.excelOperator = excelOperator;
     }
 
-    @GetMapping("assets")
+    @GetMapping("/assets")
     public List<Assets> findAll(@RequestParam(required = false) Integer state, AuthDetails details) {
         return assetsService.findAll(state, details.getAccount());
+    }
+
+    @GetMapping("/assets/export")
+    public void exportAll(AuthDetails details, HttpServletResponse response) throws Exception {
+        List<List<String>> result = assetsService.getExcelData(details.getAccount());
+
+        response.addHeader("Content-Disposition", "attachment; filename=\"assets.xlsx\"");
+        excelOperator.writeExcel(response.getOutputStream(), result);
     }
 
     @GetMapping("assets/mine")

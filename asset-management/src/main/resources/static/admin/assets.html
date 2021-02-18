@@ -33,6 +33,7 @@
     <template>
         <div style="text-align: left">
             <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增资产</el-button>
+            <el-button type="info" icon="el-icon-upload" @click="doExport">导出资产</el-button>
             <el-button type="info" icon="el-icon-upload" @click="showImport">导入资产</el-button>
             <el-button @click="location.reload()">刷新</el-button>
         </div>
@@ -309,6 +310,9 @@
                         alert('保存成功');
                     }).catch(error => this.ajaxError(error));
                 });
+            },
+            doExport: function () {
+                window.open('/assets/export');
             },
             showImport: function () {
                 this.openImportDialog = true;

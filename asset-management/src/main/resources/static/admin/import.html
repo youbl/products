@@ -67,6 +67,9 @@
                     return alert('导入出错');
                 }
                 this.result = response;
+                if (window.parent) {
+                    window.parent.location.reload();
+                }
             },
             downTemplate: function () {
                 window.open('/template/assets.xlsx', 'downFrm'); // 直接静态文件下载

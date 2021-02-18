@@ -11,4 +11,6 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
     List<Users> findAllByOrderByAccountAsc();
 
     Users findByAccount(String account);
+
+    Users findByUserName(String userName);
 }

@@ -48,6 +48,14 @@ public class UsersService {
         return result;
     }
 
+    public Users findByUserName(String userName, boolean hideSensitive) {
+        Users result = usersRepository.findByUserName(userName);
+        if (hideSensitive) {
+            hideSensitiveInfo(result);
+        }
+        return result;
+    }
+
     public void resetPassword(int id) {
         Users result = usersRepository.findById(id).orElseThrow(() -> new RuntimeException("指定id未找到用户:" + id));
         result.setPassword(getPwdEncoder().encode("123456"));
