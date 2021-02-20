@@ -11,6 +11,8 @@ public class TotalDto {
      */
     private int key;
 
+    private String name;
+
     /**
      * 该汇总下所有的明细项汇总
      */
