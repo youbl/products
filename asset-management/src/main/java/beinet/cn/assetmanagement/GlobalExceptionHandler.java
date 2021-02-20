@@ -34,11 +34,14 @@ public class GlobalExceptionHandler {
         if (StringUtils.isEmpty(msg)) {
             msg = exp.getClass().getName();
         }
+        log.error("RuntimeException: " + exp);
         BeinetSecurityAutoConfiguration.outputDenyMsg(response, msg);
     }
 
     @ExceptionHandler(value = Exception.class)
     public void ExceptionHandler(HttpServletResponse response, Exception exp) throws IOException {
+        log.error("OtherException: " + exp);
+
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         response.setContentType("application/json; charset=utf-8");

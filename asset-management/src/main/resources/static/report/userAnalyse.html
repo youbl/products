@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>固定资产管理系统</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/elemeIndex.js"></script>
+    <script type="text/javascript" src="/res/qs.min.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .noborder input {
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div id="divApp" style="text-align: center;width: 98%;">
+    <h1 style="text-align: center">
+        用户分析报表
+    </h1>
+
+    <template>
+        <div style="text-align: left">
+            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增</el-button>
+            <el-button icon="el-icon-edit" @click="location.reload()">刷新</el-button>
+        </div>
+        <el-table
+                :data="dataList"
+                stripe
+                border
+                style="width: 100%">
+            <el-table-column v-for="(value, key, index) in dataList[0]"
+                             :prop="key"
+                             :label="dataAtt[key].title"
+                             :width="dataAtt[key].width"
+                             v-if="dataAtt[key].show">
+            </el-table-column>
+            <el-table-column label="">
+                <template slot-scope="scope">
+                    <el-button size="mini" type="primary" plain
+                               @click="showEdit(scope.$index, scope.row)">编辑
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+
+    <el-dialog title="分类编辑" :visible.sync="openEditDialog">
+        <el-form :model="editData" ref="editForm" style="width:500px">
+            <el-form-item label="分类名称" label-width="200px">
+                <el-input v-model="editData.className" placeholder="请输入分类名称"></el-input>
+            </el-form-item>
+            <el-form-item label="分类说明" label-width="200px">
+                <el-input v-model="editData.description" placeholder="请输入分类说明"></el-input>
+            </el-form-item>
+            <el-form-item label="分类管理员" label-width="200px" prop="department" style="text-align: left">
+                <el-select v-model="editData.admin" filterable placeholder="请选择分类管理员">
+                    <el-option
+                            v-for="item in userList"
+                            :label="item.userName"
+                            :value="item.userName">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button icon="el-icon-success" type="primary" @click="saveData('editForm')">保 存</el-button>
+            <el-button @click="hideEditDialog">取 消</el-button>
+        </div>
+    </el-dialog>
+</div>
+<script type="text/javascript">
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                user: {},
+                userList: [],
+
+                dataList: [],
+                dataAtt: {
+                    id: {width: 40, title: 'ID', show: true},
+                    className: {width: 200, title: '分类名称', show: true},
+                    description: {width: 350, title: '分类说明', show: true},
+                    creationTime: {width: 180, title: '创建时间', show: true},
+                    lastModificationTime: {width: 180, title: '更新时间', show: true},
+                    totalAmount: {width: 180, title: '总数', show: false},
+                    admin: {width: 80, title: '管理员', show: true},
+                },
+                openEditDialog: false,
+                editData: {
+                    className: '',
+                    description: '',
+                    admin: '',
+                },
+            }
+        },
+        created: function () {
+            this.getCurrentUser().then(this.loadUsers).then(this.loadClasses);
+        },
+        computed: {},
+        methods: {
+            getCurrentUser: function () {
+                let url = '/login/currentUser';
+                return axios.get(url).then(response => {
+                    this.user = response.data;
+                    if (!this.user) {
+                        return this.goLogin();
+                    }
+                }).catch(error => this.ajaxError(error));
+            },
+            loadUsers: function () {
+                let url = '/users';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return alert('没有找到用户列表');
+                    }
+                    this.userList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadClasses: function () {
+                let url = '/assetClasses';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    this.dataList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            showEdit: function (idx, data) {
+                this.openEditDialog = true;
+                if (!data) {
+                    data = {};
+                }
+                Vue.set(this, 'editData', data);
+            },
+            hideEditDialog: function () {
+                this.openEditDialog = false;
+                this.editData = {};
+            },
+            saveData: function (form) {
+                this.$refs[form].validate(valid => {
+                    if (!valid)
+                        return false;
+                    let url = '/assetClass';
+                    return axios.post(url, this.editData).then(response => {
+                        if (!response || !response.data || !response.data.id) {
+                            return alert('保存失败');
+                        }
+                        this.hideEditDialog();
+                        this.loadClasses();
+                        alert('保存成功');
+                    }).catch(error => this.ajaxError(error));
+                });
+            },
+            goLogin: function () {
+                top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (msg && msg === 'Unauthorized') {
+                        this.goLogin();
+                    } else {
+                        alert(msg ? msg : '出错了');
+                    }
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>固定资产管理系统</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/elemeIndex.js"></script>
+    <script type="text/javascript" src="/res/qs.min.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .noborder input {
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div id="divApp" style="text-align: center;width: 98%;">
+    <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+        <el-tab-pane :label="labelName" name="assetState">
+            <div v-for="item in dataList" style="text-align: left">
+                <div style="text-align: left">
+                    <span style="display: inline-block; width: 200px; font-weight: bold">{{item.name}}</span>
+                    <span style="display: inline-block; width: 200px; font-weight: bold">{{item.num}}</span>
+                </div>
+                <div v-for="subItem in item.details" style="text-align: left">
+                    <div style="text-align: left">
+                        <span style="display: inline-block; width: 200px;">- {{subItem.name}}</span>
+                        <span style="display: inline-block; width: 200px;">{{subItem.num}}</span>
+                    </div>
+                </div>
+                <hr>
+            </div>
+        </el-tab-pane>
+    </el-tabs>
+</div>
+<script type="text/javascript">
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                labelName: '',
+                classList: [],
+                departList: [],
+                stateList: [
+                    '库存',
+                    '借出',
+                    '故障',
+                    '报废',
+                ],
+
+                type: '',
+                activeName: 'assetState',
+                dataList: [],
+            }
+        },
+        created: function () {
+            this.type = getQueryString('type');
+            this.loadClasses().then(this.loadDepartments).then(this.loadStateReport);
+            //this.getCurrentUser().then(this.loadUsers).then();
+            switch (this.type) {
+                case 'state':
+                    this.labelName = '资产状态统计';
+                    break;
+                case 'class':
+                    this.labelName = '资产分类统计';
+                    break;
+                case 'classGet':
+                    this.labelName = '领用分类统计';
+                    break;
+                case 'depart':
+                    this.labelName = '领用部门统计';
+                    break;
+            }
+        },
+        computed: {},
+        methods: {
+            loadClasses: function () {
+                let url = '/assetClasses';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return alert('未配置资产分类');
+                    }
+                    this.classList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            loadDepartments: function () {
+                let url = '/departments';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return alert('没有找到部门列表');
+                    }
+                    this.departList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            handleClick: function (tab, event) {
+            },
+            loadStateReport: function () {
+                let url = '/report/total?type=' + this.type;
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    for (let i = 0, j = response.data.length; i < j; i++) {
+                        let item = response.data[i];
+                        this.setItemName(item, this.type);
+
+                        for (let k = 0, m = item.details.length; k < m; k++) {
+                            let subItem = item.details[k];
+                            this.setSubItemName(subItem, this.type);
+                        }
+                    }
+                    this.dataList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            setItemName: function (item, type) {
+                switch (type) {
+                    case 'state':
+                        item.name = this.getAssetStateName(item.key);
+                        break;
+                    case 'class':
+                    case 'classGet':
+                        item.name = this.getClassName(item.key);
+                        break;
+                    case 'depart':
+                        item.name = this.getDepartName(item.key);
+                        break;
+                }
+            },
+            setSubItemName: function (item, type) {
+                switch (type) {
+                    case 'state':
+                    case 'depart':
+                        item.name = this.getClassName(item.key);
+                        break;
+                    case 'class':
+                        item.name = this.getAssetStateName(item.key);
+                        break;
+                    case 'classGet':
+                        item.name = this.getDepartName(item.key);
+                        break;
+                }
+            },
+            getClassName: function (classId) {
+                for (let i = 0, j = this.classList.length; i < j; i++) {
+                    let item = this.classList[i];
+                    if (item.id === classId) {
+                        return item.className;
+                    }
+                }
+                return classId.toString();
+            },
+            getDepartName: function (depId) {
+                for (let i = 0, j = this.departList.length; i < j; i++) {
+                    let item = this.departList[i];
+                    if (item.id === depId) {
+                        return item.departmentName;
+                    }
+                }
+                return depId.toString();
+            },
+            getAssetStateName: function (state) {
+                return this.stateList[state];
+            },
+            goLogin: function () {
+                top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (msg && msg === 'Unauthorized') {
+                        this.goLogin();
+                    } else {
+                        alert(msg ? msg : '出错了');
+                    }
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+
+    /**
+     * 获取url里的变量值
+     * @param {string} name 变量名
+     * @return {string} 变量值
+     */
+    function getQueryString(name) {
+        if (typeof (name) !== 'string') {
+            return '';
+        }
+        name = name.trim();
+        if (name.length === 0) {
+            return '';
+        }
+        let localSearch = location.search.toLocaleLowerCase();
+        name = name.toLowerCase() + '=';
+        let tmpName = '?' + name;
+        let idx = localSearch.indexOf(tmpName);
+        if (idx < 0) {
+            tmpName = '&' + name;
+            idx = localSearch.indexOf(tmpName);
+            if (idx < 0) {
+                return '';
+            }
+        }
+        name = tmpName;
+        let tmp = location.search.substr(idx + name.length);
+        idx = tmp.indexOf('&');
+        if (idx === 0)
+            return '';
+        let ret;
+        if (idx < 0) {
+            ret = tmp;
+        } else {
+            ret = tmp.substr(0, idx);
+        }
+        return decodeURIComponent(ret.trim());
+    }
+</script>
+</body>
+</html>

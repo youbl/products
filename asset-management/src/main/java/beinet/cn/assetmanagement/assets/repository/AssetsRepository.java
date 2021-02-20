@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface AssetsRepository extends JpaRepository<Assets, Integer> {
@@ -26,4 +27,17 @@ public interface AssetsRepository extends JpaRepository<Assets, Integer> {
     Assets findByCode(String code);
 
     List<Assets> findAllByCodeInOrderByClassIdAscAssetNameAsc(String[] codes);
+
+    @Query(value = "SELECT a.state, a.classId, COUNT(1) num " +
+            "FROM assets a " +
+            "GROUP BY a.state, a.classId",
+            nativeQuery = true)
+    List<Map<String, Object>> totalByStateAndClass();
+
+    @Query(value = "SELECT b.department, a.classId, COUNT(1) num " +
+            "FROM assets a " +
+            "INNER JOIN users b ON a.state=1 AND a.account=b.account " +
+            "GROUP BY b.department, a.classId",
+            nativeQuery = true)
+    List<Map<String, Object>> totalByDepartment();
 }

@@ -30,7 +30,7 @@
 <div id="divApp" style="text-align: center;">
     <el-container style="height: 100%; border: 1px solid #eee">
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-            <el-menu :default-openeds="['1', '2', '3']">
+            <el-menu :default-openeds="['1', '2', '3', '4']">
                 <el-submenu index="1">
                     <template slot="title"><i class="el-icon-menu"></i>账户相关</template>
                     <el-menu-item-group>
@@ -58,6 +58,17 @@
                         <el-menu-item index="3-4" @click.native="switchTab(34)" v-if="isAdmin || classId > 0">资产管理
                         </el-menu-item>
                         <el-menu-item index="3-5" @click.native="switchTab(35)" v-if="isAdmin">配置维护</el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+                <el-submenu index="4" v-if="isAdmin || classId > 0">
+                    <template slot="title"><i class="el-icon-setting"></i>统计分析</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="4-1" @click.native="switchTab(41)">资产分类统计</el-menu-item>
+                        <el-menu-item index="4-2" @click.native="switchTab(42)">资产状态统计</el-menu-item>
+                        <el-menu-item index="4-3" @click.native="switchTab(43)">领用分类统计</el-menu-item>
+                        <el-menu-item index="4-4" @click.native="switchTab(44)">领用部门统计</el-menu-item>
+                        <el-menu-item index="4-5" @click.native="switchTab(45)">资产分析</el-menu-item>
+                        <el-menu-item index="4-6" @click.native="switchTab(46)">用户分析</el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
             </el-menu>
@@ -104,6 +115,12 @@
                     33: '/admin/assetsClass.html',  // 资产分类管理页面
                     34: '/admin/assets.html',       // 资产管理页面
                     35: '/admin/configs.html',      // 配置管理页面
+                    41: '/report/assetsReport.html?type=class',// 资产分类统计报表
+                    42: '/report/assetsReport.html?type=state',// 资产状态统计报表
+                    43: '/report/assetsReport.html?type=classGet',// 领用分类统计报表
+                    44: '/report/assetsReport.html?type=depart',// 领用部门统计报表
+                    45: '/report/assetAnalyse.html',// 资产分析报表
+                    46: '/report/userAnalyse.html', // 用户分析报表
                 },
             }
         },
