@@ -30,7 +30,7 @@
 <div id="divApp" style="text-align: center;">
     <el-container style="height: 100%; border: 1px solid #eee">
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-            <el-menu :default-openeds="['1', '2', '3', '4']">
+            <el-menu :default-openeds="defaultOpenArr">
                 <el-submenu index="1">
                     <template slot="title"><i class="el-icon-menu"></i>账户相关</template>
                     <el-menu-item-group>
@@ -100,6 +100,7 @@
         el: '#divApp',
         data: function () {
             return {
+                defaultOpenArr: ['1', '2', '3', '4'],
                 showTab: 11,
                 user: {},
                 classId: 0,
