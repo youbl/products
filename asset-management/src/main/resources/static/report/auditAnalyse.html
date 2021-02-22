@@ -18,7 +18,7 @@
 <body>
 <div id="divApp" style="text-align: center;width: 98%;">
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
-        <el-tab-pane label="用户资产数量排行" name="userNum">
+        <el-tab-pane label="资产审核原因排行" name="auditNum">
             <el-table
                     :data="dataList"
                     stripe
@@ -33,13 +33,15 @@
                 <el-table-column label="">
                     <template slot-scope="scope">
                         <el-popover
-                                placement="bottom-start"
-                                width="650"
+                                placement="bottom"
+                                width="1200"
                                 trigger="click">
                             <el-table :data="details">
-                                <el-table-column width="190" property="assetName" label="资产名称"></el-table-column>
+                                <el-table-column width="90" property="userName" label="申请人"></el-table-column>
+                                <el-table-column width="180" property="creationTime" label="申请时间"></el-table-column>
+                                <el-table-column width="350" property="description" label="申请说明"></el-table-column>
+                                <el-table-column width="180" property="assetName" label="资产名称"></el-table-column>
                                 <el-table-column width="170" property="code" label="资产编码"></el-table-column>
-                                <el-table-column width="180" property="accountTime" label="借用时间"></el-table-column>
                                 <el-table-column width="80" label="">
                                     <template slot-scope="scope">
                                         <el-button size="mini" type="primary"
@@ -65,13 +67,15 @@
     const vueApp = new Vue({
         el: '#divApp',
         data: function () {
+            let name = 'auditNum';
             return {
-                activeName: 'userNum',
+                defaultName: name,
+                activeName: name,
                 dataList: [],
                 dataAtt: {
-                    key: {width: 80, title: '账号', show: true},
-                    name: {width: 120, title: '姓名', show: true},
-                    num: {width: 80, title: '资产数量', show: true},
+                    key: {width: 180, title: '编码', show: true},
+                    name: {width: 160, title: '说明', show: true},
+                    num: {width: 80, title: '审核数量', show: true},
                     details: {width: 80, title: '详情', show: false},
                 },
 
@@ -86,16 +90,16 @@
         methods: {
             handleClick: function (tab, event) {
                 if (tab.label === '导出') {
-                    let url = '/report/userNum?export=1';
+                    let url = '/report/auditNum?export=1';
                     window.open(url);
                     // this.doExport();
                 }
                 setTimeout(() => {
-                    this.activeName = 'userNum';
+                    this.activeName = this.defaultName;
                 }, 100);
             },
             loadReport: function () {
-                let url = '/report/userNum';
+                let url = '/report/auditNum';
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;
@@ -108,7 +112,10 @@
                     this.details = row.details;
                 } else {
                     this.details = [];
-                    let url = '/assets/user/' + row.key;
+                    let idx = row.key.indexOf('-');
+                    let type = row.key.substring(0, idx);
+                    let subtype = row.key.substring(idx + 1);
+                    let url = '/report/audit/' + type + '/' + subtype;
                     axios.get(url).then(response => {
                         this.details = response.data;
                         row.details = this.details;

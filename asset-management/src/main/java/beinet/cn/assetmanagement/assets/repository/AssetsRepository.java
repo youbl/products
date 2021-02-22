@@ -40,4 +40,23 @@ public interface AssetsRepository extends JpaRepository<Assets, Integer> {
             "GROUP BY b.department, a.classId",
             nativeQuery = true)
     List<Map<String, Object>> totalByDepartment();
+
+    @Query(value = "SELECT a.account, b.userName, COUNT(1) cnt " +
+            "FROM assets a " +
+            "INNER JOIN users b ON a.account=b.account " +
+            "WHERE a.state=1 " +
+            "GROUP BY a.account " +
+            "ORDER BY cnt DESC, account " +
+            "LIMIT ?",
+            nativeQuery = true)
+    List<Map<String, Object>> totalByUserNum(int limit);
+
+    @Query(value = "SELECT b.type, b.subtype, c.description, COUNT(1) cnt FROM assetauditdetail a " +
+            "INNER JOIN assetaudit b ON a.auditId=b.id " +
+            "INNER JOIN configs c ON c.type=b.type AND c.code=b.subtype " +
+            "GROUP BY b.type, b.subtype " +
+            "ORDER BY cnt DESC, type, subtype " +
+            "LIMIT ?",
+            nativeQuery = true)
+    List<Map<String, Object>> totalByAuditAssetNum(int limit);
 }

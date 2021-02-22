@@ -68,4 +68,5 @@ public class AssetauditController {
         item.setAuditUser(details.getAccount());
         assetauditService.doAudit(item);
     }
+
 }

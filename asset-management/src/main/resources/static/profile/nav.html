@@ -67,8 +67,8 @@
                         <el-menu-item index="4-2" @click.native="switchTab(42)">资产状态统计</el-menu-item>
                         <el-menu-item index="4-3" @click.native="switchTab(43)">领用分类统计</el-menu-item>
                         <el-menu-item index="4-4" @click.native="switchTab(44)">领用部门统计</el-menu-item>
-                        <el-menu-item index="4-5" @click.native="switchTab(45)">资产分析</el-menu-item>
-                        <el-menu-item index="4-6" @click.native="switchTab(46)">用户分析</el-menu-item>
+                        <el-menu-item index="4-5" @click.native="switchTab(45)">借还原因分析</el-menu-item>
+                        <el-menu-item index="4-6" @click.native="switchTab(46)">用户领用分析</el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
             </el-menu>
@@ -120,8 +120,8 @@
                     42: '/report/assetsReport.html?type=state',// 资产状态统计报表
                     43: '/report/assetsReport.html?type=classGet',// 领用分类统计报表
                     44: '/report/assetsReport.html?type=depart',// 领用部门统计报表
-                    45: '/report/assetAnalyse.html',// 资产分析报表
-                    46: '/report/userAnalyse.html', // 用户分析报表
+                    45: '/report/auditAnalyse.html',// 借还原因分析报表
+                    46: '/report/userAnalyse.html', // 用户资产分析报表
                 },
             }
         },

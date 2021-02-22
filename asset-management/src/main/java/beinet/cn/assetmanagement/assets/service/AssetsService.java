@@ -77,7 +77,7 @@ public class AssetsService {
         return result;
     }
 
-    public List<Assets> findByCurrentUser(String account) {
+    public List<Assets> findByUser(String account) {
         Users user = usersService.findByAccount(account, true);
         if (user == null) {
             return new ArrayList<>();

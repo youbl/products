@@ -9,7 +9,7 @@ public class TotalDto {
     /**
      * 分类id或state或部门id
      */
-    private int key;
+    private Object key;
 
     private String name;
 

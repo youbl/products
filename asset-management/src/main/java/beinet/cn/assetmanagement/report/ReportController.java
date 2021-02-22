@@ -1,9 +1,12 @@
 package beinet.cn.assetmanagement.report;
 
+import beinet.cn.assetmanagement.assets.model.Assetaudit;
+import beinet.cn.assetmanagement.report.dto.AuditDetailDto;
 import beinet.cn.assetmanagement.report.dto.TotalDto;
 import beinet.cn.assetmanagement.utils.EasyExcelOperator;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,34 +42,65 @@ public class ReportController {
             return new ArrayList<>();
         }
         if (StringUtils.hasText(export)) {
-            doExport(response, ret, type);
+            doExportAssetsTotal(response, ret, type);
         }
         return ret;
     }
 
-    private void doExport(HttpServletResponse response, Collection<TotalDto> ret, String type) throws Exception {
+    @GetMapping("/report/userNum")
+    public Collection<TotalDto> userNum(@RequestParam(required = false) String export,
+                                        HttpServletResponse response) throws Exception {
+        Collection<TotalDto> ret = reportService.userNumRank();
+        if (StringUtils.hasText(export)) {
+            doExportAssetsTotal(response, ret, "userRank");
+        }
+        return ret;
+    }
+
+    @GetMapping("/report/auditNum")
+    public Collection<TotalDto> auditNum(@RequestParam(required = false) String export,
+                                         HttpServletResponse response) throws Exception {
+        Collection<TotalDto> ret = reportService.auditNumRank();
+        if (StringUtils.hasText(export)) {
+            doExportAssetsTotal(response, ret, "auditRank");
+        }
+        return ret;
+    }
+
+    @GetMapping("/report/audit/{type}/{subType}")
+    public List<AuditDetailDto> findByType(@PathVariable String type, @PathVariable String subType) {
+        return reportService.findByType(type, subType);
+    }
+
+    private void doExportAssetsTotal(HttpServletResponse response, Collection<TotalDto> ret, String type) throws Exception {
         List<List<String>> result = new ArrayList<>();
         // 标题行
         List<String> titles = new ArrayList<>();
         result.add(titles);
         titles.add(getTypeName(type));
+        titles.add("名称");
         titles.add("数量");
 
         for (TotalDto dto : ret) {
             List<String> item = new ArrayList<>();
             result.add(item);
+            item.add(dto.getKey().toString());
             item.add(dto.getName());
             item.add(String.valueOf(dto.getNum()));
-
+            if (dto.getDetails() == null || dto.getDetails().isEmpty()) {
+                continue;
+            }
             for (TotalDto subDto : dto.getDetails()) {
                 List<String> subItem = new ArrayList<>();
                 result.add(subItem);
-                subItem.add("- " + subDto.getName());
+                subItem.add("- " + subDto.getKey());
+                subItem.add(subDto.getName());
                 subItem.add(String.valueOf(subDto.getNum()));
             }
             // 空行
             item = new ArrayList<>();
             result.add(item);
+            item.add(" ");
             item.add(" ");
             item.add(" ");
         }
@@ -84,6 +118,10 @@ public class ReportController {
                 return "领用分类统计";
             case "depart":
                 return "领用部门统计";
+            case "userRank":
+                return "用户资产数量排行";
+            case "auditRank":
+                return "借还理由排行";
         }
         return type;
     }

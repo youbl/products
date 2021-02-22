@@ -1,13 +1,18 @@
 package beinet.cn.assetmanagement.report;
 
+import beinet.cn.assetmanagement.assets.model.Assetaudit;
 import beinet.cn.assetmanagement.assets.model.Assetclass;
+import beinet.cn.assetmanagement.assets.repository.AssetauditRepository;
 import beinet.cn.assetmanagement.assets.repository.AssetclassRepository;
 import beinet.cn.assetmanagement.assets.repository.AssetsRepository;
+import beinet.cn.assetmanagement.report.dto.AuditDetailDto;
 import beinet.cn.assetmanagement.report.dto.TotalDto;
 import beinet.cn.assetmanagement.user.model.Department;
 import beinet.cn.assetmanagement.user.repository.DepartmentRepository;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -15,13 +20,16 @@ public class ReportService {
     private final AssetsRepository assetsRepository;
     private final AssetclassRepository assetClassRepository;
     private final DepartmentRepository departmentRepository;
+    private final AssetauditRepository assetauditRepository;
 
     public ReportService(AssetsRepository assetsRepository,
                          AssetclassRepository assetClassRepository,
-                         DepartmentRepository departmentRepository) {
+                         DepartmentRepository departmentRepository,
+                         AssetauditRepository assetauditRepository) {
         this.assetsRepository = assetsRepository;
         this.assetClassRepository = assetClassRepository;
         this.departmentRepository = departmentRepository;
+        this.assetauditRepository = assetauditRepository;
     }
 
     /**
@@ -145,6 +153,61 @@ public class ReportService {
         arrState.add("报废");
 
         return arrState.get(state);
+    }
+
+    public Collection<TotalDto> userNumRank() {
+        List<TotalDto> ret = new ArrayList<>();
+
+        List<Map<String, Object>> result = assetsRepository.totalByUserNum(10);
+        for (Map<String, Object> row : result) {
+            TotalDto dto = new TotalDto();
+            ret.add(dto);
+            dto.setKey(row.get("account").toString());
+            dto.setName(row.get("userName").toString());
+            dto.setNum(Integer.parseInt(row.get("cnt").toString()));
+        }
+        return ret;
+    }
+
+    public Collection<TotalDto> auditNumRank() {
+        List<TotalDto> ret = new ArrayList<>();
+
+        List<Map<String, Object>> result = assetsRepository.totalByAuditAssetNum(10);
+        for (Map<String, Object> row : result) {
+            TotalDto dto = new TotalDto();
+            ret.add(dto);
+            String type = row.get("type").toString();
+            String subtype = row.get("subtype").toString();
+
+            dto.setKey(type + "-" + subtype);
+            dto.setName(row.get("description").toString());
+            dto.setNum(Integer.parseInt(row.get("cnt").toString()));
+        }
+        return ret;
+    }
+
+    /**
+     * 根据类型和子类型，查找审核明细资产返回
+     *
+     * @param type    类型
+     * @param subType 子类型
+     * @return 数据
+     */
+    public List<AuditDetailDto> findByType(String type, String subType) {
+        List<Map<String, Object>> data = assetauditRepository.findDetailByType(type, subType);
+        List<AuditDetailDto> ret = new ArrayList<>();
+        for (Map<String, Object> row : data) {
+            ret.add(AuditDetailDto
+                    .builder()
+                    .account(row.get("account").toString())
+                    .userName(row.get("userName").toString())
+                    .description(row.get("description").toString())
+                    .code(row.get("code").toString())
+                    .assetName(row.get("assetName").toString())
+                    .creationTime(((Timestamp) row.get("creationTime")).toLocalDateTime())
+                    .build());
+        }
+        return ret;
     }
 
     interface NameGetter {

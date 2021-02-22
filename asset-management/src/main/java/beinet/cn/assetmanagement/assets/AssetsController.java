@@ -42,9 +42,14 @@ public class AssetsController {
         excelOperator.writeExcel(response.getOutputStream(), result);
     }
 
-    @GetMapping("assets/mine")
+    @GetMapping("/assets/mine")
     public List<Assets> findByCurrentUser(AuthDetails details) {
-        return assetsService.findByCurrentUser(details.getAccount());
+        return assetsService.findByUser(details.getAccount());
+    }
+
+    @GetMapping("/assets/user/{account}")
+    public List<Assets> findByUser(@PathVariable String account) {
+        return assetsService.findByUser(account);
     }
 
     @GetMapping("asset")
