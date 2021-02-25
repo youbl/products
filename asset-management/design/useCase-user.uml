@@ -1,0 +1,21 @@
+@startuml
+title 员工用例图
+
+actor 员工 as user
+usecase 员工注册 as register
+usecase 员工登录 as login
+usecase 个人信息 as userInfo
+usecase 修改密码 as changePwd
+usecase 我的资产 as myAssets
+usecase 资产领用 as assetGet
+usecase 资产退库 as assetReturn
+
+user --> register
+user --> login
+user --> userInfo
+user --> changePwd
+user --> myAssets
+user --> assetGet
+user --> assetReturn
+
+@enduml

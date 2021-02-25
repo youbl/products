@@ -1,0 +1,18 @@
+@startuml
+title 超级管理员用例图
+
+actor 超级管理员 as user
+usecase 部门维护 as depAdmin
+usecase 用户管理 as userAdmin
+usecase 分类管理 as classAdmin
+usecase 资产管理 as assetAdmin
+usecase 配置维护 as configAdmin
+
+user .> 分类管理员 : 包含
+user --> depAdmin
+user --> userAdmin
+user --> classAdmin
+user --> assetAdmin
+user --> configAdmin
+
+@enduml

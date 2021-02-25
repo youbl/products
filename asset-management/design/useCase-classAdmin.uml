@@ -1,0 +1,22 @@
+@startuml
+title 分类管理员用例图
+
+actor 分类管理员 as user
+usecase 资产审核 as assetAudit
+usecase 资产分类统计 as classTotal
+usecase 资产状态统计 as stateTotal
+usecase 领用分类统计 as classGetTotal
+usecase 领用部门统计 as depGetTotal
+usecase 借还原因分析 as auditReasonAnalyse
+usecase 用户领用分析 as userAnalyse
+
+user .> 普通员工 : 包含
+user --> assetAudit
+user --> classTotal
+user --> stateTotal
+user --> classGetTotal
+user --> depGetTotal
+user --> auditReasonAnalyse
+user --> userAnalyse
+
+@enduml
