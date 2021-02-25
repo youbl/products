@@ -27,9 +27,10 @@
 
     <template>
         <div style="text-align: left">
-            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增申请</el-button>
-            <el-button icon="el-icon-edit" @click="location.reload()">刷新</el-button>
+            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增领用申请</el-button>
+            <el-button icon="el-icon-refresh" @click="location.reload()">刷新</el-button>
         </div>
+        <br>
         <el-table
                 :data="dataList"
                 stripe
