@@ -43,8 +43,15 @@ public class AssetsController {
     }
 
     @GetMapping("/assets/mine")
-    public List<Assets> findByCurrentUser(AuthDetails details) {
-        return assetsService.findByUser(details.getAccount());
+    public List<Assets> findByCurrentUser(@RequestParam(required = false) String export,
+                                          AuthDetails details, HttpServletResponse response) throws Exception {
+        List<Assets> ret = assetsService.findByUser(details.getAccount());
+        if (StringUtils.hasText(export)) {
+            List<List<String>> result = assetsService.getExcelData(ret);
+            response.addHeader("Content-Disposition", "attachment; filename=\"assetsMine.xlsx\"");
+            excelOperator.writeExcel(response.getOutputStream(), result);
+        }
+        return ret;
     }
 
     @GetMapping("/assets/user/{account}")

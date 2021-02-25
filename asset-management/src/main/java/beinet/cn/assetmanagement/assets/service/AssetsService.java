@@ -185,6 +185,10 @@ public class AssetsService {
 
     public List<List<String>> getExcelData(String account) {
         List<Assets> result = findAll(null, account);
+        return getExcelData(result);
+    }
+
+    public List<List<String>> getExcelData(List<Assets> result) {
         List<List<String>> excelData = new ArrayList<>();
 
         List<String> titleRow = new ArrayList<>();

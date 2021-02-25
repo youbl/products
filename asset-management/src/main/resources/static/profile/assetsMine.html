@@ -7,6 +7,7 @@
     <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
     <script type="text/javascript" src="/res/unpkg/elemeIndex.js"></script>
     <script type="text/javascript" src="/res/qs.min.js"></script>
+    <script type="text/javascript" src="/res/qrcode.min.js"></script>
 
     <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
     <style>
@@ -27,8 +28,10 @@
 
     <template>
         <div style="text-align: left">
-            <el-button icon="el-icon-edit" @click="location.reload()">刷新</el-button>
+            <el-button type="info" icon="el-icon-download" @click="doExport">导出资产</el-button>
+            <el-button icon="el-icon-refresh" @click="location.reload()">刷新</el-button>
         </div>
+        <br>
         <el-table
                 :data="dataList"
                 stripe
@@ -50,19 +53,31 @@
                     <el-button size="mini" type="primary" plain
                                @click="showDetail(scope.$index, scope.row)">详情
                     </el-button>
-<!--                    <el-button size="mini" type="warning" plain-->
-<!--                               @click="showReturn(scope.$index, scope.row)">退库-->
-<!--                    </el-button>-->
+                    <!--                    <el-button size="mini" type="warning" plain-->
+                    <!--                               @click="showReturn(scope.$index, scope.row)">退库-->
+                    <!--                    </el-button>-->
+
+                    <el-button size="mini" type="success" plain
+                               @click="showQrCode(scope.$index, scope.row)">二维码
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
     </template>
+
+    <el-dialog :title="qrCodeTitle + '二维码'" :visible.sync="openQrCodeDialog" style="width: 600px;">
+        <div id="divQrCode" name="divQrCodeName" class="divQrCodeCss"></div>
+    </el-dialog>
 </div>
 <script type="text/javascript">
     const vueApp = new Vue({
         el: '#divApp',
         data: function () {
             return {
+                openQrCodeDialog: false,
+                qrCodeTitle: '',
+                qrCode: null,
+
                 user: {},
                 classList: [],
                 dataList: [],
@@ -90,6 +105,7 @@
             }
         },
         created: function () {
+            this.showQrCode(0, null);
             this.getCurrentUser()
                 .then(this.loadClasses)
                 .then(this.loadAssets);
@@ -145,6 +161,29 @@
                 window.open('/profile/asset.html?code=' + data.code);
             },
             showReturn: function (idx, data) {
+            },
+            doExport: function () {
+                let url = '/assets/mine?export=1';
+                window.open(url);
+            },
+
+            showQrCode: function (idx, data) {
+                this.openQrCodeDialog = true;
+                if (data) {
+                    this.qrCodeTitle = data.assetName;
+                    // https://github.com/davidshimjs/qrcodejs
+                    let qrCodeUrl = location.protocol + '//' + location.host + '/profile/asset.html?code=' + data.code;
+                    if (this.qrCode === null) {
+                        this.qrCode = new QRCode(document.getElementById('divQrCode'), qrCodeUrl);
+                    } else {
+                        this.qrCode.clear(); // clear the code.
+                        this.qrCode.makeCode(qrCodeUrl); // make another code.
+                    }
+                } else {
+                    this.$nextTick(function () {
+                        this.openQrCodeDialog = false; // 让div渲染一下后再关闭
+                    });
+                }
             },
             goLogin: function () {
                 top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);

@@ -33,9 +33,9 @@
     <template>
         <div style="text-align: left">
             <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增资产</el-button>
-            <el-button type="info" icon="el-icon-upload" @click="doExport">导出资产</el-button>
+            <el-button type="info" icon="el-icon-download" @click="doExport">导出资产</el-button>
             <el-button type="info" icon="el-icon-upload" @click="showImport">导入资产</el-button>
-            <el-button @click="location.reload()">刷新</el-button>
+            <el-button icon="el-icon-refresh" @click="location.reload()">刷新</el-button>
         </div>
         <br>
         <el-table
@@ -195,13 +195,6 @@
                 .then(this.loadAssets);
 
             this.showQrCode(0, null);
-            this.$nextTick(function () {
-                this.openQrCodeDialog = false; // 让div渲染一下后再关闭
-                // let div = document.getElementById("divQrCode");
-                // let divName = document.getElementsByName('divQrCodeName');
-                // let divCss = document.getElementsByClassName('divQrCodeCss');
-                // alert(div + ':' + divName.length + ':' + divCss.length)
-            });
         },
         computed: {
             isAdmin: function () {
@@ -292,6 +285,14 @@
                         this.qrCode.clear(); // clear the code.
                         this.qrCode.makeCode(qrCodeUrl); // make another code.
                     }
+                } else {
+                    this.$nextTick(function () {
+                        this.openQrCodeDialog = false; // 让div渲染一下后再关闭
+                        // let div = document.getElementById("divQrCode");
+                        // let divName = document.getElementsByName('divQrCodeName');
+                        // let divCss = document.getElementsByClassName('divQrCodeCss');
+                        // alert(div + ':' + divName.length + ':' + divCss.length)
+                    });
                 }
             },
             saveData: function (form) {
