@@ -18,7 +18,7 @@ public class OperatelogDto {
 
     private String description;
 
-    private int operator;
+    private String operator;
 
     private java.time.LocalDateTime creationTime;
 

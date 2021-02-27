@@ -1,0 +1,26 @@
+@startuml
+title 员工注册流程
+start
+:输入账号/密码/工号/姓名/部门/图形验证码;
+:注册;
+if(图形验证码匹配)then(no)
+    end
+else(yes)
+endif
+
+if(用户名or工号存在)then(yes)
+    end
+else(no)
+endif
+
+:MD5(密码);
+note right
+  不允许保存原始密码，避免泄露。
+  MD5要进行加盐，提升安全性
+end note
+:设置角色为普通员工;
+:设置状态为待审核;
+:保存入库;
+
+stop
+@enduml

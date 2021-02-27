@@ -24,7 +24,7 @@ CREATE TABLE `assetaudit` (
   `classId` int(11) NOT NULL DEFAULT '0' COMMENT '资产分类id',
   `account` varchar(50) NOT NULL DEFAULT '' COMMENT '申请人',
   `returnTime` datetime NOT NULL COMMENT '归还时间',
-  `state` int(11) NOT NULL DEFAULT '0' COMMENT '审核状态',
+  `state` int(11) NOT NULL DEFAULT '0' COMMENT '审核状态,0库存,1借出,2故障,3报废',
   `auditUser` varchar(20) NOT NULL DEFAULT '' COMMENT '审核人',
   `auditReason` varchar(100) NOT NULL DEFAULT '' COMMENT '审核意见',
   `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -125,7 +125,7 @@ CREATE TABLE `operatelog` (
   `type` varchar(20) NOT NULL DEFAULT '' COMMENT '日志类型',
   `subType` varchar(20) NOT NULL DEFAULT '' COMMENT '子类型',
   `description` varchar(500) NOT NULL DEFAULT '' COMMENT '说明',
-  `operator` int(11) NOT NULL DEFAULT '0' COMMENT '操作人',
+  `operator` varchar(50) NOT NULL DEFAULT '' COMMENT '操作人',
   `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `idx_code` (`code`),
@@ -150,6 +150,7 @@ CREATE TABLE `users` (
   `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `LastModificationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `unq_code` (`code`)
   UNIQUE KEY `unq_account` (`account`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='员工信息表';
 

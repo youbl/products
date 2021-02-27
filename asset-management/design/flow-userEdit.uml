@@ -1,0 +1,19 @@
+@startuml
+title 员工信息编辑流程
+start
+:输入工号/姓名/部门;
+:点击保存;
+if(当前已登录)then(no)
+    end
+else(yes)
+endif
+:根据登录名查找用户;
+if(用户存在)then(no)
+    end
+else(yes)
+endif
+:设置状态为待审核;
+:保存入库;
+
+stop
+@enduml

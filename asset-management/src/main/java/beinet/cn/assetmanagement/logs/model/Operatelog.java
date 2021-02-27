@@ -41,8 +41,8 @@ public class Operatelog {
     @Column(columnDefinition = "varchar(500) COMMENT '说明'")
     private String description;
 
-    @Column(columnDefinition = "int(11) COMMENT '操作人'")
-    private int operator;
+    @Column(columnDefinition = "varchar(50) COMMENT '操作人'")
+    private String operator;
 
     @Column(columnDefinition = "datetime COMMENT '创建时间'", insertable = false, updatable = false)
     private java.time.LocalDateTime creationTime;

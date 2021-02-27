@@ -1,0 +1,32 @@
+@startuml
+title 员工登录流程
+start
+:输入用户名/密码/图形验证码;
+:登录;
+if(图形验证码匹配)then(no)
+    end
+else(yes)
+endif
+
+if(用户名存在)then(no)
+    end
+else(yes)
+endif
+
+if(用户名对应的密码 == MD5(输入的密码))then(no)
+    end
+else(yes)
+endif
+
+if(是超级管理员)then(yes)
+    :显示超级管理员菜单;
+else
+    if(是分类管理员)then(yes)
+        :显示分类管理员菜单;
+    else
+        :显示普通员工菜单;
+    endif
+endif
+
+stop
+@enduml
