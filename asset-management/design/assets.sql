@@ -22,16 +22,31 @@ CREATE TABLE `assetaudit` (
   `subtype` varchar(20) NOT NULL DEFAULT '' COMMENT '审核子类型',
   `description` varchar(100) NOT NULL DEFAULT '' COMMENT '申请说明',
   `classId` int(11) NOT NULL DEFAULT '0' COMMENT '资产分类id',
-  `assetCode` varchar(20) NOT NULL DEFAULT '' COMMENT '资产编号',
   `account` varchar(50) NOT NULL DEFAULT '' COMMENT '申请人',
+  `returnTime` datetime NOT NULL COMMENT '归还时间',
   `state` int(11) NOT NULL DEFAULT '0' COMMENT '审核状态',
+  `auditUser` varchar(20) NOT NULL DEFAULT '' COMMENT '审核人',
   `auditReason` varchar(100) NOT NULL DEFAULT '' COMMENT '审核意见',
   `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `LastModificationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
   PRIMARY KEY (`id`),
-  KEY `idx_code` (`assetCode`),
+  KEY `idx_code` (`auditUser`),
   KEY `idx_account` (`account`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资产审核表';
+
+/*Table structure for table `assetauditdetail` */
+
+DROP TABLE IF EXISTS `assetauditdetail`;
+
+CREATE TABLE `assetauditdetail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id',
+  `auditId` int(11) NOT NULL DEFAULT '0' COMMENT '审核表主键',
+  `code` varchar(20) NOT NULL DEFAULT '' COMMENT '资产编码',
+  `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_code` (`code`,`auditId`),
+  KEY `idx_auditId` (`auditId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资产审核分配表';
 
 /*Table structure for table `assetclass` */
 
@@ -64,6 +79,7 @@ CREATE TABLE `assets` (
   `state` int(11) NOT NULL DEFAULT '0' COMMENT '状态 0可用，1借出，2故障，3报废',
   `place` varchar(50) NOT NULL DEFAULT '' COMMENT '库存位置编号',
   `account` varchar(50) NOT NULL DEFAULT '' COMMENT '保管人',
+  `accountTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '最后借用时间',
   `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `LastModificationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
   PRIMARY KEY (`id`),
