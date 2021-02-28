@@ -31,12 +31,32 @@
     </h1>
 
     <template>
-        <div style="text-align: left">
-            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增资产</el-button>
-            <el-button type="info" icon="el-icon-download" @click="doExport">导出资产</el-button>
-            <el-button type="info" icon="el-icon-upload" @click="showImport">导入资产</el-button>
-            <el-button icon="el-icon-refresh" @click="location.reload()">刷新</el-button>
-        </div>
+        <el-form :model="searchCond" :inline="true" class="demo-form-inline" style="text-align: left">
+            <el-form-item label="资产编号">
+                <el-input v-model="searchCond.code" placeholder="请输入资产编号"></el-input>
+            </el-form-item>
+            <el-form-item label="资产名称">
+                <el-input v-model="searchCond.assetName" placeholder="请输入资产名称"></el-input>
+            </el-form-item>
+            <el-form-item label="资产状态">
+                <el-select v-model="searchCond.state" multiple placeholder="请选择资产状态">
+                    <el-option
+                            v-for="(value, key) in stateList"
+                            :key="key"
+                            :label="value"
+                            :value="key">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <br>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" @click="loadAssets">查 询</el-button>
+                <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增资产</el-button>
+                <el-button type="info" icon="el-icon-download" @click="doExport">导出资产</el-button>
+                <el-button type="info" icon="el-icon-upload" @click="showImport">导入资产</el-button>
+                <el-button icon="el-icon-refresh" @click="location.reload()">刷新</el-button>
+            </el-form-item>
+        </el-form>
         <br>
         <el-table
                 :data="dataList"
@@ -157,6 +177,12 @@
                 userArr: {},
                 classList: [],
                 dataList: [],
+                searchCond: {
+                    code: '',
+                    assetName: '',
+                    state: [],
+                },
+
                 stateList: [
                     '库存',
                     '借出',
@@ -260,7 +286,9 @@
                 if (this.classList.length <= 0) {
                     return;
                 }
-                let url = '/assets';
+                // repeat是 state=0&state=2  brackets是 state[]=0&state[]=2  默认是 state[0]=0&state[1]=2
+                let para = Qs.stringify(this.searchCond, {arrayFormat: 'repeat'});
+                let url = '/assets?' + para;
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;

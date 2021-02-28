@@ -2,6 +2,7 @@ package beinet.cn.assetmanagement.assets;
 
 import beinet.cn.assetmanagement.assets.model.Assets;
 import beinet.cn.assetmanagement.assets.model.AssetsDto;
+import beinet.cn.assetmanagement.assets.model.AssetsSearchDto;
 import beinet.cn.assetmanagement.assets.service.AssetsService;
 import beinet.cn.assetmanagement.security.AuthDetails;
 import beinet.cn.assetmanagement.utils.ExcelOperator;
@@ -30,8 +31,8 @@ public class AssetsController {
     }
 
     @GetMapping("/assets")
-    public List<Assets> findAll(@RequestParam(required = false) Integer state, AuthDetails details) {
-        return assetsService.findAll(state, details.getAccount());
+    public List<Assets> findAll(AssetsSearchDto dto, AuthDetails details) {
+        return assetsService.findAll(dto, details.getAccount());
     }
 
     @GetMapping("/assets/export")

@@ -3,17 +3,19 @@ package beinet.cn.assetmanagement.assets.service;
 import beinet.cn.assetmanagement.assets.model.Assetclass;
 import beinet.cn.assetmanagement.assets.model.Assets;
 import beinet.cn.assetmanagement.assets.model.AssetsDto;
+import beinet.cn.assetmanagement.assets.model.AssetsSearchDto;
 import beinet.cn.assetmanagement.assets.repository.AssetsRepository;
 import beinet.cn.assetmanagement.user.model.Users;
 import beinet.cn.assetmanagement.user.service.UsersService;
 import beinet.cn.assetmanagement.utils.DateTimeHelper;
 import beinet.cn.assetmanagement.utils.ExcelOperator;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.criteria.Predicate;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -59,22 +61,37 @@ public class AssetsService {
         this.excelOperator = excelOperator;
     }
 
-    public List<Assets> findAll(Integer state, String account) {
-        Users user = usersService.findByAccount(account, true);
-        if (user == null) {
+    public List<Assets> findAll(AssetsSearchDto dto, String account) {
+        int classId = assetclassService.findByAccountAdmin(account);
+        if (classId == 0) {
             return new ArrayList<>();
         }
-        List<Assets> result;
-        if (user.isAdmin()) {
-            result = assetsRepository.findAll();
-        } else {
-            result = assetsRepository.findAllByAdminAccount(user.getUserName());
+        if (classId > 0) {
+            dto.setClassId(classId); // 分类管理员
         }
-        if (state != null) {
-            result = result.stream().filter(assets -> assets.getState() == state).
-                    collect(Collectors.toList());
-        }
-        return result;
+        Specification specification = (x, y, z) -> {
+            ArrayList<Predicate> list = new ArrayList<>();
+            if (StringUtils.hasText(dto.getCode())) {
+                list.add(z.equal(x.get("code"), dto.getCode()));
+            }
+            if (StringUtils.hasText(dto.getAssetName())) {
+                list.add(z.like(x.get("assetName"), "%" + dto.getAssetName() + "%"));
+            }
+            if (dto.getClassId() > 0) {
+                list.add(z.equal(x.get("classId"), dto.getClassId()));
+            }
+            if (dto.getState() != null && dto.getState().length > 0) {
+                Predicate[] arrPredicates = new Predicate[dto.getState().length];
+                for (int i = 0, j = dto.getState().length; i < j; i++) {
+                    int state = dto.getState()[i];
+                    arrPredicates[i] = z.equal(x.get("state"), state);
+                }
+                list.add(z.or(arrPredicates));
+            }
+            return z.and(list.toArray(new Predicate[0]));
+            //return z.and(z.equal(x.get("username"), "AAA"), z.equal(x.get("password"), "123"));
+        };
+        return assetsRepository.findAll(specification);
     }
 
     public List<Assets> findByUser(String account) {
