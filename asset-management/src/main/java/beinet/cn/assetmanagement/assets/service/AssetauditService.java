@@ -158,6 +158,13 @@ public class AssetauditService {
         if (item.getState() != 1 && item.getState() != 8) {
             throw new RuntimeException("审核状态设置有误:" + item.getState());
         }
+
+        // 获取当前登录用户管理的分类id
+        int classId = assetclassService.findByAccountAdmin(item.getAuditUser());
+        if (classId != -1 && classId != item.getClassId()) {
+            throw new RuntimeException("您没有该分类的审批权限:" + item.getClassId());
+        }
+
         Assetaudit audit = findById(item.getId(), item.getAccount(), true);
         switch (audit.getType()) {
             case "assetGet":
@@ -214,7 +221,7 @@ public class AssetauditService {
             throw new RuntimeException("未找到要退库的资产");
         }
         for (AssetauditDetail detail : result) {
-            // 更新资产状态和归属人为空
+            // 更新资产状态，归属人不处理
             assetsService.setAssetsUser(detail.getCode(), null);
         }
     }

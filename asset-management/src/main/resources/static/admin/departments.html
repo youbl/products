@@ -49,11 +49,11 @@
     </template>
 
     <el-dialog title="部门编辑" :visible.sync="openEditDialog">
-        <el-form :model="editData" ref="editForm" style="width:500px">
-            <el-form-item label="部门名称" label-width="200px">
+        <el-form :model="editData" :rules="rulesEdit" ref="editForm" style="width:500px">
+            <el-form-item label="部门名称" prop="departmentName" label-width="200px">
                 <el-input v-model="editData.departmentName" placeholder="请输入部门名称"></el-input>
             </el-form-item>
-            <el-form-item label="部门说明" label-width="200px">
+            <el-form-item label="部门说明" prop="description" label-width="200px">
                 <el-input v-model="editData.description" placeholder="请输入部门说明"></el-input>
             </el-form-item>
         </el-form>
@@ -79,6 +79,16 @@
                 },
                 openEditDialog: false,
                 editData: {},
+                rulesEdit: {
+                    departmentName: [
+                        {required: true, message: '部门名称不能为空', trigger: 'blur'},
+                        {min: 3, max: 20, message: '部门名称长度为3~20个字符', trigger: 'blur'},
+                    ],
+                    description: [
+                        {required: true, message: '部门说明不能为空', trigger: 'blur'},
+                        {min: 3, max: 100, message: '部门说明长度为3~100个字符', trigger: 'blur'},
+                    ],
+                },
             }
         },
         created: function () {

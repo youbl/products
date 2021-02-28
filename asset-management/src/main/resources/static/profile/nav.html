@@ -53,7 +53,7 @@
                     <template slot="title"><i class="el-icon-setting"></i>管理功能</template>
                     <el-menu-item-group>
                         <el-menu-item index="3-1" @click.native="switchTab(31)" v-if="isAdmin">部门维护</el-menu-item>
-                        <el-menu-item index="3-2" @click.native="switchTab(32)" v-if="isAdmin">用户管理</el-menu-item>
+                        <el-menu-item index="3-2" @click.native="switchTab(32)" v-if="isAdmin">员工管理</el-menu-item>
                         <el-menu-item index="3-3" @click.native="switchTab(33)" v-if="isAdmin">分类管理</el-menu-item>
                         <el-menu-item index="3-4" @click.native="switchTab(34)" v-if="isAdmin || classId > 0">资产管理
                         </el-menu-item>

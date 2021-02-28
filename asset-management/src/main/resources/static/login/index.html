@@ -12,23 +12,23 @@
 </head>
 <body>
 <div id="divApp" style="text-align: center;">
-    <el-form style="width:500px">
+    <el-form :model="login" :rules="rulesLogin" ref="loginForm" style="width:500px">
         <h1 style="text-align: center">
             龙岩一企固资系统
         </h1>
-        <el-form-item label="账号" label-width="200px">
+        <el-form-item label="账号" prop="beinetUser" label-width="200px">
             <el-input v-model="login.beinetUser" placeholder="请输入账号"></el-input>
         </el-form-item>
-        <el-form-item label="密码" label-width="200px">
+        <el-form-item label="密码" prop="beinetPwd" label-width="200px">
             <el-input v-model="login.beinetPwd" placeholder="请输入" show-password></el-input>
         </el-form-item>
-        <el-form-item label="验证码" label-width="200px" prop="imgCode" style="text-align: left">
+        <el-form-item label="验证码" prop="imgCode" label-width="200px" style="text-align: left">
             <el-input v-model="login.imgCode" placeholder="请输入图形验证码" maxlength="6" style="width:50%"></el-input>
             <img :src="imgCodeBase64" style="cursor: pointer; height: 30px; vertical-align: middle"
                  @click="getImgCode"/>
         </el-form-item>
         <div>
-            <el-button icon="el-icon-success" type="primary" @click="doLogin">登 录</el-button>
+            <el-button icon="el-icon-success" type="primary" @click="doLogin('loginForm')">登 录</el-button>
             <el-button @click="openRegister">注 册</el-button>
         </div>
     </el-form>
@@ -44,6 +44,19 @@
                     beinetPwd: '',
                     imgSn: '',
                     imgCode: '',
+                },
+                rulesLogin: {
+                    beinetUser: [
+                        {required: true, message: '账号不能为空', trigger: 'blur'},
+                        {min: 3, max: 30, message: '账号长度为3~30个字符', trigger: 'blur'},
+                    ],
+                    beinetPwd: [
+                        {required: true, message: '密码不能为空', trigger: 'blur'},
+                        {min: 6, max: 30, message: '密码长度为6~30个字符', trigger: 'blur'},
+                    ],
+                    imgCode: [
+                        {required: true, message: '图形验证码不能为空', trigger: 'blur'},
+                    ],
                 },
             }
         },
@@ -65,16 +78,20 @@
                     this.login.imgSn = response.data.sn;
                 }).catch(error => this.ajaxError(error));
             },
-            doLogin: function () {
-                let url = '/login';
-                // 默认登录使用的是form形式，因此要用Qs转换一下
-                return axios.post(url, Qs.stringify(this.login)).then(response => {
-                    let goUrl = '/profile/nav.html';
+            doLogin: function (form) {
+                this.$refs[form].validate(valid => {
+                    if (!valid)
+                        return false;
+                    let url = '/login';
+                    // 默认登录使用的是form形式，因此要用Qs转换一下
+                    return axios.post(url, Qs.stringify(this.login)).then(response => {
+                        let goUrl = '/profile/nav.html';
 
-                    top.location.href = goUrl;
-                }).catch(error => {
-                    this.getImgCode();
-                    this.ajaxError(error);
+                        top.location.href = goUrl;
+                    }).catch(error => {
+                        this.getImgCode();
+                        this.ajaxError(error);
+                    });
                 });
             },
             ajaxError: function (error) {

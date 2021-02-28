@@ -1,0 +1,24 @@
+@startuml
+title 修改密码流程
+start
+:输入旧密码/新密码;
+:点击保存;
+if(当前已登录)then(no)
+    end
+else(yes)
+endif
+:根据登录名查找用户;
+if(用户存在)then(no)
+    end
+else(yes)
+endif
+
+if(用户名对应的密码 == MD5(输入的旧密码))then(no)
+    end
+else(yes)
+endif
+:设置密码为MD5(新密码);
+:保存入库;
+
+stop
+@enduml

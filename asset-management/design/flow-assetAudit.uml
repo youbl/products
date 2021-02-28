@@ -1,0 +1,33 @@
+@startuml
+title 资产申请审核流程
+start
+:输入审核状态和审核说明;
+if(是资产领用申请)then(yes)
+    :分配资产;
+else(no)
+endif
+
+:点击提交;
+if(审核记录状态等于待审核)then(no)
+    end
+else(yes)
+endif
+if(当前登录用户是超级管理员 || 是审核记录所属分类管理员)then(no)
+    end
+else(yes)
+endif
+
+
+:保存审核记录;
+
+
+if(是资产领用申请)then(yes)
+    :为分配的资产 添加审核明细记录;
+    :修改资产状态为借用，并设置借用人和借用时间;
+else(no)
+    :查找审核明细记录里的资产;
+    :修改资产状态为库存;
+endif
+
+stop
+@enduml
