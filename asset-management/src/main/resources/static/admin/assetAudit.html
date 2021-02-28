@@ -40,7 +40,7 @@
             <el-table-column prop="auditName" label="申请类别" width="120" align="center"></el-table-column>
             <el-table-column prop="typeName" label="申请原因" width="120" align="center"></el-table-column>
             <el-table-column prop="className" label="申请资产分类" width="120" align="center"></el-table-column>
-            <el-table-column prop="description" label="领用说明" width="400"></el-table-column>
+            <el-table-column prop="description" label="申请说明" width="400"></el-table-column>
             <el-table-column prop="creationTime" label="申请时间" width="160" align="center"></el-table-column>
             <el-table-column prop="stateName" label="审核状态" width="80" align="center"></el-table-column>
             <el-table-column label="" width="150" align="center">
@@ -54,7 +54,7 @@
         </el-table>
     </template>
 
-    <el-dialog title="资产申领详情" :visible.sync="openViewDialog" style="width:1200px" top="2vh">
+    <el-dialog :title="auditTitle" :visible.sync="openViewDialog" style="width:1200px" top="2vh">
         <el-form :model="auditData" :rules="viewData.state === 0?rulesAudit:null" ref="auditForm">
             <el-form-item label="申请人" label-width="200px" style="text-align: left;">
                 <el-input v-model="viewData.userName + '  ' + viewData.creationTime" class="noborder"
@@ -147,6 +147,7 @@
 
                 searchAssets: [],
 
+                auditTitle: '',
                 auditData: {
                     id: 0,
                     state: 0,
@@ -298,7 +299,7 @@
             getAuditName: function (type) {
                 switch (type) {
                     case 'assetGet':
-                        return '领用资产';
+                        return '借用资产';
                     case 'assetReturn':
                         return '资产退库';
                     case 'assetScrap':
@@ -347,6 +348,8 @@
                 this.auditData.account = data.account;
                 this.auditData.state = 0;
                 this.auditData.assetCodes = [];
+                this.auditTitle = data.auditName + '申请详情';
+
                 if (data.type === 'assetReturn' || (data.type === 'assetGet' && data.state === 8)) {
                     this.loadAuditDetails(data.id);
                 }

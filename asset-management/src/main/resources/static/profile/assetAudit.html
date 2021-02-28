@@ -22,7 +22,7 @@
 <body>
 <div id="divApp" style="text-align: center;width: 98%;">
     <h1 style="text-align: center">
-        我的资产申请列表
+        我的资产借用申请列表
     </h1>
 
     <template>
@@ -56,7 +56,7 @@
         </el-table>
     </template>
 
-    <el-dialog title="资产申领" :visible.sync="openEditDialog" style="width:1200px">
+    <el-dialog title="资产借用申请" :visible.sync="openEditDialog" style="width:1200px">
         <el-form :model="editData" :rules="rulesEdit" ref="editForm">
             <el-form-item label="申请原因" label-width="200px" prop="subtype" style="text-align: left;">
                 <el-select v-model="editData.subtype" filterable placeholder="请选择领用原因">
@@ -151,10 +151,10 @@
                 editData: {},
                 rulesEdit: {
                     subtype: [
-                        {required: true, message: '原因必选', trigger: 'blur'},
+                        {required: true, message: '原因必选', trigger: 'change'},
                     ],
                     classId: [
-                        {required: true, message: '分类必选', trigger: 'blur'},
+                        {required: true, message: '分类必选', trigger: 'change'},
                         // {pattern: /^1\d{10}$/, message: '手机号格式有误'},
                     ],
                     description: [

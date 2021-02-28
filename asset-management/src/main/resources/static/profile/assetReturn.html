@@ -15,14 +15,14 @@
         }
 
         .el-form-item {
-            margin-bottom: 10px;
+            margin-bottom: 13px;
         }
     </style>
 </head>
 <body>
 <div id="divApp" style="text-align: center;width: 98%;">
     <h1 style="text-align: center">
-        我的资产退库列表
+        我的资产退库申请列表
     </h1>
 
     <template>
@@ -146,14 +146,14 @@
                 editData: {},
                 rulesEdit: {
                     subtype: [
-                        {required: true, message: '原因必选', trigger: 'blur'},
+                        {required: true, message: '原因必选', trigger: 'change'},
                     ],
                     description: [
                         {required: true, message: '说明不能为空', trigger: 'blur'},
                         {min: 4, max: 100, message: '说明的长度为4~100个字', trigger: 'blur'},
                     ],
                     assetCodes: [
-                        {type: 'array', required: true, message: '请至少选择一个资产', trigger: 'blur'}
+                        {type: 'array', required: true, message: '请至少选择一个资产', trigger: 'change'}
                     ],
                 },
             }

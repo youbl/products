@@ -31,6 +31,12 @@
     </h1>
 
     <template>
+        <div style="text-align: left;">
+            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增资产</el-button>
+            <el-button type="info" icon="el-icon-download" @click="doExport">导出资产</el-button>
+            <el-button type="info" icon="el-icon-upload" @click="showImport">导入资产</el-button>
+        </div>
+        <br>
         <el-form :model="searchCond" :inline="true" class="demo-form-inline" style="text-align: left">
             <el-form-item label="资产编号">
                 <el-input v-model="searchCond.code" placeholder="请输入资产编号"></el-input>
@@ -48,13 +54,8 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <br>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="loadAssets">查 询</el-button>
-                <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增资产</el-button>
-                <el-button type="info" icon="el-icon-download" @click="doExport">导出资产</el-button>
-                <el-button type="info" icon="el-icon-upload" @click="showImport">导入资产</el-button>
-                <el-button icon="el-icon-refresh" @click="location.reload()">刷新</el-button>
             </el-form-item>
         </el-form>
         <br>
