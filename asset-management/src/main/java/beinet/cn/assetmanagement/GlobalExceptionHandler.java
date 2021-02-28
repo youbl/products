@@ -3,6 +3,8 @@ package beinet.cn.assetmanagement;
 import beinet.cn.assetmanagement.security.BeinetSecurityAutoConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.ObjectError;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +34,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = RuntimeException.class)
     public void RuntimeExceptionHandler(HttpServletResponse response, RuntimeException exp) throws IOException {
         String msg = exp == null ? "没有异常明细" : exp.getMessage();
+        if (exp instanceof DataIntegrityViolationException &&
+                exp.getCause() instanceof ConstraintViolationException &&
+                exp.getCause().getCause() instanceof SQLIntegrityConstraintViolationException) {
+            msg = exp.getCause().getCause().getMessage();
+        }
         if (StringUtils.isEmpty(msg)) {
             msg = exp.getClass().getName();
         }

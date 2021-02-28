@@ -41,6 +41,10 @@ public class ConfigsService {
         if (item == null) {
             return null;
         }
+        Configs configs = configsRepository.findByTypeAndCode(item.getType(), item.getCode());
+        if (configs != null && configs.getId() != item.getId()) {
+            throw new RuntimeException("此类型+键值已存在，不允许重复");
+        }
         return configsRepository.save(item);
     }
 

@@ -15,7 +15,7 @@
         }
 
         .el-form-item {
-            margin-bottom: 10px;
+            margin-bottom: 13px;
         }
 
         .el-dialog__header {
@@ -75,8 +75,8 @@
     </template>
 
     <el-dialog title="资产编辑" :visible.sync="openEditDialog">
-        <el-form :model="editData" ref="editForm" style="width:500px">
-            <el-form-item label="资产编号" label-width="200px">
+        <el-form :model="editData" :rules="rulesEdit" ref="editForm" style="width:500px">
+            <el-form-item label="资产编号" prop="code" label-width="200px">
                 <el-input v-model="editData.code" placeholder="后台自动生成" maxlength="30"
                           :readonly="true" class="noborder"></el-input>
             </el-form-item>
@@ -91,31 +91,31 @@
                 </el-select>
             </el-form-item>
 
-            <el-form-item label="资产名称" label-width="200px">
+            <el-form-item label="资产名称" prop="assetName" label-width="200px">
                 <el-input v-model="editData.assetName" placeholder="请输入资产名称"></el-input>
             </el-form-item>
-            <el-form-item label="资产说明" label-width="200px">
+            <el-form-item label="资产说明" prop="description" label-width="200px">
                 <el-input v-model="editData.description" placeholder="请输入资产说明"></el-input>
             </el-form-item>
-            <el-form-item label="购买时间" label-width="200px" style="text-align: left">
+            <el-form-item label="购买时间" prop="buyTime" label-width="200px" style="text-align: left">
                 <el-date-picker
                         v-model="editData.buyTime"
                         type="datetime"
                         placeholder="请选择购买时间">
                 </el-date-picker>
             </el-form-item>
-            <el-form-item label="购买价格" label-width="200px">
+            <el-form-item label="购买价格" prop="price" label-width="200px">
                 <el-input v-model="editData.price" placeholder="请输入购买价格"></el-input>
             </el-form-item>
-            <el-form-item label="库房位置" label-width="200px">
+            <el-form-item label="库房位置" prop="place" label-width="200px">
                 <el-input v-model="editData.place" placeholder="请输入库房位置"></el-input>
             </el-form-item>
-            <el-form-item label="资产状态" label-width="200px" prop="state" style="text-align: left">
+            <el-form-item label="资产状态" prop="state" label-width="200px" prop="state" style="text-align: left">
                 <el-radio-group v-model="editData.state">
                     <el-radio v-for="(val, key, idx) in stateList" :label="key">{{val}}</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="最后借用人" label-width="200px">
+            <el-form-item label="最后借用人" prop="account" label-width="200px">
                 <el-select v-model="editData.account" filterable placeholder="请选择最后借用人" style="width:100%;">
                     <el-option
                             v-for="item in userArr"
@@ -125,7 +125,8 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="最后借用时间" label-width="200px" v-if="editData.account" style="text-align: left;">
+            <el-form-item label="最后借用时间" prop="accountTime" label-width="200px" v-if="editData.account"
+                          style="text-align: left;">
                 <el-date-picker v-model="editData.accountTime" type="datetime"
                                 placeholder="最后借用时间">
                 </el-date-picker>
@@ -179,6 +180,25 @@
                 },
                 openEditDialog: false,
                 editData: {},
+                rulesEdit: {
+                    assetName: [
+                        {required: true, message: '资产名称不能为空', trigger: 'blur'},
+                        {min: 2, max: 20, message: '资产名称长度为2~20个字符', trigger: 'blur'},
+                    ],
+                    description: [
+                        {required: true, message: '资产说明不能为空', trigger: 'blur'},
+                        {min: 3, max: 300, message: '资产说明长度为3~300个字符', trigger: 'blur'},
+                    ],
+                    buyTime: [
+                        {required: true, message: '购买时间不能为空', trigger: 'blur'},
+                    ],
+                    price: [
+                        {required: true, message: '购买价格不能为空', trigger: 'blur'},
+                    ],
+                    place: [
+                        {required: true, message: '库房位置不能为空', trigger: 'blur'},
+                    ],
+                },
 
                 openQrCodeDialog: false,   // 是否弹出二维码框
                 qrCode: null,

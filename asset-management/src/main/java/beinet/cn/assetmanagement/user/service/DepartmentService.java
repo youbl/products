@@ -30,6 +30,10 @@ public class DepartmentService {
         if (item == null) {
             return null;
         }
+        Department department = departmentRepository.findByDepartmentName(item.getDepartmentName());
+        if (department != null && department.getId() != item.getId()) {
+            throw new RuntimeException("部门名称已存在");
+        }
         return departmentRepository.save(item);
     }
 

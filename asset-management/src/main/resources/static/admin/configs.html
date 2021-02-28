@@ -49,18 +49,18 @@
     </template>
 
     <el-dialog title="配置编辑" :visible.sync="openEditDialog">
-        <el-form :model="editData" ref="editForm" style="width:500px">
-            <el-form-item label="配置类型" label-width="200px" style="text-align: left;">
+        <el-form :model="editData" :rules="rulesEdit" ref="editForm" style="width:500px">
+            <el-form-item label="配置类型" prop="type" label-width="200px" style="text-align: left;">
                 <el-select v-model="editData.type" filterable placeholder="请选择配置类型">
                     <el-option label="资产领用-assetGet" value="assetGet"></el-option>
                     <el-option label="资产退库-assetReturn" value="assetReturn"></el-option>
-                    <el-option label="资产报废-assetScrap" value="assetScrap"></el-option>
+<!--                    <el-option label="资产报废-assetScrap" value="assetScrap"></el-option>-->
                 </el-select>
             </el-form-item>
-            <el-form-item label="配置键值" label-width="200px">
+            <el-form-item label="配置键值" prop="code" label-width="200px">
                 <el-input v-model="editData.code" placeholder="请输入配置键值"></el-input>
             </el-form-item>
-            <el-form-item label="配置说明" label-width="200px">
+            <el-form-item label="配置说明" prop="description" label-width="200px">
                 <el-input v-model="editData.description" placeholder="请输入配置说明"></el-input>
             </el-form-item>
         </el-form>
@@ -87,6 +87,19 @@
                 },
                 openEditDialog: false,
                 editData: {},
+                rulesEdit: {
+                    type: [
+                        {required: true, message: '配置类型不能为空', trigger: 'blur'},
+                    ],
+                    code: [
+                        {required: true, message: '配置键值不能为空', trigger: 'blur'},
+                        {min: 3, max: 20, message: '配置键值长度为3~20个字符', trigger: 'blur'},
+                    ],
+                    description: [
+                        {required: true, message: '配置说明不能为空', trigger: 'blur'},
+                        {min: 3, max: 100, message: '配置说明长度为3~100个字符', trigger: 'blur'},
+                    ],
+                },
             }
         },
         created: function () {

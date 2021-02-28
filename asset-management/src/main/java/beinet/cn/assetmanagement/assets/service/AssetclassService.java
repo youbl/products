@@ -37,6 +37,10 @@ public class AssetclassService {
         if (item == null) {
             return null;
         }
+        Assetclass assetclass = assetclassRepository.findByClassName(item.getClassName());
+        if (assetclass != null && assetclass.getId() != item.getId()) {
+            throw new RuntimeException("此分类名称已存在，不允许重复");
+        }
         return assetclassRepository.save(item);
     }
 

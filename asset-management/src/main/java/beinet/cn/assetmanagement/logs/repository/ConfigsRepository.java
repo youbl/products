@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface ConfigsRepository extends JpaRepository<Configs, Integer> {
     List<Configs> findByTypeInOrderByTypeAscCodeAsc(List<String> type);
+
+    Configs findByTypeAndCode(String type, String code);
 }

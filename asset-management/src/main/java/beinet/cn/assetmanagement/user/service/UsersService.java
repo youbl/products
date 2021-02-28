@@ -95,11 +95,8 @@ public class UsersService {
             return null;
         }
         if (StringUtils.isEmpty(currentAccount) || currentAccount.equals("匿名")) {
-            // 注册
-            item.setPassword(getPwdEncoder().encode(item.getPassword()));
-            Users newUser = item.mapTo();
-            newUser.setRoles("USER");
-            return save(newUser);
+            // 新注册
+            return insert(item);
         }
         // 已登录时，表示更新资料
         return update(item, currentAccount);
@@ -122,6 +119,19 @@ public class UsersService {
             user.setPassword(getPwdEncoder().encode(user.getPassword()));
         }
         return save(user);
+    }
+
+    private Users insert(UsersDto item) {
+        Users user = usersRepository.findByAccountOrCode(item.getAccount(), item.getCode());
+        if (user != null) {
+            throw new RuntimeException("此账号或工号已存在，不允许使用");
+        }
+        item.setPassword(getPwdEncoder().encode(item.getPassword()));
+        Users newUser = item.mapTo();
+        newUser.setState(0); // 新注册要审核
+        newUser.setId(0);    // 确保是注册
+        newUser.setRoles("USER");
+        return save(newUser);
     }
 
     private Users update(UsersDto item, String currentAccount) {

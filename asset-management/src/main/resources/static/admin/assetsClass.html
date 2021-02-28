@@ -49,11 +49,11 @@
     </template>
 
     <el-dialog title="分类编辑" :visible.sync="openEditDialog">
-        <el-form :model="editData" ref="editForm" style="width:500px">
-            <el-form-item label="分类名称" label-width="200px">
+        <el-form :model="editData" :rules="rulesEdit" ref="editForm" style="width:500px">
+            <el-form-item label="分类名称" prop="className" label-width="200px">
                 <el-input v-model="editData.className" placeholder="请输入分类名称"></el-input>
             </el-form-item>
-            <el-form-item label="分类说明" label-width="200px">
+            <el-form-item label="分类说明" prop="description" label-width="200px">
                 <el-input v-model="editData.description" placeholder="请输入分类说明"></el-input>
             </el-form-item>
             <el-form-item label="分类管理员" label-width="200px" prop="department" style="text-align: left">
@@ -95,6 +95,16 @@
                     className: '',
                     description: '',
                     admin: '',
+                },
+                rulesEdit: {
+                    className: [
+                        {required: true, message: '分类名称不能为空', trigger: 'blur'},
+                        {min: 3, max: 20, message: '分类名称长度为3~20个字符', trigger: 'blur'},
+                    ],
+                    description: [
+                        {required: true, message: '分类说明不能为空', trigger: 'blur'},
+                        {min: 3, max: 100, message: '分类说明长度为3~100个字符', trigger: 'blur'},
+                    ],
                 },
             }
         },
