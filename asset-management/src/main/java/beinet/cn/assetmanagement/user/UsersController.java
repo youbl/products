@@ -4,6 +4,7 @@ import beinet.cn.assetmanagement.security.AuthDetails;
 import beinet.cn.assetmanagement.user.model.PasswordDto;
 import beinet.cn.assetmanagement.user.model.Users;
 import beinet.cn.assetmanagement.user.model.UsersDto;
+import beinet.cn.assetmanagement.user.model.UsersSearchDto;
 import beinet.cn.assetmanagement.user.service.UsersService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +30,8 @@ public class UsersController {
 
     //@PreAuthorize("hasAnyRole('ADMIN')")// 分类管理员的资产审核需要名字
     @GetMapping("/users")
-    public List<Users> findAll() {
-        return usersService.findAll();
+    public List<Users> findAll(UsersSearchDto dto) {
+        return usersService.findAll(dto);
     }
 
     /**

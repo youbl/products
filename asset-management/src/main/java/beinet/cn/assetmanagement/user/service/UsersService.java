@@ -3,12 +3,16 @@ package beinet.cn.assetmanagement.user.service;
 import beinet.cn.assetmanagement.user.model.PasswordDto;
 import beinet.cn.assetmanagement.user.model.Users;
 import beinet.cn.assetmanagement.user.model.UsersDto;
+import beinet.cn.assetmanagement.user.model.UsersSearchDto;
 import beinet.cn.assetmanagement.user.repository.UsersRepository;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,13 +36,40 @@ public class UsersService {
         return passwordEncoder;
     }
 
-    public List<Users> findAll() {
-        List<Users> results = usersRepository.findAllByOrderByAccountAsc();
+    public List<Users> findAll(UsersSearchDto dto) {
+        List<Users> results = usersRepository.findAll(getCond(dto));//.findAllByOrderByAccountAsc();
         for (Users user : results) {
             hideSensitiveInfo(user);
         }
         return results;
     }
+
+    private Specification getCond(UsersSearchDto dto) {
+        Specification specification = (x, y, z) -> {
+            ArrayList<Predicate> list = new ArrayList<>();
+
+            if (StringUtils.hasText(dto.getCode())) {
+                list.add(z.like(x.get("code"), "%" + dto.getCode() + "%"));
+            }
+            if (StringUtils.hasText(dto.getAccount())) {
+                list.add(z.like(x.get("account"), "%" + dto.getAccount() + "%"));
+            }
+            if (StringUtils.hasText(dto.getUserName())) {
+                list.add(z.like(x.get("userName"), "%" + dto.getUserName() + "%"));
+            }
+            if (dto.getState() != null && dto.getState().length > 0) {
+                Predicate[] arrPredicates = new Predicate[dto.getState().length];
+                for (int i = 0, j = dto.getState().length; i < j; i++) {
+                    int state = dto.getState()[i];
+                    arrPredicates[i] = z.equal(x.get("state"), state);
+                }
+                list.add(z.or(arrPredicates));
+            }
+            return z.and(list.toArray(new Predicate[0]));
+        };
+        return specification;
+    }
+
 
     public Users findByAccount(String account, boolean hideSensitive) {
         Users result = usersRepository.findByAccount(account);

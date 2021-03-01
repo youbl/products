@@ -22,10 +22,31 @@
     </h1>
 
     <template>
-        <div style="text-align: left">
-            <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增</el-button>
-            <el-button icon="el-icon-refresh" @click="location.reload()">刷新</el-button>
-        </div>
+        <el-form :model="searchCond" :inline="true" class="demo-form-inline" style="text-align: left">
+            <el-form-item label="工号">
+                <el-input style="width:100px;" v-model="searchCond.code" placeholder="请输入工号"></el-input>
+            </el-form-item>
+            <el-form-item label="账号">
+                <el-input style="width:100px;" v-model="searchCond.account" placeholder="请输入账号"></el-input>
+            </el-form-item>
+            <el-form-item label="姓名">
+                <el-input style="width:100px;" v-model="searchCond.userName" placeholder="请输入姓名"></el-input>
+            </el-form-item>
+            <el-form-item label="状态">
+                <el-select v-model="searchCond.state" multiple placeholder="请选择员工状态">
+                    <el-option
+                            v-for="(value, key) in userState"
+                            :key="key"
+                            :label="value"
+                            :value="key">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" @click="loadUsers">查 询</el-button>
+                <el-button type="primary" icon="el-icon-edit" @click="showEdit">新增员工</el-button>
+            </el-form-item>
+        </el-form>
         <br>
         <el-table
                 :data="dataList"
@@ -116,6 +137,17 @@
         el: '#divApp',
         data: function () {
             return {
+                userState: {
+                    0: '待审核',
+                    1: '禁用',
+                    8: '启用',
+                },
+                searchCond: {
+                    code: '',
+                    account: '',
+                    userName: '',
+                    state: [],
+                },
                 user: {},
                 departmentList: [],
                 dataList: [],
@@ -174,7 +206,9 @@
                 }).catch(error => this.ajaxError(error));
             },
             loadUsers: function () {
-                let url = '/users';
+                // repeat是 state=0&state=2  brackets是 state[]=0&state[]=2  默认是 state[0]=0&state[1]=2
+                let para = Qs.stringify(this.searchCond, {arrayFormat: 'repeat'});
+                let url = '/users?' + para;
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return alert('没有找到用户列表');
@@ -192,15 +226,7 @@
                 return '未找到';
             },
             getStateName: function (state) {
-                switch (state) {
-                    case 0:
-                        return '待审核';
-                    case 1:
-                        return '禁用';
-                    case 8:
-                        return '启用';
-                }
-                return '未知';
+                return this.userState[state];
             },
             getRevertStateName: function (state) {
                 let newState = state === 8 ? 1 : 8;
