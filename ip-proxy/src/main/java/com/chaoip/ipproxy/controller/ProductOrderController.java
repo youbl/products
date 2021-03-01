@@ -63,4 +63,9 @@ public class ProductOrderController {
     public List<ProductOrder> getOrders(AuthDetails details) {
         return productOrderService.findByUser(details.getUserName());
     }
+
+    @PostMapping("/close/{id}")
+    public ProductOrder closeOrders(@PathVariable int id, AuthDetails details) {
+        return productOrderService.close(id, details.getUserName());
+    }
 }

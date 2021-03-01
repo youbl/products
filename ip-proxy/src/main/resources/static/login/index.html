@@ -23,6 +23,11 @@
         <el-form-item label="密码" label-width="200px">
             <el-input v-model="login.beinetPwd" placeholder="请输入" show-password></el-input>
         </el-form-item>
+        <el-form-item label="验证码" prop="imgCode" label-width="200px" style="text-align: left">
+            <el-input v-model="login.imgCode" placeholder="请输入图形验证码" maxlength="6" style="width:50%"></el-input>
+            <img :src="imgCodeBase64" style="cursor: pointer; height: 30px; vertical-align: middle"
+                 @click="getImgCode"/>
+        </el-form-item>
         <div>
             <el-button icon="el-icon-success" type="primary" @click="doLogin">登 录</el-button>
             <el-button @click="openRegister">注 册</el-button>
@@ -73,10 +78,13 @@
             return {
                 openRegisterOption: false,
                 imgCodeBase64: '/favicon.ico',
+
                 enableSmsButton: 0,
                 login: {
                     beinetUser: '',
                     beinetPwd: '',
+                    imgSn: '',
+                    imgCode: '',
                 },
                 register: {
                     name: '',
@@ -113,6 +121,7 @@
             }
         },
         created: function () {
+            this.getImgCode();
         },
         computed: {},
         methods: {
@@ -131,6 +140,7 @@
                     }
                     this.imgCodeBase64 = "data:image/jpg;base64," + response.data.img;
                     this.register.imgSn = response.data.sn;
+                    this.login.imgSn = response.data.sn;
                 }).catch(error => this.ajaxError(error));
             },
             sendSmscode: function (form) {

@@ -2,6 +2,7 @@ package com.chaoip.ipproxy.security;
 
 import com.chaoip.ipproxy.repository.BeinetUserRepository;
 import com.chaoip.ipproxy.service.RealOrderService;
+import com.chaoip.ipproxy.service.ValidCodeService;
 import com.chaoip.ipproxy.util.VerifyHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +12,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -33,6 +37,14 @@ import java.util.Map;
 @Configuration
 public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     static final String LOGIN_PAGE = "/login/index.html";
+
+    private final ValidCodeService validcodeService;
+    private final AuthenticationFailureHandler failureHandler;
+
+    public BeinetSecurityAutoConfiguration(ValidCodeService validcodeService) {
+        this.validcodeService = validcodeService;
+        this.failureHandler = new BeinetHandleFail();
+    }
 
     @Bean
     public PasswordEncoder createPasswordEncoder() {
@@ -94,6 +106,10 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 //.antMatchers("/**").permitAll()
                 //.antMatchers("/role/**").permitAll()    // 忽略配置里的权限，改用 EnableGlobalMethodSecurity 和 PreAuthorize 注解
                 .anyRequest().authenticated();      // 其它所有请求都要求登录后访问，但是不限制角色
+
+        // 在用户名密码校验之前，检查图形验证码是否正确
+        OncePerRequestFilter filterCode = new ValidCodeFilter(validcodeService, failureHandler);
+        http.addFilterBefore(filterCode, UsernamePasswordAuthenticationFilter.class);
 
         BeinetAuthenticationFilter filter = new BeinetAuthenticationFilter();
         //http.addFilterBefore(filter, RequestCacheAwareFilter.class);

@@ -48,6 +48,18 @@ public class ProductOrderService {
         return productOrderRepository.findByOrderByCreationTimeDesc();
     }
 
+    public ProductOrder close(long id, String account) {
+        ProductOrder order = productOrderRepository.findById(id).orElse(null);
+        if (order == null) {
+            throw new RuntimeException("指定的订单id不存在：" + id);
+        }
+        if (!order.getName().equals(account)) {
+            throw new RuntimeException("不能关闭他人的订单：" + id);
+        }
+        order.setDisabled(1);
+        return productOrderRepository.save(order);
+    }
+
     public ProductOrder close(long id) {
         ProductOrder order = productOrderRepository.findById(id).orElse(null);
         if (order == null) {

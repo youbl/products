@@ -55,7 +55,7 @@
                         <el-radio-group v-model="productBuyInfo.payType">
                             <el-radio :label="0" :disabled="!isUserMoneyCanPay">余额支付</el-radio>
                             <el-radio :label="1">支付宝</el-radio>
-                            <el-radio :label="2">微信</el-radio>
+                            <el-radio :label="2" v-show="false">微信</el-radio>
                         </el-radio-group>
                     </el-form-item>
                 </el-form>

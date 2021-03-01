@@ -31,7 +31,7 @@
                     <el-form-item label="支付选项" label-width="200px" prop="payType">
                         <el-radio-group v-model="userCharge.payType">
                             <el-radio :label="1">支付宝</el-radio>
-                            <el-radio :label="2">微信</el-radio>
+                            <el-radio :label="2" v-show="false">微信</el-radio>
                         </el-radio-group>
                     </el-form-item>
                 </el-form>

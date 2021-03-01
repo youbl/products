@@ -73,6 +73,10 @@
                     </el-table-column>
                     <el-table-column label="">
                         <template slot-scope="scope">
+                            <el-button v-show="scope.row.disabled !== 1"
+                                       size="mini"
+                                       @click="closeOrder(scope.$index, scope.row)">关闭订单
+                            </el-button>
                             <el-button v-if="canGetIP(scope.row)"
                                        size="mini"
                                        @click="showGetIPDailog(scope.$index, scope.row)">提取代理
@@ -240,6 +244,20 @@
             changeProvince: function () {
                 this.provinceSelected = this.searchProvince(this.getIpCondition.province);
                 this.getIpCondition.area = this.provinceSelected.citys[0].code;
+            },
+            closeOrder: function (idx, item) {
+                if (!confirm('确认要关闭订单吗？此操作不可恢复')) {
+                    return;
+                }
+                let url = '/order/close/' + item.id;
+                axios.post(url, {params: this.getIpCondition}).then(response => {
+                    if (!response || !response.data) {
+                        alert('关闭失败');
+                        return;
+                    }
+                    alert('关闭成功');
+                    item.disabled = 1;
+                }).catch(error => this.ajaxError(error));
             },
             showGetIPDailog: function (idx, row) {
                 this.loadCitys();//.then((citys) => {
