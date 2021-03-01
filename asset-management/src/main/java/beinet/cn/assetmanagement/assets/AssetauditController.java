@@ -1,5 +1,6 @@
 package beinet.cn.assetmanagement.assets;
 
+import beinet.cn.assetmanagement.assets.model.AssetSearchDto;
 import beinet.cn.assetmanagement.assets.model.Assetaudit;
 import beinet.cn.assetmanagement.assets.model.AssetauditDetail;
 import beinet.cn.assetmanagement.assets.model.AssetauditDto;
@@ -23,9 +24,9 @@ public class AssetauditController {
         return assetauditService.findAuditByType(details.getAccount(), auditType);
     }
 
-    @GetMapping("/assetaudits/admin/{auditType}")
-    public List<Assetaudit> findForAdmin(@PathVariable String auditType, AuthDetails details) {
-        return assetauditService.findForAdmin(details.getAccount(), auditType);
+    @GetMapping("/assetaudits/admin")
+    public List<Assetaudit> findForAdmin(AssetSearchDto auditCond, AuthDetails details) {
+        return assetauditService.findForAdmin(details.getAccount(), auditCond);
     }
 
     @GetMapping("/assetauditDetails/{auditId}")

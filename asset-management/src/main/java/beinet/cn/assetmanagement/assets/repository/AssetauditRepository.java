@@ -2,6 +2,7 @@ package beinet.cn.assetmanagement.assets.repository;
 
 import beinet.cn.assetmanagement.assets.model.Assetaudit;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public interface AssetauditRepository extends JpaRepository<Assetaudit, Integer> {
+public interface AssetauditRepository extends JpaRepository<Assetaudit, Integer>, JpaSpecificationExecutor<Assetaudit> {
     List<Assetaudit> findAllByAccountAndTypeInOrderByIdDesc(String account, List<String> type);
 
     List<Assetaudit> findAllByTypeInOrderByIdDesc(List<String> type);

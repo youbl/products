@@ -26,9 +26,31 @@
     </h1>
 
     <template>
-        <div style="text-align: left">
-            <el-button icon="el-icon-refresh" @click="location.reload()">刷新</el-button>
-        </div>
+        <el-form :model="searchCond" :inline="true" class="demo-form-inline" style="text-align: left">
+            <el-form-item label="申请人">
+                <el-select v-model="searchCond.account" multiple placeholder="请选择申请人">
+                    <el-option
+                            v-for="item in userArr"
+                            :key="item.account"
+                            :label="item.account + ':' + item.userName"
+                            :value="item.account">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="申请状态">
+                <el-select v-model="searchCond.state" multiple placeholder="请选择申请状态">
+                    <el-option
+                            v-for="(value, key) in auditState"
+                            :key="key"
+                            :label="value"
+                            :value="key">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" @click="loadAudites">查 询</el-button>
+            </el-form-item>
+        </el-form>
         <br>
         <el-table
                 :data="dataList"
@@ -135,6 +157,16 @@
         el: '#divApp',
         data: function () {
             return {
+                auditState: {
+                    0: '待审核',
+                    1: '审核拒绝',
+                    2: '作废',
+                    8: '审核通过',
+                },
+                searchCond: {
+                    account: [],
+                    state: [],
+                },
                 user: {},
                 userArr: [],
 
@@ -219,7 +251,9 @@
                 }).catch(error => this.ajaxError(error));
             },
             loadAudites: function () {
-                let url = '/assetaudits/admin/assetGet,assetReturn';
+                // repeat是 state=0&state=2  brackets是 state[]=0&state[]=2  默认是 state[0]=0&state[1]=2
+                let para = Qs.stringify(this.searchCond, {arrayFormat: 'repeat'});
+                let url = '/assetaudits/admin?' + para;
                 return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;
@@ -284,17 +318,7 @@
                 return state;
             },
             getStateName: function (state) {
-                switch (state) {
-                    case 0:
-                        return '待审核';
-                    case 1:
-                        return '审核拒绝';
-                    case 2:
-                        return '作废';
-                    case 8:
-                        return '审核通过';
-                }
-                return state;
+                return this.auditState[state];
             },
             getAuditName: function (type) {
                 switch (type) {

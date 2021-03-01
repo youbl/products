@@ -1,21 +1,17 @@
 package beinet.cn.assetmanagement.assets.service;
 
-import beinet.cn.assetmanagement.assets.model.Assetaudit;
-import beinet.cn.assetmanagement.assets.model.AssetauditDetail;
-import beinet.cn.assetmanagement.assets.model.AssetauditDto;
-import beinet.cn.assetmanagement.assets.model.Assets;
+import beinet.cn.assetmanagement.assets.model.*;
 import beinet.cn.assetmanagement.assets.repository.AssetauditDetailRepository;
 import beinet.cn.assetmanagement.assets.repository.AssetauditRepository;
-import beinet.cn.assetmanagement.security.AuthDetails;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,11 +34,11 @@ public class AssetauditService {
     /**
      * 管理员或分类管理员，查找他们负责的审批
      *
-     * @param account 分类管理员账号
-     * @param type    要查找的审批类型
+     * @param account   分类管理员账号
+     * @param auditCond 要查找的审批条件
      * @return 列表
      */
-    public List<Assetaudit> findForAdmin(String account, String type) {
+    public List<Assetaudit> findForAdmin(String account, AssetSearchDto auditCond) {
         if (StringUtils.isEmpty(account) || account.equals("匿名")) {
             return new ArrayList<>();
         }
@@ -50,15 +46,39 @@ public class AssetauditService {
         if (adminClassId == 0) {
             return new ArrayList<>(); // 没有管理权限
         }
-        List<String> arrType = getTypes(type);
-        if (arrType.isEmpty()) {
-            return new ArrayList<>();
+        if (adminClassId > 0) {
+            auditCond.setClassId(adminClassId); // 分类管理员
         }
-        // 超级管理员
-        if (adminClassId == -1) {
-            return assetauditRepository.findAllByTypeInOrderByIdDesc(arrType);
-        }
-        return assetauditRepository.findAllByClassIdAndTypeInOrderByIdDesc(adminClassId, arrType);
+
+        return assetauditRepository.findAll(getCond(auditCond));
+    }
+
+    Specification getCond(AssetSearchDto dto) {
+        Specification specification = (x, y, z) -> {
+            ArrayList<Predicate> list = new ArrayList<>();
+
+            if (dto.getAccount() != null && dto.getAccount().length > 0) {
+                Predicate[] arrPredicates = new Predicate[dto.getAccount().length];
+                for (int i = 0, j = dto.getAccount().length; i < j; i++) {
+                    String user = dto.getAccount()[i];
+                    arrPredicates[i] = z.equal(x.get("account"), user);
+                }
+                list.add(z.or(arrPredicates));
+            }
+            if (dto.getClassId() > 0) {
+                list.add(z.equal(x.get("classId"), dto.getClassId()));
+            }
+            if (dto.getState() != null && dto.getState().length > 0) {
+                Predicate[] arrPredicates = new Predicate[dto.getState().length];
+                for (int i = 0, j = dto.getState().length; i < j; i++) {
+                    int state = dto.getState()[i];
+                    arrPredicates[i] = z.equal(x.get("state"), state);
+                }
+                list.add(z.or(arrPredicates));
+            }
+            return z.and(list.toArray(new Predicate[0]));
+        };
+        return specification;
     }
 
     /**
