@@ -21,8 +21,8 @@
             <el-button type="primary" icon="el-icon-edit" @click="showAddDialog">添加记录</el-button>
 
             <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
-            <el-button @click="getAfterPage" :disabled="isLastPage">下一页</el-button>
-            <span>&nbsp;当前第 {{page+1}} 页，总记录数 {{ipTotalNum}} 条</span>
+            <el-button @click="getAfterPage" :disabled="ipData.length<pageSize">下一页</el-button>
+            <span>&nbsp;第 {{page+1}}/{{Math.ceil(ipTotalNum/pageSize)}} 页，总记录数 {{ipTotalNum}} 条</span>
 
             <button onclick="location.reload()">刷新</button>
         </div>
@@ -32,11 +32,13 @@
         <div style="float: right; width:200px;">&nbsp;</div>
     </div>
     <div style="clear: both"></div>
+    <br>
     <div class="tab-content">
         <template>
             <el-table
                     :data="ipData"
                     stripe
+                    border
                     style="width: 100%">
                 <el-table-column
                         prop="id"
@@ -124,7 +126,7 @@
             ipData: [],
             ipTotalNum: 0,
             page: 0,
-            isLastPage: false,
+            pageSize: 12,
             openEditDialog: false,
             newRecord: {
                 protocal: 'http',
@@ -141,17 +143,15 @@
         computed: {},
         methods: {
             showAllIP: function () {
-                let url = '/manage/routes?pageNum=' + this.page;
+                let url = '/manage/routes?pageNum=' + this.page + '&pageSize=' + this.pageSize;
                 axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.content || response.data.content.length <= 0) {
                         this.ipData = [];
-                        this.isLastPage = true;
                         alert('无数据');
                         return;
                     }
                     this.ipData = response.data.content;
                     this.ipTotalNum = response.data.totalElements;
-                    this.isLastPage = (response.data.numberOfElements < response.data.size);
                 }).catch(error => this.ajaxError(error));
             },
             getPrevPage: function () {

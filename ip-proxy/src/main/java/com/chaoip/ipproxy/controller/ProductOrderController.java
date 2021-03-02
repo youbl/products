@@ -10,7 +10,7 @@ import com.chaoip.ipproxy.service.ProductOrderService;
 import com.chaoip.ipproxy.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -60,8 +60,9 @@ public class ProductOrderController {
      * @return 产品订单
      */
     @GetMapping("")
-    public List<ProductOrder> getOrders(AuthDetails details) {
-        return productOrderService.findByUser(details.getUserName());
+    public Page<ProductOrder> getOrders(ProductOrderDto dto, AuthDetails details) {
+        dto.setName(details.getUserName());
+        return productOrderService.findByUser(dto);
     }
 
     @PostMapping("/close/{id}")

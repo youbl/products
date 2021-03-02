@@ -4,11 +4,16 @@ import com.chaoip.ipproxy.controller.dto.ChargeDto;
 import com.chaoip.ipproxy.repository.PayOrderRepository;
 import com.chaoip.ipproxy.repository.entity.OrderStatus;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
+import com.chaoip.ipproxy.repository.entity.PayOrderDto;
+import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.util.AliPayHelper;
 import com.chaoip.ipproxy.util.WechatPay;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -60,11 +65,38 @@ public class PayService {
         return payOrderRepository.save(order);
     }
 
-    public List<PayOrder> findOrder(String name) {
-        if (StringUtils.isEmpty(name)) {
-            return payOrderRepository.findByOrderByCreationTimeDesc();
+    public Page<PayOrder> findOrder(PayOrderDto dto) {
+        // 不使用的属性，必须要用 withIgnorePaths 忽略，否则会列入条件
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnorePaths("id", "description", "payUrl", "payType", "money", "status", "payTime", "creationTime");
+        if (StringUtils.hasText(dto.getName())) {
+            matcher = matcher.withMatcher("name", ExampleMatcher.GenericPropertyMatchers.exact());
+        } else {
+            matcher = matcher.withIgnorePaths("name");
         }
-        return payOrderRepository.findByNameOrderByCreationTimeDesc(name);
+        if (StringUtils.hasText(dto.getOrderNo())) {
+            matcher = matcher.withMatcher("orderNo", ExampleMatcher.GenericPropertyMatchers.exact());
+        } else {
+            matcher = matcher.withIgnorePaths("orderNo");
+        }
+        if (StringUtils.hasText(dto.getTitle())) {
+            matcher = matcher.withMatcher("title", ExampleMatcher.GenericPropertyMatchers.exact());
+        } else {
+            matcher = matcher.withIgnorePaths("title");
+        }
+
+        PayOrder condition = PayOrder.builder()
+                .name(dto.getName())
+                .orderNo(dto.getOrderNo())
+                .title(dto.getTitle())
+                .build();
+        Example<PayOrder> example = Example.of(condition, matcher);
+        return payOrderRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize(), "creationTime", true);
+    }
+
+    public List<PayOrder> findOrder() {
+        return payOrderRepository.findByOrderByCreationTimeDesc();
+        //return payOrderRepository.findByNameOrderByCreationTimeDesc(name);
     }
 
     /**

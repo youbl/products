@@ -16,6 +16,16 @@ import javax.validation.constraints.Min;
 @Data
 public class ProductOrderDto {
     /**
+     * 用户账号
+     */
+    private String name;
+
+    /**
+     * 订单号
+     */
+    private String orderNo;
+
+    /**
      * 购买时长，几个月
      */
     @Min(value = 1, message = "购买时长最小为1")
@@ -46,4 +56,15 @@ public class ProductOrderDto {
      * 支付通道, 0余额，1支付宝，2微信
      */
     private int payType;
+
+
+    /**
+     * 第几页
+     */
+    private int pageNum;
+
+    /**
+     * 每页条数
+     */
+    private int pageSize;
 }

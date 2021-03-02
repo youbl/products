@@ -11,8 +11,12 @@ import com.chaoip.ipproxy.util.AliBase;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -72,11 +76,37 @@ public class ProductOrderService {
     /**
      * 根据用户名查找所有购买订单
      *
-     * @param userName 用户名
+     * @param dto 条件
      * @return 订单
      */
-    public List<ProductOrder> findByUser(String userName) {
-        return productOrderRepository.findByNameOrderByCreationTimeDesc(userName);
+    public Page<ProductOrder> findByUser(ProductOrderDto dto) {
+        //return productOrderRepository.findByNameOrderByCreationTimeDesc(userName);
+        // 不使用的属性，必须要用 withIgnorePaths 忽略，否则会列入条件
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnorePaths("id", "buyNum", "using", "description", "money", "payType", "payOrderId", "ipNumPerDay", "ipNumToday", "payTime", "endTime", "status", "disabled", "creationTime");
+        if (StringUtils.hasText(dto.getName())) {
+            matcher = matcher.withMatcher("name", ExampleMatcher.GenericPropertyMatchers.exact());
+        } else {
+            matcher = matcher.withIgnorePaths("name");
+        }
+        if (StringUtils.hasText(dto.getOrderNo())) {
+            matcher = matcher.withMatcher("orderNo", ExampleMatcher.GenericPropertyMatchers.exact());
+        } else {
+            matcher = matcher.withIgnorePaths("orderNo");
+        }
+        if (dto.getProductId() > 0) {
+            matcher = matcher.withMatcher("productId", ExampleMatcher.GenericPropertyMatchers.exact());
+        } else {
+            matcher = matcher.withIgnorePaths("productId");
+        }
+
+        ProductOrder condition = ProductOrder.builder()
+                .name(dto.getName())
+                .orderNo(dto.getOrderNo())
+                .productId(dto.getProductId())
+                .build();
+        Example<ProductOrder> example = Example.of(condition, matcher);
+        return productOrderRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize(), "creationTime", true);
     }
 
     /**
@@ -219,6 +249,7 @@ public class ProductOrderService {
             String desc = "购买:" + product.getName() + " 充值:" + money;
             chargeDto.setTitle(desc);
             chargeDto.setDescription(desc);
+            chargeDto.setPayType(dto.getPayType());
             payOrder = payService.addOrder(chargeDto, username);
             order.setPayOrderId(payOrder.getId());
             productOrderRepository.save(order);

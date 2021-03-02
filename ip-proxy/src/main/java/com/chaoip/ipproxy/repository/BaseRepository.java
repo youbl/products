@@ -25,7 +25,7 @@ public interface BaseRepository<T, ID> extends MongoRepository<T, ID> {
      */
     default Page<T> pageSearch(Example<T> example, int pageNum, int pageSize, String sort, boolean isDesc) {
         pageNum = Math.max(pageNum, 0);
-        pageSize = pageSize > 0 && pageSize < 100 ? pageSize : 20;
+        pageSize = pageSize > 0 && pageSize < 100 ? pageSize : 12;
         Sort.Direction direction = isDesc ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(pageNum, pageSize, direction, sort);
         // getContent是记录，getTotalElements是总记录数，用于前端分页

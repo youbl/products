@@ -2,10 +2,7 @@ package com.chaoip.ipproxy.controller;
 
 import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.*;
-import com.chaoip.ipproxy.repository.entity.BeinetUser;
-import com.chaoip.ipproxy.repository.entity.PayOrder;
-import com.chaoip.ipproxy.repository.entity.RealOrder;
-import com.chaoip.ipproxy.repository.entity.ValidCode;
+import com.chaoip.ipproxy.repository.entity.*;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.service.PayService;
@@ -14,6 +11,7 @@ import com.chaoip.ipproxy.service.ValidCodeService;
 import com.chaoip.ipproxy.util.ImgHelper;
 import com.chaoip.ipproxy.util.QrcodeHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -220,12 +218,14 @@ public class UserController {
     /**
      * 返回当前登录用户的充值记录
      *
+     * @param dto     检索条件
      * @param details 登录人
      * @return 记录
      */
     @GetMapping("charges")
-    public List<PayOrder> getCharges(AuthDetails details) {
-        return payService.findOrder(details.getUserName());
+    public Page<PayOrder> getCharges(PayOrderDto dto, AuthDetails details) {
+        dto.setName(details.getUserName());
+        return payService.findOrder(dto);
     }
 
     /**

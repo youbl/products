@@ -40,6 +40,6 @@ public class ManagerService {
     }
 
     public List<PayOrder> findCharges() {
-        return payService.findOrder(null);
+        return payService.findOrder();
     }
 }

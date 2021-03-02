@@ -21,15 +21,28 @@
     <template>
         <el-tabs v-model="tab.activeTab">
             <el-tab-pane label="历史订单" name="first">
+                <div style="text-align: left;">
+                    <el-button @click="getPrevPage" :disabled="pageNum<=0">上一页</el-button>
+                    <el-button @click="getAfterPage" :disabled="orderData.length<pageSize">下一页</el-button>
+                    <span>&nbsp;第 {{pageNum+1}}/{{Math.ceil(orderTotalNum/pageSize)}} 页，总记录数 {{orderTotalNum}} 条</span>
+
+                    <button onclick="location.reload()">刷新</button>
+                </div>
+                <br>
+
                 <el-table
                         :data="orderData"
                         stripe
+                        border
                         show-summary
                         style="width: 100%">
                     <el-table-column
-                            prop="orderNo"
-                            label="订单号"
-                            width="250">
+                            label="订单号/创建时间"
+                            width="250" align="center">
+                        <template slot-scope="scope">
+                            {{scope.row.orderNo}}<br>
+                            {{scope.row.creationTime}}<br>
+                        </template>
                     </el-table-column>
                     <el-table-column
                             prop="buyNum"
@@ -57,25 +70,27 @@
                             width="300">
                     </el-table-column>
                     <el-table-column
-                            prop="payTime"
-                            label="支付时间"
-                            width="230">
-                    </el-table-column>
-                    <el-table-column
-                            prop="endTime"
-                            label="过期时间"
-                            width="230">
+                            label="支付/过期时间"
+                            width="230" align="center">
+                        <template slot-scope="scope">
+                            {{scope.row.payTime}}<br>
+                            {{scope.row.endTime}}<br>
+                        </template>
                     </el-table-column>
                     <el-table-column
                             prop="disabled"
                             label="失效"
-                            width="40">
+                            width="50">
                     </el-table-column>
                     <el-table-column label="">
                         <template slot-scope="scope">
                             <el-button v-show="scope.row.disabled !== 1"
-                                       size="mini"
+                                       size="mini" type="warning"
                                        @click="closeOrder(scope.$index, scope.row)">关闭订单
+                            </el-button>
+<!--                            <el-button v-show="scope.row.status === 'NO_PAY'"-->
+<!--                                       size="mini" type="primary"-->
+<!--                                       @click="closeOrder(scope.$index, scope.row)">去支付-->
                             </el-button>
                             <el-button v-if="canGetIP(scope.row)"
                                        size="mini"
@@ -166,6 +181,10 @@
                 },
                 user: {},
                 orderData: [],
+                orderTotalNum: 0,
+                pageNum: 0,
+                pageSize: 12,
+
                 provinceSelected: {},
                 provinceList: [{id: '', text: '不限', citys: [{code: '', text: '不限'}]}],
 
@@ -287,14 +306,25 @@
             getUrlPrefix: function () {
                 return location.protocol + '//' + location.host;
             },
+            getPrevPage: function () {
+                if (this.pageNum > 0) {
+                    this.pageNum--;
+                    this.loadOrderDatas();
+                }
+            },
+            getAfterPage: function () {
+                this.pageNum++;
+                this.loadOrderDatas();
+            },
             loadOrderDatas: function () {
-                let url = '/order';
+                let url = '/order?pageNum=' + this.pageNum + '&pageSize=' + this.pageSize;
                 axios.get(url).then(response => {
                     if (!response || !response.data) {
                         alert('获取失败');
                         return;
                     }
-                    this.orderData = this.processData(response.data);
+                    this.orderData = this.processData(response.data.content);
+                    this.orderTotalNum = response.data.totalElements;
                 }).catch(error => this.ajaxError(error));
             },
             processData: function (data) {
