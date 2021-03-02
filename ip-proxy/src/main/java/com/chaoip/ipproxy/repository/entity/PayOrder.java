@@ -48,7 +48,12 @@ public class PayOrder {
     /**
      * 1 支付宝；2 微信；3 其它
      */
-    private int payType;
+    private Integer payType;
+
+    public int getPayType() {
+        return payType == null ? 1 : payType;
+    }
+
     /**
      * 申请支付金额
      */

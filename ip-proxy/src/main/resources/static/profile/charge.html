@@ -189,7 +189,8 @@
                     let args = {
                         money: this.userCharge.money * 100, // 接口单位是分
                         title: this.userCharge.title,
-                        description: this.userCharge.description
+                        description: this.userCharge.description,
+                        payType: this.userCharge.payType,
                     };
                     // 默认情况下Chrome会阻止ajax弹窗，用这个方法解决
                     let newWindown = window.open('about:blank', '_blank');
