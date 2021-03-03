@@ -164,7 +164,7 @@
                         alert('获取失败');
                         return;
                     }
-                    this.products = (response.data);
+                    this.products = (response.data.content);
                     if (this.products.length > 0) {
                         this.product = this.products[0];
 

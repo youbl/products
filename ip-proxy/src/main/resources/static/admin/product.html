@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>产品管理</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script src="/res/unpkg/elemeIndex.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+</head>
+
+<body>
+<div id="divApp">
+    <h1 style="text-align: center">
+        产品列表
+    </h1>
+    <div class="tab-content">
+        <template>
+            <div style="text-align: left;">
+                <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
+                <el-button @click="getAfterPage" :disabled="productData.length<pageSize">下一页</el-button>
+                <span>&nbsp;当前第 {{page+1}}/{{Math.ceil(productTotalNum/pageSize)}} 页，总记录数 {{productTotalNum}} 条</span>
+
+                <button onclick="location.reload()">刷新</button>
+            </div>
+            <br>
+            <el-table
+                    :data="productData"
+                    stripe
+                    border
+                    style="width: 100%">
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                </el-table-column>
+                <el-table-column
+                        prop="id"
+                        label="ID"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="name"
+                        label="产品名称"
+                        width="150">
+                </el-table-column>
+                <el-table-column
+                        prop="moneyPerUnit"
+                        label="产品价格"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="type"
+                        label="订单时长"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="numPerDay"
+                        label="每天IP数"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="creationTime"
+                        label="创建时间"
+                        width="230">
+                </el-table-column>
+                </el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                    </template>
+                </el-table-column>
+            </el-table>
+        </template>
+    </div>
+
+    <el-dialog title="产品详情" :visible.sync="openEditDialog">
+        <el-form>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button icon="el-icon-success" type="primary">保 存</el-button>
+            <el-button @click="hideAddDialog">取 消</el-button>
+        </div>
+    </el-dialog>
+</div>
+<script>
+    var vueApp = new Vue({
+        el: '#divApp',
+        data: {
+            productData: [],
+            productTotalNum: 0,
+            page: 0,
+            pageSize: 12,
+            openEditDialog: false,
+        },
+        created: function () {
+            this.showAllProduct();
+        },
+        computed: {},
+        methods: {
+            showAllProduct: function () {
+                let url = '/product/all?pageNum=' + this.page + '&pageSize=' + this.pageSize;
+                axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.content || response.data.content.length <= 0) {
+                        this.productData = [];
+                        alert('无数据');
+                        return;
+                    }
+                    for (let i = 0, j = response.data.content.length; i < j; i++) {
+                        let item = response.data.content[i];
+                        item.moneyPerUnit = item.moneyPerUnit / 100;
+                    }
+                    this.productData = response.data.content;
+                    this.productTotalNum = response.data.totalElements;
+                }).catch(error => this.ajaxError(error));
+            },
+            getPrevPage: function () {
+                if (this.page > 0) {
+                    this.page--;
+                    this.showAllProduct();
+                }
+            },
+            getAfterPage: function () {
+                this.page++;
+                this.showAllProduct();
+            },
+            showAddDialog: function () {
+                this.openEditDialog = true;
+            },
+            hideAddDialog: function () {
+                this.openEditDialog = false;
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    let msg = error.response.data['Msg'];
+                    if (msg === 'Unauthorized') {
+                        location.href = '/login?r=%2Fadmin%23%2FserverStatus.html';
+                        return;
+                    }
+                    console.log(JSON.stringify(error.response.data));
+                    alert('出错了');
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+
+
+    /**
+     * 滚动到窗口底部
+     */
+    function toWindowBottom() {
+        window.scrollTo(0, getWindowHeight());
+    }
+
+    /**
+     * 获取窗口高度
+     * @return {number} 窗口高度值
+     */
+    function getWindowHeight() {
+        // body是chrome，documentElement是IE和Firefox
+        return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    }
+
+    /**
+     * 获取url里的变量值
+     * @param {string} name 变量名
+     * @return {string} 变量值
+     */
+    function getQueryString(name) {
+        if (typeof (name) !== 'string') {
+            return '';
+        }
+        name = name.trim();
+        if (name.length === 0) {
+            return '';
+        }
+        let localSearch = location.search.toLocaleLowerCase();
+        name = name.toLowerCase() + '=';
+        let tmpName = '?' + name;
+        let idx = localSearch.indexOf(tmpName);
+        if (idx < 0) {
+            tmpName = '&' + name;
+            idx = localSearch.indexOf(tmpName);
+            if (idx < 0) {
+                return '';
+            }
+        }
+        name = tmpName;
+        let tmp = location.search.substr(idx + name.length);
+        idx = tmp.indexOf('&');
+        if (idx === 0)
+            return '';
+        let ret;
+        if (idx < 0) {
+            ret = tmp;
+        } else {
+            ret = tmp.substr(0, idx);
+        }
+        return decodeURIComponent(ret.trim());
+    }
+</script>
+</body>
+
+</html>

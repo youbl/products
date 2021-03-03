@@ -51,6 +51,9 @@
                         <el-menu-item index="2-7" @click.native="switchTab(27)"
                                       v-if="isAdmin">代理管理
                         </el-menu-item>
+                        <el-menu-item index="2-4" @click.native="switchTab(24)"
+                                      v-if="isAdmin">产品价格管理
+                        </el-menu-item>
                         <el-menu-item index="2-8" @click.native="switchTab(28)"
                                       v-if="isAdmin">用户充值管理
                         </el-menu-item>
@@ -172,6 +175,18 @@
                         frameborder="0"></iframe>
             </el-main>
 
+            <!-- 产品管理 -->
+            <el-main v-show="showTab===24" v-if="isAdmin">
+                <iframe v-if="showTab===24" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
+                        frameborder="0"></iframe>
+            </el-main>
+
+            <!-- 用户订单管理 -->
+            <el-main v-show="showTab===25" v-if="isAdmin">
+                <iframe v-if="showTab===25" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
+                        frameborder="0"></iframe>
+            </el-main>
+
             <!-- 用户管理 -->
             <el-main v-show="showTab===26" v-if="isAdmin">
                 <iframe v-if="showTab===26" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
@@ -187,12 +202,6 @@
             <!-- 用户充值管理 -->
             <el-main v-show="showTab===28" v-if="isAdmin">
                 <iframe v-if="showTab===28" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
-                        frameborder="0"></iframe>
-            </el-main>
-
-            <!-- 用户订单管理 -->
-            <el-main v-show="showTab===25" v-if="isAdmin">
-                <iframe v-if="showTab===25" :src="allPage[showTab]" width="100%" height="95%" scrolling="auto"
                         frameborder="0"></iframe>
             </el-main>
 
@@ -223,14 +232,15 @@
                 user: {},
                 imgSrc: '/favicon.ico',
                 allPage: {
-                    14: '/profile/charge.html',    // 充值页面
-                    21: '/profile/product.html',// 用户购买页
-                    22: '/profile/buylist.html', // 用户已购订单页
-                    26: '/admin/user.html',     // 管理用户列表页
-                    27: '/admin/list.html',       // 管理ip列表页
-                    28: '/admin/charge.html', // 管理员查看充值页面
-                    25: '/admin/buylist.html',     // 管理用户订单列表页
-                    29: '/admin/config.html',  // 站点配置页面
+                    14: '/profile/charge.html',     // 充值页面
+                    21: '/profile/product.html',    // 用户购买页
+                    22: '/profile/buylist.html',    // 用户已购订单页
+                    26: '/admin/user.html',         // 管理用户列表页
+                    27: '/admin/list.html',         // 管理ip列表页
+                    24: '/admin/product.html',      // 管理产品列表页
+                    28: '/admin/charge.html',       // 管理员查看充值页面
+                    25: '/admin/buylist.html',      // 管理用户订单列表页
+                    29: '/admin/config.html',       // 站点配置页面
                 },
                 realNameValidateQrCode: '',
 
