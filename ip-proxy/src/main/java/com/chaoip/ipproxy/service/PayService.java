@@ -94,11 +94,6 @@ public class PayService {
         return payOrderRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize(), "creationTime", true);
     }
 
-    public List<PayOrder> findOrder() {
-        return payOrderRepository.findByOrderByCreationTimeDesc();
-        //return payOrderRepository.findByNameOrderByCreationTimeDesc(name);
-    }
-
     /**
      * 根据订单号找订单
      *

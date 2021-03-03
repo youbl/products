@@ -13,14 +13,22 @@
 
 <body style="height: 900px;">
 <div id="divApp" style="height: 100%;">
-    <button onclick="location.reload()">刷新</button>
     <template>
         <el-tabs v-model="tab.activeTab">
 
-            <el-tab-pane label="充值记录" name="first">
+            <el-tab-pane label="所有充值记录" name="first">
+                <div style="text-align: left;">
+                    <el-button @click="getPrevPage" :disabled="pageNum<=0">上一页</el-button>
+                    <el-button @click="getAfterPage" :disabled="chargeData.length<pageSize">下一页</el-button>
+                    <span>&nbsp;第 {{pageNum+1}}/{{Math.ceil(chargeTotalNum/pageSize)}} 页，总记录数 {{chargeTotalNum}} 条</span>
+
+                    <button onclick="location.reload()">刷新</button>
+                </div>
+                <br>
                 <el-table
                         :data="chargeData"
                         stripe
+                        border
                         show-summary
                         style="width: 100%">
                     <el-table-column
@@ -102,6 +110,9 @@
                 },
                 user: {},
                 chargeData: [],
+                chargeTotalNum: 0,
+                pageNum: 0,
+                pageSize: 12,
 
                 userCharge: {
                     name: '',
@@ -144,14 +155,25 @@
                 //     showClose: false,
                 // });
             },
+            getPrevPage: function () {
+                if (this.pageNum > 0) {
+                    this.pageNum--;
+                    this.loadChargsDatas();
+                }
+            },
+            getAfterPage: function () {
+                this.pageNum++;
+                this.loadChargsDatas();
+            },
             loadChargsDatas: function () {
-                let url = '/manage/charges';
+                let url = '/manage/charges?pageNum=' + this.pageNum + '&pageSize=' + this.pageSize;
                 axios.get(url).then(response => {
                     if (!response || !response.data) {
                         alert('获取失败');
                         return;
                     }
-                    this.chargeData = this.processData(response.data);
+                    this.chargeData = this.processData(response.data.content);
+                    this.chargeTotalNum = response.data.totalElements;
                 }).catch(error => this.ajaxError(error));
             },
             processData: function (data) {

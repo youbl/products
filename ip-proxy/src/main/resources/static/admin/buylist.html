@@ -19,10 +19,19 @@
 <body style="height: 900px;">
 <div id="divApp" style="height: 100%;">
     <el-tabs v-model="tab.activeTab">
-        <el-tab-pane label="历史订单" name="first">
+        <el-tab-pane label="所有购买订单" name="first">
+            <div style="text-align: left;">
+                <el-button @click="getPrevPage" :disabled="pageNum<=0">上一页</el-button>
+                <el-button @click="getAfterPage" :disabled="orderData.length<pageSize">下一页</el-button>
+                <span>&nbsp;第 {{pageNum+1}}/{{Math.ceil(orderTotalNum/pageSize)}} 页，总记录数 {{orderTotalNum}} 条</span>
+
+                <button onclick="location.reload()">刷新</button>
+            </div>
+            <br>
             <el-table
                     :data="orderData"
                     stripe
+                    border
                     show-summary
                     style="width: 100%">
                 <el-table-column
@@ -102,6 +111,9 @@
                 },
                 user: {},
                 orderData: [],
+                orderTotalNum: 0,
+                pageNum: 0,
+                pageSize: 12,
             }
         },
         created: function () {
@@ -130,14 +142,25 @@
                     item.disabled = 1;
                 }).catch(error => this.ajaxError(error));
             },
+            getPrevPage: function () {
+                if (this.pageNum > 0) {
+                    this.pageNum--;
+                    this.loadOrderDatas();
+                }
+            },
+            getAfterPage: function () {
+                this.pageNum++;
+                this.loadOrderDatas();
+            },
             loadOrderDatas: function () {
-                let url = '/manage/order';
+                let url = '/manage/order?pageNum=' + this.pageNum + '&pageSize=' + this.pageSize;
                 axios.get(url).then(response => {
                     if (!response || !response.data) {
                         alert('获取失败');
                         return;
                     }
-                    this.orderData = this.processData(response.data);
+                    this.orderData = this.processData(response.data.content);
+                    this.orderTotalNum = response.data.totalElements;
                 }).catch(error => this.ajaxError(error));
             },
             processData: function (data) {

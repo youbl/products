@@ -3,7 +3,9 @@ package com.chaoip.ipproxy.service;
 import com.chaoip.ipproxy.controller.dto.ChargeDto;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
+import com.chaoip.ipproxy.repository.entity.PayOrderDto;
 import com.chaoip.ipproxy.security.BeinetUserService;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -39,7 +41,7 @@ public class ManagerService {
         payService.addMoneyAndOrder(money);
     }
 
-    public List<PayOrder> findCharges() {
-        return payService.findOrder();
+    public Page<PayOrder> findCharges(PayOrderDto dto) {
+        return payService.findOrder(dto);
     }
 }

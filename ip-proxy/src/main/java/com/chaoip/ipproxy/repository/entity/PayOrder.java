@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 /**
- * 支付订单表
+ * 支付订单表。也是充值清单
  *
  * @author youbl
  * @version 1.0

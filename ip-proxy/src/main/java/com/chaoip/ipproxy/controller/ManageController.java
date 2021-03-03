@@ -1,12 +1,10 @@
 package com.chaoip.ipproxy.controller;
 
 import com.chaoip.ipproxy.controller.dto.ChargeDto;
+import com.chaoip.ipproxy.controller.dto.ProductOrderDto;
 import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
-import com.chaoip.ipproxy.repository.entity.BeinetUser;
-import com.chaoip.ipproxy.repository.entity.PayOrder;
-import com.chaoip.ipproxy.repository.entity.ProductOrder;
-import com.chaoip.ipproxy.repository.entity.Route;
+import com.chaoip.ipproxy.repository.entity.*;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.service.ManagerService;
@@ -196,22 +194,20 @@ public class ManageController {
      * @return 记录
      */
     @GetMapping("charges")
-    public List<PayOrder> getCharges() {
-        return managerService.findCharges();
+    public Page<PayOrder> getCharges(PayOrderDto dto) {
+        return managerService.findCharges(dto);
     }
 
 
     /**
      * 获取所有购买订单
      *
-     * @param page 第几页
-     * @param size 每页几条
+     * @param dto 条件
      * @return 产品订单
      */
     @GetMapping("order")
-    public List<ProductOrder> getOrders(@RequestParam(required = false, defaultValue = "0") int page,
-                                        @RequestParam(required = false, defaultValue = "20") int size) {
-        return productOrderService.findAll();
+    public Page<ProductOrder> getOrders(ProductOrderDto dto) {
+        return productOrderService.findAll(dto);
     }
 
     @PostMapping("order")

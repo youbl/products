@@ -62,7 +62,7 @@ public class ProductOrderController {
     @GetMapping("")
     public Page<ProductOrder> getOrders(ProductOrderDto dto, AuthDetails details) {
         dto.setName(details.getUserName());
-        return productOrderService.findByUser(dto);
+        return productOrderService.findAll(dto);
     }
 
     @PostMapping("/close/{id}")

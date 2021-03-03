@@ -48,10 +48,6 @@ public class ProductOrderService {
         this.productOrderDetailRepository = productOrderDetailRepository;
     }
 
-    public List<ProductOrder> findAll() {
-        return productOrderRepository.findByOrderByCreationTimeDesc();
-    }
-
     public ProductOrder close(long id, String account) {
         ProductOrder order = productOrderRepository.findById(id).orElse(null);
         if (order == null) {
@@ -79,7 +75,7 @@ public class ProductOrderService {
      * @param dto 条件
      * @return 订单
      */
-    public Page<ProductOrder> findByUser(ProductOrderDto dto) {
+    public Page<ProductOrder> findAll(ProductOrderDto dto) {
         //return productOrderRepository.findByNameOrderByCreationTimeDesc(userName);
         // 不使用的属性，必须要用 withIgnorePaths 忽略，否则会列入条件
         ExampleMatcher matcher = ExampleMatcher.matching()
@@ -244,13 +240,17 @@ public class ProductOrderService {
             order.setPayOrderId(0);
             setOrderSuccess(order);
         } else {
+            // 创建一笔充值订单，并返回支付链接
             ChargeDto chargeDto = new ChargeDto();
             chargeDto.setMoney(money);
-            String desc = "购买:" + product.getName() + " 充值:" + money;
-            chargeDto.setTitle(desc);
+            String title = "购买:" + product.getName();
+            chargeDto.setTitle(title);
+            String desc = title + " 需支付:" + (money / 100) + "元";
             chargeDto.setDescription(desc);
             chargeDto.setPayType(dto.getPayType());
+            // payOrder就是充值记录（也就是支付订单）
             payOrder = payService.addOrder(chargeDto, username);
+
             order.setPayOrderId(payOrder.getId());
             productOrderRepository.save(order);
         }
