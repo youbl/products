@@ -16,25 +16,20 @@
     <h1 style="text-align: center">
         用户列表
     </h1>
-    <div>
-        <div style="float: left;">
-            <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
-            <el-button @click="getAfterPage" :disabled="isLastPage">下一页</el-button>
-            <span>&nbsp;当前第 {{page+1}} 页，总记录数 {{userTotalNum}} 条</span>
-
-            <button onclick="location.reload()">刷新</button>
-        </div>
-        <div style="float: right">
-            <el-link type="warning" href="/logout">退出登录</el-link>
-        </div>
-        <div style="float: right; width:200px;">&nbsp;</div>
-    </div>
-    <div style="clear: both"></div>
     <div class="tab-content">
         <template>
+            <div style="text-align: left;">
+                <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
+                <el-button @click="getAfterPage" :disabled="userData.length<pageSize">下一页</el-button>
+                <span>&nbsp;当前第 {{page+1}}/{{Math.ceil(userTotalNum/pageSize)}} 页，总记录数 {{userTotalNum}} 条</span>
+
+                <button onclick="location.reload()">刷新</button>
+            </div>
+            <br>
             <el-table
                     :data="userData"
                     stripe
+                    border
                     style="width: 100%">
                 <el-table-column
                         label="序号"
@@ -113,7 +108,7 @@
             userData: [],
             userTotalNum: 0,
             page: 0,
-            isLastPage: false,
+            pageSize: 12,
             openEditDialog: false,
         },
         created: function () {
@@ -122,11 +117,10 @@
         computed: {},
         methods: {
             showAllUser: function () {
-                let url = '/manage/users?pageNum=' + this.page;
+                let url = '/manage/users?pageNum=' + this.page + '&pageSize=' + this.pageSize;
                 axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.content || response.data.content.length <= 0) {
                         this.userData = [];
-                        this.isLastPage = true;
                         alert('无数据');
                         return;
                     }
@@ -136,7 +130,6 @@
                     }
                     this.userData = response.data.content;
                     this.userTotalNum = response.data.totalElements;
-                    this.isLastPage = (response.data.numberOfElements < response.data.size);
                 }).catch(error => this.ajaxError(error));
             },
             getPrevPage: function () {
