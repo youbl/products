@@ -5,7 +5,6 @@ import com.chaoip.ipproxy.repository.PayOrderRepository;
 import com.chaoip.ipproxy.repository.entity.OrderStatus;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.repository.entity.PayOrderDto;
-import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.util.AliPayHelper;
 import com.chaoip.ipproxy.util.WechatPay;
 import lombok.Synchronized;
@@ -20,7 +19,6 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 /**
  * 支付服务类
@@ -102,6 +100,21 @@ public class PayService {
      */
     public PayOrder findByOrder(String orderNo) {
         return payOrderRepository.findByOrderNo(orderNo);
+    }
+
+    /**
+     * 根据id找充值记录，并对比用户名
+     *
+     * @param id       记录id
+     * @param userName 用户名
+     * @return 记录
+     */
+    public PayOrder findById(int id, String userName) {
+        PayOrder order = payOrderRepository.findById((long) id).orElse(null);
+        if (order != null && order.getName().equals(userName)) {
+            return order;
+        }
+        return null;
     }
 
     /**

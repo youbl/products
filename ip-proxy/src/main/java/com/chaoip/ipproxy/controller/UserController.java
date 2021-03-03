@@ -229,6 +229,18 @@ public class UserController {
     }
 
     /**
+     * 返回当前登录用户的充值记录
+     *
+     * @param payId   记录id
+     * @param details 登录人
+     * @return 记录
+     */
+    @GetMapping("charge/{payId}")
+    public PayOrder getCharges(@PathVariable int payId, AuthDetails details) {
+        return payService.findById(payId, details.getUserName());
+    }
+
+    /**
      * 获取图形验证码和序号
      *
      * @return 序号和图片

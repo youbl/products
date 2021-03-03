@@ -88,9 +88,9 @@
                                        size="mini" type="warning"
                                        @click="closeOrder(scope.$index, scope.row)">关闭订单
                             </el-button>
-<!--                            <el-button v-show="scope.row.status === 'NO_PAY'"-->
-<!--                                       size="mini" type="primary"-->
-<!--                                       @click="closeOrder(scope.$index, scope.row)">去支付-->
+                            <el-button v-show="scope.row.status === 'NO_PAY' && scope.row.payUrl"
+                                       size="mini" type="primary"
+                                       @click="goPay(scope.$index, scope.row)">去支付
                             </el-button>
                             <el-button v-if="canGetIP(scope.row)"
                                        size="mini"
@@ -162,6 +162,14 @@
             <el-input v-model="getIpConditionURL" maxlength="30"></el-input>
         </div>
     </el-dialog>
+
+    <el-dialog title="支付成功？" :visible.sync="openPayConfirm" width="400px">
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="doPayConfirm">确认已支付</el-button>
+            <el-button @click="openPayConfirm=false">取消支付</el-button>
+            <el-button @click="location.reload()">刷新</el-button>
+        </div>
+    </el-dialog>
 </div>
 
 <script>
@@ -207,6 +215,9 @@
                 },
 
                 getIpConditionURL: '', // 生成的结果链接
+
+                openPayConfirm: false,  // 是否弹窗显示支付成功的对话框
+                payConfirmOrderNo: '',  // 点击确认时，用于确认的订单号
             }
         },
         created: function () {
@@ -263,6 +274,44 @@
             changeProvince: function () {
                 this.provinceSelected = this.searchProvince(this.getIpCondition.province);
                 this.getIpCondition.area = this.provinceSelected.citys[0].code;
+            },
+            getPayUrl: function (productOrder) {
+                productOrder.payUrl = '';
+                if (!productOrder.payOrderId) {
+                    return;
+                }
+                let url = '/user/charge/' + productOrder.payOrderId;
+                axios.get(url).then(response => {
+                    if (!response || !response.data) {
+                        alert('获取充值记录失败，请重试 ' + productOrder.payOrderId);
+                        return;
+                    }
+                    productOrder.payUrl = response.data.payUrl;
+                    productOrder.payOrderNo = response.data.orderNo;
+                }).catch(error => this.ajaxError(error));
+            },
+            goPay: function (idx, row) {
+                window.open(row.payUrl, '_blank');
+                this.showConfirmDialog(row.payOrderNo);
+            },
+            // 弹窗跳转到支付宝后，本页面弹出是否支付成功的对话框，以便用户点击查询支付结果
+            showConfirmDialog: function (orderNo) {
+                if (!orderNo) {
+                    alert('订单号为空，出啥错了？');
+                    return;
+                }
+                this.payConfirmOrderNo = orderNo;
+                this.openPayConfirm = true;
+            },
+            doPayConfirm: function () {
+                let url = '/user/payback/' + this.payConfirmOrderNo;
+                axios.get(url).then(response => {
+                    if (!response || !response.data) {
+                        alert('获取支付结果失败，请重试');
+                        return;
+                    }
+                    alert(response.data);
+                }).catch(error => this.ajaxError(error));
             },
             closeOrder: function (idx, item) {
                 if (!confirm('确认要关闭订单吗？此操作不可恢复')) {
@@ -334,6 +383,7 @@
                     switch (item.status) {
                         case 'NO_PAY':
                             item.statusName = '未支付';
+                            this.getPayUrl(item);
                             break;
                         case 'SUCCESS':
                             item.statusName = '成功';
