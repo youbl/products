@@ -7,6 +7,7 @@
     <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
     <script type="text/javascript" src="/res/unpkg/elemeIndex.js"></script>
     <script type="text/javascript" src="/res/qs.min.js"></script>
+    <script type="text/javascript" src="/res/echarts.min.js"></script>
 
     <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
     <style>
@@ -32,6 +33,10 @@
                 </div>
                 <hr>
             </div>
+            <template>
+                <div id="echarts_box" style="width: 98%;height:400px;"></div>
+            </template>
+
         </el-tab-pane>
         <el-tab-pane label="导出" name="export">
         </el-tab-pane>
@@ -47,11 +52,15 @@
                 type: '',
                 activeName: 'assetState',
                 dataList: [],
+                myChart: {},
             }
         },
-        created: function () {
+        mounted: function () {
             this.type = getQueryString('type');
-            this.loadStateReport();
+            if (!this.type) {
+                this.type = 'state';
+            }
+            this.loadStateReport().then(this.showEChart);
             //this.getCurrentUser().then(this.loadUsers).then();
             switch (this.type) {
                 case 'state':
@@ -68,7 +77,6 @@
                     break;
             }
         },
-        computed: {},
         methods: {
             handleClick: function (tab, event) {
                 if (tab.label === '导出') {
@@ -88,6 +96,61 @@
                     }
                     this.dataList = response.data;
                 }).catch(error => this.ajaxError(error));
+            },
+            showEChart: function () {
+                // 初始化图表
+                this.myChart = echarts.init(document.getElementById('echarts_box'))
+                let xDataName = []; // 每列数据的下标名称
+                let xDataLabel = [];
+                let xData = [];     // 所有数据
+
+                for (let i = 0, j = this.dataList.length; i < j; i++) {
+                    let item = this.dataList[i];
+                    xDataName.push(item.name);
+                    xDataLabel.push(item.name);
+                    xData.push(item.num);
+                    for (let m = 0, n = item.details.length; m < n; m++) {
+                        let subItem = item.details[m];
+                        xDataName.push(subItem.name);
+                        xDataLabel.push(item.name);
+                        xData.push({value: subItem.num, itemStyle: {color: '#F781F3'}});
+                    }
+                }
+                // 指定图表的配置项和数据
+                let option = {
+                    title: {
+                        text: this.labelName,
+                        x: 'center',
+                        textAlign: 'left',
+                    },
+                    tooltip: {},
+                    legend: {
+                        data: ['库存数量'],
+                    },
+                    xAxis: {
+                        data: xDataName,
+                        axisLabel: {
+                            interval: 0,//让所有坐标值全部显示
+                            rotate: 15,//让坐标值旋转一定的角度
+                        },
+                    },
+                    yAxis: {},
+                    series: [{
+                        name: '销量',
+                        type: 'bar',
+                        data: xData,
+                        show: true,
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'top',
+                            }
+                        }
+                    }]
+                };
+
+                // 使用刚指定的配置项和数据显示图表。
+                this.myChart.setOption(option);
             },
             goLogin: function () {
                 top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
