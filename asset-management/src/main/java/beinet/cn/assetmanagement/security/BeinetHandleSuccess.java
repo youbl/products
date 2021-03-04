@@ -31,11 +31,7 @@ public class BeinetHandleSuccess implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException {
-        LoginDto dto = LoginDto.builder()
-                .account(authentication.getName())
-                .ip(request.getRemoteAddr() + ";X-Real-IP:" + request.getHeader("X-Real-IP") + ";X-Forwarded-For" + request.getHeader("X-Forwarded-For"))
-                .build();
-        eventPublisher.publishEvent(dto);
+        publishEvent(request, authentication);
 
         // response.sendRedirect("/user/sub");
         response.setStatus(HttpStatus.OK.value());
@@ -46,5 +42,13 @@ public class BeinetHandleSuccess implements AuthenticationSuccessHandler {
         Map<String, Object> data = new HashMap<>();
         data.put("msg", authentication.getName() + " 登录成功");
         response.getOutputStream().write(new ObjectMapper().writeValueAsString(data).getBytes(StandardCharsets.UTF_8));
+    }
+
+    private void publishEvent(HttpServletRequest request, Authentication authentication) {
+        LoginDto dto = LoginDto.builder()
+                .account(authentication.getName())
+                .ip(request.getRemoteAddr() + ";X-Real-IP:" + request.getHeader("X-Real-IP") + ";X-Forwarded-For:" + request.getHeader("X-Forwarded-For"))
+                .build();
+        eventPublisher.publishEvent(dto);
     }
 }
