@@ -1,6 +1,8 @@
 package beinet.cn.assetmanagement.security;
 
+import beinet.cn.assetmanagement.event.LoginDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -20,9 +22,21 @@ import java.util.Map;
  * @date 2020/11/25 14:58
  */
 public class BeinetHandleSuccess implements AuthenticationSuccessHandler {
+    private final ApplicationEventPublisher eventPublisher; // 发送事件用
+
+    public BeinetHandleSuccess(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException {
+        LoginDto dto = LoginDto.builder()
+                .account(authentication.getName())
+                .ip(request.getRemoteAddr() + ";X-Real-IP:" + request.getHeader("X-Real-IP") + ";X-Forwarded-For" + request.getHeader("X-Forwarded-For"))
+                .build();
+        eventPublisher.publishEvent(dto);
+
         // response.sendRedirect("/user/sub");
         response.setStatus(HttpStatus.OK.value());
 
