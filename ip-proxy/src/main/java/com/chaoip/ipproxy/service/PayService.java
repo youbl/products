@@ -134,7 +134,8 @@ public class PayService {
             throw new RuntimeException(orderNo + " 订单金额有误：" + order.getMoney());
         }
         if (order.getStatus() != OrderStatus.NO_PAY) {
-            throw new RuntimeException("您的订单已处理完毕: " + orderNo);
+            return order.getStatus() == OrderStatus.SUCCESS;
+            // throw new RuntimeException("您的订单已处理完毕: " + orderNo);
         }
 
         boolean ret;

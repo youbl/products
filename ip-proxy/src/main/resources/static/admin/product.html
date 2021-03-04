@@ -19,11 +19,12 @@
     <div class="tab-content">
         <template>
             <div style="text-align: left;">
+                <el-button icon="el-icon-edit" type="primary" @click="showAddDialog()">新建</el-button>
                 <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
                 <el-button @click="getAfterPage" :disabled="productData.length<pageSize">下一页</el-button>
                 <span>&nbsp;当前第 {{page+1}}/{{Math.ceil(productTotalNum/pageSize)}} 页，总记录数 {{productTotalNum}} 条</span>
 
-                <button onclick="location.reload()">刷新</button>
+                <el-button icon="el-icon-refresh" @click="location.reload()">刷新</el-button>
             </div>
             <br>
             <el-table
@@ -31,45 +32,72 @@
                     stripe
                     border
                     style="width: 100%">
-                <el-table-column
-                        label="序号"
-                        type="index"
-                        width="50"
-                        align="center">
+                <el-table-column align="center"
+                                 prop="id"
+                                 label="ID"
+                                 width="100">
                 </el-table-column>
-                <el-table-column
-                        prop="id"
-                        label="ID"
-                        width="100">
+                <el-table-column align="center"
+                                 prop="name"
+                                 label="产品名称"
+                                 width="150">
                 </el-table-column>
-                <el-table-column
-                        prop="name"
-                        label="产品名称"
-                        width="150">
+                <el-table-column align="center"
+                                 prop="type"
+                                 label="产品类型"
+                                 width="100">
                 </el-table-column>
-                <el-table-column
-                        prop="moneyPerUnit"
-                        label="产品价格"
-                        width="100">
+                <el-table-column align="center"
+                                 label="IP有效时长"
+                                 width="100">
+                    <template slot-scope="scope">
+                        <div v-for="item in scope.row.ipValidTime">
+                            {{item.minuteMin}}~{{item.minuteMax}}分钟
+                        </div>
+                    </template>
                 </el-table-column>
-                <el-table-column
-                        prop="type"
-                        label="订单时长"
-                        width="100">
+                <el-table-column align="center"
+                                 label="产品价格"
+                                 width="100">
+                    <template slot-scope="scope">
+                        <div v-for="item in scope.row.moneyPerUnit">
+                            {{item}}元
+                        </div>
+                    </template>
                 </el-table-column>
-                <el-table-column
-                        prop="numPerDay"
-                        label="每天IP数"
-                        width="100">
+                <el-table-column align="center"
+                                 prop="numPerDay"
+                                 label="每日/最大IP数"
+                                 :render-header="renderheader"
+                                 width="100">
                 </el-table-column>
-                <el-table-column
-                        prop="creationTime"
-                        label="创建时间"
-                        width="230">
+                <el-table-column align="center"
+                                 prop="numPerTime"
+                                 label="单次/最大IP数"
+                                 :render-header="renderheader"
+                                 width="100">
+                </el-table-column>
+                <el-table-column align="center"
+                                 label="状态"
+                                 width="50">
+                    <template slot-scope="scope">
+                        <span style="color:red;">{{scope.row.status===0?'启用':'禁用'}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column align="center"
+                                 prop="creationTime"
+                                 label="创建时间"
+                                 width="110">
                 </el-table-column>
                 </el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
+                        <el-button icon="el-icon-setting" type="warning" @click="changeStatus(scope.row)">
+                            {{scope.row.status===0?'禁用':'启用'}}
+                        </el-button>
+                        <el-button icon="el-icon-edit" type="primary" @click="showAddDialog(scope.row)">
+                            编辑
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -77,11 +105,32 @@
     </div>
 
     <el-dialog title="产品详情" :visible.sync="openEditDialog">
-        <el-form>
+        <el-form :model="editData" :rules="rulesEdit" ref="editForm">
+            <el-form-item label="产品名称" label-width="200px" prop="name" style="text-align: left;">
+                <el-input v-model="editData.name" placeholder="请输入产品名称"></el-input>
+            </el-form-item>
+            <el-form-item label="产品类型" label-width="200px" prop="type" style="text-align: left">
+                <el-select v-model="editData.type" filterable placeholder="请选择产品类型">
+                    <el-option v-for="(val,key,idx) in typeArr" :label="val" :value="key"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="每单位价格" label-width="200px" style="text-align: left" v-if="editData.type">
+                <div v-for="(item, idx) in editData.ipValidTime">
+                    {{editData.moneyPerUnit[idx]}}元/IP有效时长:{{editData.ipValidTime[idx].minuteMin}}~{{editData.ipValidTime[idx].minuteMax}}分钟/{{typeArr[editData.type]}}
+                    <el-link icon="el-icon-edit" @click="delPrice(editData, idx)">删除</el-link>
+                </div>
+
+            </el-form-item>
+            <el-form-item label="每日最大IP数" label-width="200px" prop="numPerDay" style="text-align: left;">
+                <el-input v-model="editData.numPerDay" placeholder="请输入每日最大IP数"></el-input>
+            </el-form-item>
+            <el-form-item label="单次最大IP数" label-width="200px" prop="numPerTime" style="text-align: left;">
+                <el-input v-model="editData.numPerTime" placeholder="请输入单次最大IP数"></el-input>
+            </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button icon="el-icon-success" type="primary">保 存</el-button>
-            <el-button @click="hideAddDialog">取 消</el-button>
+            <el-button icon="el-icon-success" type="primary" @click="saveData('editForm')">保 存</el-button>
+            <el-button icon="el-icon-cancel" @click="hideAddDialog">取 消</el-button>
         </div>
     </el-dialog>
 </div>
@@ -89,11 +138,36 @@
     var vueApp = new Vue({
         el: '#divApp',
         data: {
+            typeArr: {
+                MONTH: '包月',
+                QUARTER: '包季',
+                YEAR: '包年',
+                STREAM: '按量',
+            },
             productData: [],
             productTotalNum: 0,
             page: 0,
             pageSize: 12,
+
             openEditDialog: false,
+            editData: {},
+            rulesEdit: {
+                name: [
+                    {required: true, message: '不能为空', trigger: 'blur'},
+                    {min: 2, max: 20, message: '长度为2~20个字', trigger: 'blur'},
+                ],
+                type: [
+                    {required: true, message: '必选', trigger: 'change'},
+                ],
+                numPerDay: [
+                    {required: true, message: '不能为空', trigger: 'blur'},
+                    {pattern: /^\d{1,10}$/, message: '格式有误'},
+                ],
+                numPerTime: [
+                    {required: true, message: '不能为空', trigger: 'blur'},
+                    {pattern: /^\d{1,10}$/, message: '格式有误'},
+                ],
+            },
         },
         created: function () {
             this.showAllProduct();
@@ -110,7 +184,9 @@
                     }
                     for (let i = 0, j = response.data.content.length; i < j; i++) {
                         let item = response.data.content[i];
-                        item.moneyPerUnit = item.moneyPerUnit / 100;
+                        for (let m = 0, n = item.moneyPerUnit.length; m < n; m++) {
+                            item.moneyPerUnit[m] = item.moneyPerUnit[m] / 100;
+                        }
                     }
                     this.productData = response.data.content;
                     this.productTotalNum = response.data.totalElements;
@@ -126,11 +202,55 @@
                 this.page++;
                 this.showAllProduct();
             },
-            showAddDialog: function () {
+            // 禁用 启用
+            changeStatus: function (row) {
+                let txt = (row.status === 0 ? '禁用' : '启用');
+                if (!confirm('确认要 ' + txt + ' 该产品吗?')) {
+                    return;
+                }
+                let url = '/product/status/' + row.id;
+                axios.post(url).then(response => {
+                    row.status = (row.status === 0 ? 1 : 0);
+                    alert(txt + '成功');
+                }).catch(error => this.ajaxError(error));
+            },
+            showAddDialog: function (row) {
+                if (row) {
+                    this.editData = row;
+                } else {
+                    this.editData = {};
+                }
                 this.openEditDialog = true;
             },
             hideAddDialog: function () {
                 this.openEditDialog = false;
+            },
+            delPrice: function (item, idx) {
+                item.moneyPerUnit.splice(idx, 1);
+                item.ipValidTime.splice(idx, 1);
+            },
+            saveData: function (form) {
+                this.$refs[form].validate(valid => {
+                    if (!valid)
+                        return false;
+                    alert(1);
+                    return;
+                    let url = '/assetaudit';
+                    return axios.post(url, this.editData).then(response => {
+                        alert('保存成功');
+                        this.hideAddDialog();
+                        this.showAllProduct();
+                    }).catch(error => this.ajaxError(error));
+                });
+            },
+
+            // 用于表格标题换行
+            renderheader: function (h, {column, $index}) {
+                return h('span', {}, [
+                    h('span', {}, column.label.split('/')[0]),
+                    h('br'),
+                    h('span', {}, column.label.split('/')[1])
+                ]);
             },
             ajaxError: function (error) {
                 if (error.response && error.response.data) {

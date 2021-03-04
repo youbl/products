@@ -59,12 +59,25 @@ public class AutoInitData {
             return;
         }
         log.info("准备创建产品记录");
+
+        // IP有效时长数组
+        Product.IpTime[] arrTime = new Product.IpTime[4];
+        arrTime[0] = new Product.IpTime(3, 5);
+        arrTime[1] = new Product.IpTime(5, 10);
+        arrTime[2] = new Product.IpTime(10, 30);
+        arrTime[3] = new Product.IpTime(30, 60);
+        // 每个有效时长的价格
+        Integer[] arrPrice = new Integer[]{
+                100, 200, 300, 400
+        };
+
         Product product = Product.builder()
                 .name(PRODUCT_NAME)
                 .type(Product.PackageType.MONTH)
                 .numPerDay(1000)
                 .numPerTime(100)
-                .moneyPerUnit(12000)
+                .ipValidTime(arrTime)
+                .moneyPerUnit(arrPrice)
                 .status(0)
                 .build();
         productRepository.save(product);

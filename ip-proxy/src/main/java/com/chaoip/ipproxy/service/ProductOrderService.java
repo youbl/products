@@ -1,6 +1,5 @@
 package com.chaoip.ipproxy.service;
 
-import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.ChargeDto;
 import com.chaoip.ipproxy.controller.dto.ProductOrderDto;
 import com.chaoip.ipproxy.repository.ProductOrderDetailRepository;
@@ -8,7 +7,6 @@ import com.chaoip.ipproxy.repository.ProductOrderRepository;
 import com.chaoip.ipproxy.repository.entity.*;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.util.AliBase;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -212,7 +210,13 @@ public class ProductOrderService {
         if (product == null) {
             throw new RuntimeException("指定的商品id不存在：" + dto.getProductId());
         }
-        int money = dto.getBuyNum() * product.getMoneyPerUnit();
+        if (product.getIpValidTime().length != product.getMoneyPerUnit().length) {
+            throw new RuntimeException("指定的商品id价格与IP时长不匹配，请重配：" + dto.getProductId());
+        }
+        if (dto.getBuyIpTime() < 0 || dto.getBuyIpTime() >= product.getIpValidTime().length) {
+            throw new RuntimeException("指定的IP时长有误：" + dto.getBuyIpTime());
+        }
+        int money = dto.getBuyNum() * product.getMoneyPerUnit()[dto.getBuyIpTime()];
         if (money != dto.getPayMoney()) {
             throw new RuntimeException("后端价格计算与前端不一致：" + money);
         }

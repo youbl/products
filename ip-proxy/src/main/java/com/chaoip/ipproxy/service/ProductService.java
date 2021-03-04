@@ -42,4 +42,13 @@ public class ProductService {
     public Product findById(long id) {
         return productRepository.findById(id);
     }
+
+    public void changeStatus(long id) {
+        Product product = findById(id);
+        if (product == null) {
+            throw new RuntimeException("指定的产品不存在:" + id);
+        }
+        product.setStatus(product.getStatus() == 0 ? 1 : 0);
+        productRepository.save(product);
+    }
 }

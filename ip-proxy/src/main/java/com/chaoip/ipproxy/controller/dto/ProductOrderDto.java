@@ -26,6 +26,11 @@ public class ProductOrderDto {
     private String orderNo;
 
     /**
+     * 要购买的IP有效时长，为Product.ipValidTime数组的索引值
+     */
+    private int buyIpTime;
+
+    /**
      * 购买时长，几个月
      */
     @Min(value = 1, message = "购买时长最小为1")
