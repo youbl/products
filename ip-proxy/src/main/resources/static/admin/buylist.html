@@ -45,6 +45,11 @@
                         width="250">
                 </el-table-column>
                 <el-table-column
+                        prop="productName"
+                        label="购买产品"
+                        width="120">
+                </el-table-column>
+                <el-table-column
                         prop="buyNum"
                         label="购买期数"
                         width="60">
@@ -110,6 +115,7 @@
                     activeTab: 'first',
                 },
                 user: {},
+                productData: [],
                 orderData: [],
                 orderTotalNum: 0,
                 pageNum: 0,
@@ -124,7 +130,7 @@
                     return;
                 }
                 this.user = response.data;
-                this.loadOrderDatas();
+                this.loadProducts().then(this.loadOrderDatas);
             }).catch(error => this.ajaxError(error));
         },
         methods: {
@@ -152,6 +158,16 @@
                 this.pageNum++;
                 this.loadOrderDatas();
             },
+            loadProducts: function () {
+                let url = '/product/all';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data) {
+                        alert('获取产品失败');
+                        return;
+                    }
+                    this.productData = response.data.content;
+                }).catch(error => this.ajaxError(error));
+            },
             loadOrderDatas: function () {
                 let url = '/manage/order?pageNum=' + this.pageNum + '&pageSize=' + this.pageSize;
                 axios.get(url).then(response => {
@@ -167,6 +183,13 @@
                 for (let i = 0, j = data.length; i < j; i++) {
                     let item = data[i];
                     item.money = item.money / 100;
+                    item.productName = item.productId;
+                    for (let k = 0; k < this.productData.length; k++) {
+                        let product = this.productData[k];
+                        if (product.id === item.productId) {
+                            item.productName = product.name;
+                        }
+                    }
                     switch (item.status) {
                         case 'NO_PAY':
                             item.statusName = '未支付';

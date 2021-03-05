@@ -44,7 +44,7 @@
                         <el-input v-model="productBuyInfo.description" placeholder="请输入补充说明"
                                   maxlength="20"></el-input>
                     </el-form-item>
-                    <el-form-item label-width="200px">
+                    <el-form-item label="IP有效时长" label-width="200px">
                         <el-radio-group v-model="productBuyInfo.buyIpTime">
                             <el-radio v-for="(item, idx) in product.ipValidTime" :label="idx">
                                 {{item.minuteMin}}~{{item.minuteMax}}分钟
