@@ -46,12 +46,6 @@ public class ProductDto {
     private int numPerTime;
 
     /**
-     * 每单位价格，包月就是每月价格，包年就是每年价格.
-     * 单位分
-     */
-    private int moneyPerUnit;
-
-    /**
      * 状态：0有效，1禁用
      */
     private int status;

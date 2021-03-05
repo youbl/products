@@ -20,13 +20,13 @@
 <div id="divApp" style="height: 100%;">
     <template>
         <el-tabs v-model="tab.activeTab" @tab-click="handleTabClick">
-            <el-tab-pane v-for="item in products" :label="item.name" :name="item.name" style="width:500px;">
+            <el-tab-pane v-for="item in products" :label="item.name" :name="item.name" style="width:80%;">
                 <el-form :model="productBuyInfo" :rules="rulesProductBuyInfo" ref="productBuyInfoForm">
-                    <el-form-item label="购买时长" label-width="200px" prop="buyNum">
-                        <el-select v-model="productBuyInfo.buyNum" filterable placeholder="请选择购买月数">
+                    <el-form-item label="购买份数" label-width="200px" prop="buyNum">
+                        <el-select v-model="productBuyInfo.buyNum" filterable placeholder="请选择购买份数">
                             <el-option
                                     v-for="index of 36"
-                                    :label="index + '个月'"
+                                    :label="index + '份'"
                                     :value="index">
                             </el-option>
                         </el-select>
@@ -43,6 +43,13 @@
                     <el-form-item label="用途补充说明" label-width="200px" prop="description">
                         <el-input v-model="productBuyInfo.description" placeholder="请输入补充说明"
                                   maxlength="20"></el-input>
+                    </el-form-item>
+                    <el-form-item label-width="200px">
+                        <el-radio-group v-model="productBuyInfo.buyIpTime">
+                            <el-radio v-for="(item, idx) in product.ipValidTime" :label="idx">
+                                {{item.minuteMin}}~{{item.minuteMax}}分钟
+                            </el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="每天IP量" label-width="200px">
                         <el-input v-model="product.numPerDay" placeholder="请输入每天IP量" maxlength="20"
@@ -146,7 +153,11 @@
                 return ret;
             },
             payMoney: function () {
-                return (this.product.moneyPerUnit * this.productBuyInfo.buyNum / 100);
+                if (this.productBuyInfo.buyIpTime === undefined) {
+                    return 0;
+                }
+                let price = this.product.ipValidTime[this.productBuyInfo.buyIpTime].price;
+                return (this.productBuyInfo.buyNum * price / 100);
             },
             payMoneyChinese: function () {
                 return this.payMoney + '元     【您的账户余额:' + this.user.money / 100 + '元】';

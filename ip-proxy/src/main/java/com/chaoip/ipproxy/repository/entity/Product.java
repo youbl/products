@@ -3,6 +3,7 @@ package com.chaoip.ipproxy.repository.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,6 +20,8 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @Document
+@AllArgsConstructor
+@NoArgsConstructor
 public class Product {
     /**
      * 主键
@@ -38,16 +41,9 @@ public class Product {
     private PackageType type;
 
     /**
-     * ip有效时长，数组
+     * ip有效时长和价格，数组
      */
     private IpTime[] ipValidTime;
-
-    /**
-     * 每单位价格，包月就是每月价格，包年就是每年价格.
-     * 数组，与 ipValidTime 一一对应
-     * 单位分（不是元）
-     */
-    private Integer[] moneyPerUnit;
 
     /**
      * 每日最大IP数
@@ -70,6 +66,8 @@ public class Product {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
     public static class IpTime {
         /**
          * ip有效时长最小值
@@ -79,6 +77,11 @@ public class Product {
          * ip有效时长最大值
          */
         private int minuteMax;
+
+        /**
+         * 单价，单位分（不是元)
+         */
+        private int price;
     }
 
     /**
@@ -90,7 +93,7 @@ public class Product {
         YEAR("包年"),
         STREAM("按量");
 
-        private String title;
+        private final String title;
 
         PackageType(String title) {
             this.title = title;

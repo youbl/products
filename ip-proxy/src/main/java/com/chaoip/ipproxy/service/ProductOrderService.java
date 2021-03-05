@@ -210,13 +210,10 @@ public class ProductOrderService {
         if (product == null) {
             throw new RuntimeException("指定的商品id不存在：" + dto.getProductId());
         }
-        if (product.getIpValidTime().length != product.getMoneyPerUnit().length) {
-            throw new RuntimeException("指定的商品id价格与IP时长不匹配，请重配：" + dto.getProductId());
-        }
         if (dto.getBuyIpTime() < 0 || dto.getBuyIpTime() >= product.getIpValidTime().length) {
             throw new RuntimeException("指定的IP时长有误：" + dto.getBuyIpTime());
         }
-        int money = dto.getBuyNum() * product.getMoneyPerUnit()[dto.getBuyIpTime()];
+        int money = dto.getBuyNum() * product.getIpValidTime()[dto.getBuyIpTime()].getPrice();
         if (money != dto.getPayMoney()) {
             throw new RuntimeException("后端价格计算与前端不一致：" + money);
         }

@@ -24,7 +24,7 @@ public class ProductService {
 
     public Page<Product> findAll(ProductDto dto) {// 不使用的属性，必须要用 withIgnorePaths 忽略，否则会列入条件
         ExampleMatcher matcher = ExampleMatcher.matching()
-                .withIgnorePaths("id", "type", "numPerDay", "numPerTime", "moneyPerUnit", "status", "creationTime");
+                .withIgnorePaths("id", "type", "ipValidTime", "numPerDay", "numPerTime", "status", "creationTime");
         if (StringUtils.hasText(dto.getName())) {
             matcher = matcher.withMatcher("name", ExampleMatcher.GenericPropertyMatchers.exact());
         } else {
@@ -35,8 +35,6 @@ public class ProductService {
                 .build();
         Example<Product> example = Example.of(condition, matcher);
         return productRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize(), "creationTime", true);
-
-
     }
 
     public Product findById(long id) {
@@ -50,5 +48,15 @@ public class ProductService {
         }
         product.setStatus(product.getStatus() == 0 ? 1 : 0);
         productRepository.save(product);
+    }
+
+    public Product save(Product product) {
+        if (product == null) {
+            throw new RuntimeException("参数为空");
+        }
+        if (product.getIpValidTime() == null || product.getIpValidTime().length <= 0) {
+            throw new RuntimeException("单价和IP有效时长不能为空");
+        }
+        return productRepository.save(product);
     }
 }

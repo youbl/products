@@ -60,8 +60,8 @@
                                  label="产品价格"
                                  width="100">
                     <template slot-scope="scope">
-                        <div v-for="item in scope.row.moneyPerUnit">
-                            {{item}}元
+                        <div v-for="item in scope.row.ipValidTime">
+                            {{item.price}}元
                         </div>
                     </template>
                 </el-table-column>
@@ -116,10 +116,27 @@
             </el-form-item>
             <el-form-item label="每单位价格" label-width="200px" style="text-align: left" v-if="editData.type">
                 <div v-for="(item, idx) in editData.ipValidTime">
-                    {{editData.moneyPerUnit[idx]}}元/IP有效时长:{{editData.ipValidTime[idx].minuteMin}}~{{editData.ipValidTime[idx].minuteMax}}分钟/{{typeArr[editData.type]}}
-                    <el-link icon="el-icon-edit" @click="delPrice(editData, idx)">删除</el-link>
+                    <span style="display: inline-block; width: 340px;">
+                        <input type="text" v-model="editData.ipValidTime[idx].price"
+                               style="width:45px; text-align: right">元
+                        /
+                        IP有效时长:
+                        <input v-model="editData.ipValidTime[idx].minuteMin"
+                               style="width:30px; text-align: right">
+                        ~
+                        <input v-model="editData.ipValidTime[idx].minuteMax"
+                               style="width:30px; text-align: right">
+                        分钟
+                    </span>
+                    <el-link icon="el-icon-minus" type="danger" @click="delPrice(editData, idx)"></el-link>
+                    &nbsp;
+                    <el-link icon="el-icon-plus" type="primary" @click="addPrice(editData)"
+                             v-show="idx===0"></el-link>
                 </div>
-
+                <div>
+                    <el-link icon="el-icon-plus" type="primary" @click="addPrice(editData)"
+                             v-show="!editData.ipValidTime || editData.ipValidTime.length<=0"></el-link>
+                </div>
             </el-form-item>
             <el-form-item label="每日最大IP数" label-width="200px" prop="numPerDay" style="text-align: left;">
                 <el-input v-model="editData.numPerDay" placeholder="请输入每日最大IP数"></el-input>
@@ -184,8 +201,8 @@
                     }
                     for (let i = 0, j = response.data.content.length; i < j; i++) {
                         let item = response.data.content[i];
-                        for (let m = 0, n = item.moneyPerUnit.length; m < n; m++) {
-                            item.moneyPerUnit[m] = item.moneyPerUnit[m] / 100;
+                        for (let m = 0, n = item.ipValidTime.length; m < n; m++) {
+                            item.ipValidTime[m].price = item.ipValidTime[m].price / 100;
                         }
                     }
                     this.productData = response.data.content;
@@ -225,18 +242,27 @@
             hideAddDialog: function () {
                 this.openEditDialog = false;
             },
+            addPrice: function (item) {
+                if (!item.ipValidTime) {
+                    Vue.set(item, 'ipValidTime', []);
+                    // item.ipValidTime = []; // 无法双向绑定
+                }
+                item.ipValidTime.push({minuteMin: 1, minuteMax: 3, price: 100});
+            },
             delPrice: function (item, idx) {
-                item.moneyPerUnit.splice(idx, 1);
                 item.ipValidTime.splice(idx, 1);
             },
             saveData: function (form) {
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
-                    alert(1);
-                    return;
-                    let url = '/assetaudit';
-                    return axios.post(url, this.editData).then(response => {
+
+                    let url = '/product';
+                    let postData = JSON.parse(JSON.stringify(this.editData));
+                    for (let i = 0, j = postData.ipValidTime.length; i < j; i++) {
+                        postData.ipValidTime[i].price = Math.floor(parseFloat(postData.ipValidTime[i].price) * 100);// 后台存储分
+                    }
+                    return axios.post(url, postData).then(response => {
                         alert('保存成功');
                         this.hideAddDialog();
                         this.showAllProduct();

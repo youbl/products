@@ -6,6 +6,7 @@ import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,8 +33,14 @@ public class ProductController {
         return productService.findAll(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/status/{id}")
     public void changeStaus(@PathVariable long id) {
         productService.changeStatus(id);
+    }
+
+    @PostMapping("")
+    public void saveData(@RequestBody Product product) {
+        productService.save(product);
     }
 }

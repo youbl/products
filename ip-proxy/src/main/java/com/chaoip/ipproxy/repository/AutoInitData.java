@@ -62,10 +62,10 @@ public class AutoInitData {
 
         // IP有效时长数组
         Product.IpTime[] arrTime = new Product.IpTime[4];
-        arrTime[0] = new Product.IpTime(3, 5);
-        arrTime[1] = new Product.IpTime(5, 10);
-        arrTime[2] = new Product.IpTime(10, 30);
-        arrTime[3] = new Product.IpTime(30, 60);
+        arrTime[0] = new Product.IpTime(3, 5, 12345);
+        arrTime[1] = new Product.IpTime(5, 10, 20000);
+        arrTime[2] = new Product.IpTime(10, 30, 30000);
+        arrTime[3] = new Product.IpTime(30, 60, 40000);
         // 每个有效时长的价格
         Integer[] arrPrice = new Integer[]{
                 100, 200, 300, 400
@@ -77,7 +77,6 @@ public class AutoInitData {
                 .numPerDay(1000)
                 .numPerTime(100)
                 .ipValidTime(arrTime)
-                .moneyPerUnit(arrPrice)
                 .status(0)
                 .build();
         productRepository.save(product);
