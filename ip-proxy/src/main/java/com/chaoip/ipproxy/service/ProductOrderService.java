@@ -206,6 +206,9 @@ public class ProductOrderService {
         if (user == null) {
             throw new RuntimeException("用户未找到：" + username);
         }
+        if (StringUtils.isEmpty(user.getRealName()) || StringUtils.isEmpty(user.getIdentity())) {
+            throw new RuntimeException("用户未实名认证，不能购买：" + username);
+        }
         Product product = productService.findById(dto.getProductId());
         if (product == null) {
             throw new RuntimeException("指定的商品id不存在：" + dto.getProductId());

@@ -90,6 +90,21 @@ public class UserController {
         return userService.changePassword(dto, details.getUserName());
     }
 
+    @PostMapping("forgetPwd")
+    public void forgetPwd(@RequestBody UserDto dto) {
+        if (StringUtils.isEmpty(dto.getPhone())) {
+            throw new IllegalArgumentException("请提供手机号");
+        }
+        BeinetUser user = userService.findByPhone(dto.getPhone());
+        if (user == null) {
+            throw new IllegalArgumentException("该手机号不存在，请先注册");
+        }
+        if (!codeService.validByCodeAndSn(dto.getSmsCode(), dto.getSmsSn())) {
+            throw new IllegalArgumentException("短信验证码错误");
+        }
+        userService.resetUserPassword(user.getId());
+    }
+
     /**
      * 请求阿里的实名认证，并返回认证url二维码
      *
@@ -267,9 +282,12 @@ public class UserController {
         if (!codeService.validByCodeAndSn(dto.getCode(), dto.getSn())) {
             throw new IllegalArgumentException("图形验证码错误");
         }
-
-        if (userService.existsByPhone(dto.getPhone())) {
+        boolean isExist = userService.existsByPhone(dto.getPhone());
+        if (!dto.isForgetPwd() && isExist) {
             throw new IllegalArgumentException("该手机号已被注册");
+        }
+        if (dto.isForgetPwd() && !isExist) {
+            throw new IllegalArgumentException("该手机号还没注册");
         }
 
         String sn = codeService.sendSmsCode(dto);

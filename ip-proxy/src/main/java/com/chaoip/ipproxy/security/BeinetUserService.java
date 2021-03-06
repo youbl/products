@@ -76,6 +76,16 @@ public class BeinetUserService implements UserDetailsService {
     }
 
     /**
+     * 根据手机查找用户
+     *
+     * @param phone 手机号
+     * @return 用户
+     */
+    public BeinetUser findByPhone(String phone) {
+        return userRepository.findByPhone(phone);
+    }
+
+    /**
      * 添加用户
      *
      * @param userDto dto

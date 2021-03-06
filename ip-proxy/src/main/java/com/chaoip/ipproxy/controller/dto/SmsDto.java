@@ -35,4 +35,8 @@ public class SmsDto {
      */
     @NotEmpty(message = "序号不能为空")
     private String sn;
+    /**
+     * 是否重置密码,否要检测手机号，已注册不让发
+     */
+    private boolean forgetPwd;
 }
