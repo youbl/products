@@ -5,6 +5,7 @@ import com.alipay.api.DefaultAlipayClient;
 import com.chaoip.ipproxy.service.SiteConfigService;
 import com.chaoip.ipproxy.util.config.AliConfigBase;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +31,13 @@ public abstract class AliBase {
         if (this.config == null) {
             this.config = getConfig();
         }
+
+        assert (StringUtils.hasText(config.getUrl()) &&
+                StringUtils.hasText(config.getAppId()) &&
+                StringUtils.hasText(config.getPrivateKey()) &&
+                StringUtils.hasText(config.getPublicKey()))
+                : "请先进行支付宝相关配置";
+
         return new DefaultAlipayClient(config.getUrl(), config.getAppId(), config.getPrivateKey(),
                 config.getFormat(), config.getCharset(), config.getPublicKey(), config.getSignType());
     }

@@ -17,6 +17,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.security.PrivateKey;
@@ -55,6 +56,10 @@ public class WechatPay {
      */
     public PayOrder getPayUrl(String account, int moneyCent, String description) throws Exception {
         WechatConfig config = getConfig();
+        assert (StringUtils.hasText(config.getPayurl()) &&
+                StringUtils.hasText(config.getAppId()) &&
+                StringUtils.hasText(config.getPrivateKey()))
+                : "请先进行支付宝相关配置";
 
         HttpPost request = new HttpPost(config.getPayurl());
         request.setHeader("Content-Type", "application/json;charset=UTF-8");

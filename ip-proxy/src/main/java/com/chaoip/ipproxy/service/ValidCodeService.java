@@ -91,7 +91,7 @@ public class ValidCodeService {
                 .append(" 结果:")
                 .append(result);
 
-        if (!result.contains("\"Code\":\"OK\"")) {
+        if (result == null || !result.contains("\"Code\":\"OK\"")) {
             log.error(sbMsg.toString());
             throw new RuntimeException("短信发送失败");
         }

@@ -9,6 +9,7 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.chaoip.ipproxy.service.SiteConfigService;
 import com.chaoip.ipproxy.util.config.SmsConfig;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
  * SmsHelper
@@ -35,6 +36,10 @@ public final class SmsHelper {
      */
     public String send(String phone, String code) throws Exception {
         SmsConfig config = (configService.getSmsConfig());
+        assert (StringUtils.hasText(config.getRegion()) &&
+                StringUtils.hasText(config.getAk()) &&
+                StringUtils.hasText(config.getSk()))
+                : "请先进行短信配置";
 
         DefaultProfile profile = DefaultProfile.getProfile(config.getRegion(), config.getAk(), config.getSk());
         IAcsClient client = new DefaultAcsClient(profile);
