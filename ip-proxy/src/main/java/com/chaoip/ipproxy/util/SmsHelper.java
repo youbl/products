@@ -36,10 +36,11 @@ public final class SmsHelper {
      */
     public String send(String phone, String code) throws Exception {
         SmsConfig config = (configService.getSmsConfig());
-        assert (StringUtils.hasText(config.getRegion()) &&
-                StringUtils.hasText(config.getAk()) &&
-                StringUtils.hasText(config.getSk()))
-                : "请先进行短信配置";
+        if (StringUtils.isEmpty(config.getRegion()) ||
+                StringUtils.isEmpty(config.getAk()) ||
+                StringUtils.isEmpty(config.getSk())) {
+            throw new RuntimeException("请先进行短信配置");
+        }
 
         DefaultProfile profile = DefaultProfile.getProfile(config.getRegion(), config.getAk(), config.getSk());
         IAcsClient client = new DefaultAcsClient(profile);

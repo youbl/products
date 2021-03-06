@@ -32,12 +32,12 @@ public abstract class AliBase {
             this.config = getConfig();
         }
 
-        assert (StringUtils.hasText(config.getUrl()) &&
-                StringUtils.hasText(config.getAppId()) &&
-                StringUtils.hasText(config.getPrivateKey()) &&
-                StringUtils.hasText(config.getPublicKey()))
-                : "请先进行支付宝相关配置";
-
+        if (StringUtils.isEmpty(config.getUrl()) ||
+                StringUtils.isEmpty(config.getAppId()) ||
+                StringUtils.isEmpty(config.getPrivateKey()) ||
+                StringUtils.isEmpty(config.getPublicKey())) {
+            throw new RuntimeException("请先进行支付宝相关配置");
+        }
         return new DefaultAlipayClient(config.getUrl(), config.getAppId(), config.getPrivateKey(),
                 config.getFormat(), config.getCharset(), config.getPublicKey(), config.getSignType());
     }

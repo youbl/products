@@ -56,10 +56,11 @@ public class WechatPay {
      */
     public PayOrder getPayUrl(String account, int moneyCent, String description) throws Exception {
         WechatConfig config = getConfig();
-        assert (StringUtils.hasText(config.getPayurl()) &&
-                StringUtils.hasText(config.getAppId()) &&
-                StringUtils.hasText(config.getPrivateKey()))
-                : "请先进行支付宝相关配置";
+        if (StringUtils.isEmpty(config.getPayurl()) ||
+                StringUtils.isEmpty(config.getAppId()) ||
+                StringUtils.isEmpty(config.getPrivateKey())) {
+            throw new RuntimeException("请先进行微信支付相关配置");
+        }
 
         HttpPost request = new HttpPost(config.getPayurl());
         request.setHeader("Content-Type", "application/json;charset=UTF-8");
