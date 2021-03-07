@@ -4,8 +4,10 @@ start
 :输入用户名/密码/图形验证码;
 :登录;
 if(图形验证码匹配)then(no)
+    :验证码作废;
     end
 else(yes)
+    :验证码作废;
 endif
 
 if(用户名存在)then(no)
