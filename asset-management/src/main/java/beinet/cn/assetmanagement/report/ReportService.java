@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
@@ -170,31 +171,48 @@ public class ReportService {
     }
 
     public Collection<TotalDto> auditNumRank() {
-        List<TotalDto> ret = new ArrayList<>();
+        Map<String, TotalDto> mergeData = new HashMap<>();
 
-        List<Map<String, Object>> result = assetsRepository.totalByAuditAssetNum(10);
+        List<Map<String, Object>> result = assetsRepository.totalByAuditAssetNum(100);
         for (Map<String, Object> row : result) {
-            TotalDto dto = new TotalDto();
-            ret.add(dto);
             String type = row.get("type").toString();
             String subtype = row.get("subtype").toString();
+            String key = type + "-" + subtype;
+            TotalDto dto = mergeData.get(key);
+            if (dto == null) {
+                dto = new TotalDto();
+                dto.setKey(key);
+                dto.setName(row.get("description").toString());
+                mergeData.put(key, dto);
+                dto.setDetails(new ArrayList<>());
+                dto.setNum(0);
+            }
 
-            dto.setKey(type + "-" + subtype);
-            dto.setName(row.get("description").toString());
-            dto.setNum(Integer.parseInt(row.get("cnt").toString()));
+            int num = Integer.parseInt(row.get("cnt").toString());
+            dto.setNum(dto.getNum() + num);
+
+            TotalDto subDto = new TotalDto();
+            subDto.setKey(Integer.parseInt(row.get("departmentId").toString()));
+            subDto.setName(row.get("departmentName").toString());
+            subDto.setNum(num);
+            dto.getDetails().add(subDto);
         }
+        List<TotalDto> ret = mergeData.values().stream().collect(Collectors.toList());
+        Comparator<TotalDto> comparator = (o1, o2) -> o2.getNum() - o1.getNum();
+        Collections.sort(ret, comparator);
         return ret;
     }
 
     /**
      * 根据类型和子类型，查找审核明细资产返回
      *
-     * @param type    类型
-     * @param subType 子类型
+     * @param type         类型
+     * @param subType      子类型
+     * @param departmentId 部门id
      * @return 数据
      */
-    public List<AuditDetailDto> findByType(String type, String subType) {
-        List<Map<String, Object>> data = assetauditRepository.findDetailByType(type, subType);
+    public List<AuditDetailDto> findByType(String type, String subType, int departmentId) {
+        List<Map<String, Object>> data = assetauditRepository.findDetailByType(type, subType, departmentId);
         List<AuditDetailDto> ret = new ArrayList<>();
         for (Map<String, Object> row : data) {
             ret.add(AuditDetailDto

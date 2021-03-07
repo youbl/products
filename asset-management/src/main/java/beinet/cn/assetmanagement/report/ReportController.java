@@ -67,9 +67,11 @@ public class ReportController {
         return ret;
     }
 
-    @GetMapping("/report/audit/{type}/{subType}")
-    public List<AuditDetailDto> findByType(@PathVariable String type, @PathVariable String subType) {
-        return reportService.findByType(type, subType);
+    @GetMapping("/report/audit/{type}/{subType}/{departmentId}")
+    public List<AuditDetailDto> findByType(@PathVariable String type,
+                                           @PathVariable String subType,
+                                           @PathVariable int departmentId) {
+        return reportService.findByType(type, subType, departmentId);
     }
 
     private void doExportAssetsTotal(HttpServletResponse response, Collection<TotalDto> ret, String type) throws Exception {

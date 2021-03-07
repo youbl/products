@@ -22,8 +22,8 @@ public interface AssetauditRepository extends JpaRepository<Assetaudit, Integer>
             "INNER JOIN assetaudit b ON a.auditId=b.id " +
             "INNER JOIN users c ON c.account=b.account " +
             "INNER JOIN assets d ON d.code=a.code " +
-            "WHERE b.type=?1 AND b.subtype=?2 " +
+            "WHERE b.type=?1 AND b.subtype=?2 AND c.department=?3 " +
             "ORDER BY userName,assetName ",
             nativeQuery = true)
-    List<Map<String, Object>> findDetailByType(String type, String subType);
+    List<Map<String, Object>> findDetailByType(String type, String subType, int departmentId);
 }

@@ -20,19 +20,15 @@
 <div id="divApp" style="text-align: center;width: 98%;">
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
         <el-tab-pane :label="labelName" name="auditNum">
-            <el-table
-                    :data="dataList"
-                    stripe
-                    border
-                    style="width: 100%">
-                <el-table-column v-for="(value, key, index) in dataList[0]"
-                                 :prop="key"
-                                 :label="dataAtt[key].title"
-                                 :width="dataAtt[key].width"
-                                 v-if="dataAtt[key].show">
-                </el-table-column>
-                <el-table-column label="">
-                    <template slot-scope="scope">
+            <div v-for="item in dataList" style="text-align: left; margin-left: 10px;">
+                <div style="text-align: left">
+                    <span style="display: inline-block; width: 200px; font-weight: bold">{{item.name}}</span>
+                    <span style="display: inline-block; width: 200px; font-weight: bold">{{item.num}}</span>
+                </div>
+                <div v-for="subItem in item.details" style="text-align: left; margin-top: 5px;">
+                    <div style="text-align: left">
+                        <span style="display: inline-block; width: 200px;">- {{subItem.name}}</span>
+                        <span style="display: inline-block; width: 200px;">{{subItem.num}}</span>
                         <el-popover
                                 placement="bottom"
                                 width="1200"
@@ -53,12 +49,14 @@
                                 </el-table-column>
                             </el-table>
                             <el-button slot="reference" size="mini" type="primary" plain
-                                       @click="showDetails(scope.$index, scope.row)">详情
+                                       @click="showDetails(item.key, subItem)">详情
                             </el-button>
                         </el-popover>
-                    </template>
-                </el-table-column>
-            </el-table>
+                    </div>
+                </div>
+                <hr>
+            </div>
+
             <template>
                 <div id="echarts_box" style="width: 600px;height:400px;"></div>
             </template>
@@ -74,7 +72,7 @@
         data: function () {
             let name = 'auditNum';
             return {
-                labelName: '资产审核原因排行',
+                labelName: '借还原因分析',
 
                 defaultName: name,
                 activeName: name,
@@ -162,18 +160,18 @@
                 // 使用刚指定的配置项和数据显示图表。
                 this.myChart.setOption(option);
             },
-            showDetails: function (idx, row) {
-                if (row.details) {
-                    this.details = row.details;
+            showDetails: function (typeKey, detailRow) {
+                if (detailRow.details) {
+                    this.details = detailRow.details;
                 } else {
                     this.details = [];
-                    let idx = row.key.indexOf('-');
-                    let type = row.key.substring(0, idx);
-                    let subtype = row.key.substring(idx + 1);
-                    let url = '/report/audit/' + type + '/' + subtype;
+                    let idx = typeKey.indexOf('-');
+                    let type = typeKey.substring(0, idx);
+                    let subtype = typeKey.substring(idx + 1);
+                    let url = '/report/audit/' + type + '/' + subtype + '/' + detailRow.key;
                     axios.get(url).then(response => {
                         this.details = response.data;
-                        row.details = this.details;
+                        detailRow.details = this.details;
                     }).catch(error => this.ajaxError(error));
                 }
             },

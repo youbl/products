@@ -52,11 +52,13 @@ public interface AssetsRepository extends JpaRepository<Assets, Integer>, JpaSpe
             nativeQuery = true)
     List<Map<String, Object>> totalByUserNum(int limit);
 
-    @Query(value = "SELECT b.type, b.subtype, c.description, COUNT(1) cnt FROM assetauditdetail a " +
+    @Query(value = "SELECT b.type, b.subtype, e.id departmentId, e.departmentName, c.description, COUNT(1) cnt " +
+            " FROM assetauditdetail a " +
             "INNER JOIN assetaudit b ON a.auditId=b.id " +
             "INNER JOIN configs c ON c.type=b.type AND c.code=b.subtype " +
-            "GROUP BY b.type, b.subtype " +
-            "ORDER BY cnt DESC, type, subtype " +
+            "INNER JOIN users d ON d.account=b.account " +
+            "INNER JOIN department e ON e.id=d.department " +
+            "GROUP BY b.type, b.subtype, d.department " +
             "LIMIT ?",
             nativeQuery = true)
     List<Map<String, Object>> totalByAuditAssetNum(int limit);
