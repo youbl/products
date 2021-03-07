@@ -123,6 +123,11 @@
                     let item = this.dataList[i];
                     xDataName.push(item.name);
                     xData.push(item.num);
+                    for (let m = 0, n = item.details.length; m < n; m++) {
+                        let subItem = item.details[m];
+                        xDataName.push(subItem.name);
+                        xData.push({value: subItem.num, itemStyle: {color: '#F781F3'}});
+                    }
                 }
                 // 指定图表的配置项和数据
                 let option = {
@@ -139,7 +144,7 @@
                         data: xDataName,
                         axisLabel: {
                             interval: 0,//让所有坐标值全部显示
-                            rotate: 15,//让坐标值旋转一定的角度
+                            rotate: 25,//让坐标值旋转一定的角度
                         },
                     },
                     yAxis: {},
