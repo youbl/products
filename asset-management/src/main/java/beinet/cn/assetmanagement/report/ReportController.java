@@ -26,6 +26,15 @@ public class ReportController {
         this.excelOperator = excelOperator;
     }
 
+    /**
+     * 资产统计接口
+     *
+     * @param type     类型
+     * @param export   是否导出
+     * @param response 响应对象
+     * @return 数据
+     * @throws Exception 异常
+     */
     @GetMapping("/report/total")
     public Collection<TotalDto> total(@RequestParam String type,
                                       @RequestParam(required = false) String export,
