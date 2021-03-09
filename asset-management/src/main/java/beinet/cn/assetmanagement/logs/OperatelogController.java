@@ -25,16 +25,5 @@ public class OperatelogController {
     public Operatelog findById(@RequestParam Integer id) {
         return operatelogService.findById(id);
     }
-
-    @PostMapping("operatelog")
-    public Operatelog save(@RequestBody Operatelog item, AuthDetails details) {
-        if (item == null) {
-            return null;
-        }
-        if (StringUtils.isEmpty(item.getAccount())) {
-            item.setAccount(details.getAccount());
-        }
-        return operatelogService.save(item);
-    }
-
+    
 }

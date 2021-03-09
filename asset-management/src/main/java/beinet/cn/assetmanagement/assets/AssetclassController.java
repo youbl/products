@@ -3,10 +3,15 @@ package beinet.cn.assetmanagement.assets;
 import beinet.cn.assetmanagement.assets.model.Assetclass;
 import beinet.cn.assetmanagement.assets.model.AssetclassDto;
 import beinet.cn.assetmanagement.assets.service.AssetclassService;
+import beinet.cn.assetmanagement.event.EventDto;
+import beinet.cn.assetmanagement.event.Publisher;
+import beinet.cn.assetmanagement.logs.model.OperateEnum;
 import beinet.cn.assetmanagement.security.AuthDetails;
+import beinet.cn.assetmanagement.utils.RequestHelper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -29,11 +34,22 @@ public class AssetclassController {
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("assetClass")
-    public Assetclass save(@RequestBody AssetclassDto item) {
+    public Assetclass save(@RequestBody AssetclassDto item,
+                           AuthDetails details,
+                           HttpServletRequest request) {
         if (item == null) {
             return null;
         }
-        return assetclassService.save(item.mapTo());
+        Assetclass ret = assetclassService.save(item.mapTo());
+
+        // 发事件
+        Publisher.publishEvent(EventDto.builder()
+                .type((item.getId() > 0) ? OperateEnum.EditAssetClass : OperateEnum.AddAssetClass)
+                .account(details.getAccount())
+                .ip(RequestHelper.getFullIP(request))
+                .source(item)
+                .build());
+        return ret;
     }
 
     /**

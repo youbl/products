@@ -4,14 +4,19 @@ import beinet.cn.assetmanagement.assets.model.Assets;
 import beinet.cn.assetmanagement.assets.model.AssetsDto;
 import beinet.cn.assetmanagement.assets.model.AssetsSearchDto;
 import beinet.cn.assetmanagement.assets.service.AssetsService;
+import beinet.cn.assetmanagement.event.EventDto;
+import beinet.cn.assetmanagement.event.Publisher;
+import beinet.cn.assetmanagement.logs.model.OperateEnum;
 import beinet.cn.assetmanagement.security.AuthDetails;
 import beinet.cn.assetmanagement.utils.ExcelOperator;
+import beinet.cn.assetmanagement.utils.RequestHelper;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,11 +71,22 @@ public class AssetsController {
     }
 
     @PostMapping("asset")
-    public Assets save(@RequestBody AssetsDto item) {
+    public Assets save(@RequestBody AssetsDto item,
+                       AuthDetails details,
+                       HttpServletRequest request) {
         if (item == null) {
             return null;
         }
-        return assetsService.save(item.mapTo());
+        Assets ret = assetsService.save(item.mapTo());
+
+        // 发事件
+        Publisher.publishEvent(EventDto.builder()
+                .type((item.getId() > 0) ? OperateEnum.EditAsset : OperateEnum.AddAsset)
+                .account(details.getAccount())
+                .ip(RequestHelper.getFullIP(request))
+                .source(item)
+                .build());
+        return ret;
     }
 
     /**

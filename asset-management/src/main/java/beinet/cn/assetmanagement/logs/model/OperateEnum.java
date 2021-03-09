@@ -10,7 +10,17 @@ public enum OperateEnum {
     AdminResetPwd("管理员重置员工密码"),
     AdminChgState("管理员改员工状态"),
 
+    AddDepartment("添加部门"),
+    EditDepartment("编辑部门"),
+
+    AddAssetClass("添加分类"),
+    EditAssetClass("编辑分类"),
+
+    AddConfig("添加配置"),
+    EditConfig("编辑配置"),
+
     AddAsset("添加资产"),
+    EditAsset("编辑资产"),
     ;
 
     private String description;
