@@ -47,7 +47,6 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
     private final AuthenticationFailureHandler failureHandler;
     private final UsersService usersService;
     private final Environment environment;
-    private final ApplicationEventPublisher eventPublisher;
 
     public BeinetSecurityAutoConfiguration(ValidcodeService validcodeService,
                                            UsersService usersService,
@@ -57,7 +56,6 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
         this.failureHandler = new BeinetHandleFail();
         this.usersService = usersService;
         this.environment = environment;
-        this.eventPublisher = eventPublisher;
 
         String tmp = environment.getProperty("beinet.autologin");
         this.autoLogin = !StringUtils.isEmpty(tmp) && tmp.equals("true");
@@ -95,7 +93,7 @@ public class BeinetSecurityAutoConfiguration extends WebSecurityConfigurerAdapte
                 .passwordParameter("beinetPwd")     // 修改登录密码参数
                 .loginPage(LOGIN_PAGE)         // 使用自定义的登录表单
                 .loginProcessingUrl("/login")       // 接收POST登录请求的处理地址
-                .successHandler(new BeinetHandleSuccess(eventPublisher)) // 登录验证通过后的处理器
+                .successHandler(new BeinetHandleSuccess()) // 登录验证通过后的处理器
                 .failureHandler(failureHandler)    // 登录验证失败后的处理器
                 .permitAll()                        // 允许上述请求匿名访问, 注：不加这句，会导致302死循环
                 .and()                              // 把前面的返回结果，转换回HttpSecurity，以便后续的流式操作

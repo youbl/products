@@ -1,4 +1,4 @@
-package beinet.cn.assetmanagement.event;
+package beinet.cn.assetmanagement.event.user;
 
 import lombok.Builder;
 import lombok.Data;

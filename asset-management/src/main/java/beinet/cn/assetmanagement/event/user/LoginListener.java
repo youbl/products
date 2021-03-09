@@ -1,5 +1,7 @@
-package beinet.cn.assetmanagement.event;
+package beinet.cn.assetmanagement.event.user;
 
+import beinet.cn.assetmanagement.event.BaseListener;
+import beinet.cn.assetmanagement.logs.model.OperateEnum;
 import beinet.cn.assetmanagement.logs.model.Operatelog;
 import beinet.cn.assetmanagement.logs.service.OperatelogService;
 import org.springframework.context.event.EventListener;
@@ -18,7 +20,7 @@ public class LoginListener extends BaseListener {
     @EventListener
     public void handleLogin(LoginDto dto) {
         Operatelog log = Operatelog.builder()
-                .type("Login")
+                .type(OperateEnum.Login)
                 .subType("Success")
                 .account(dto.getAccount())
                 .description(dto.getIp())

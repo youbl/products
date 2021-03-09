@@ -12,7 +12,7 @@ public class OperatelogDto {
 
     private String account;
 
-    private String type;
+    private OperateEnum type;
 
     private String subType;
 

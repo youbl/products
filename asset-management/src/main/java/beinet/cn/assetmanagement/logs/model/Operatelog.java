@@ -29,9 +29,8 @@ public class Operatelog {
     @Column(columnDefinition = "varchar(50) COMMENT '关联用户'")
     private String account;
 
-    @Size(max = 20)
     @Column(columnDefinition = "varchar(20) COMMENT '日志类型'")
-    private String type;
+    private OperateEnum type;
 
     @Size(max = 20)
     @Column(columnDefinition = "varchar(20) COMMENT '子类型'")
