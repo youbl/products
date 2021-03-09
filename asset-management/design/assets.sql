@@ -126,6 +126,7 @@ CREATE TABLE `operatelog` (
   `subType` varchar(20) NOT NULL DEFAULT '' COMMENT '子类型',
   `description` varchar(500) NOT NULL DEFAULT '' COMMENT '说明',
   `operator` varchar(50) NOT NULL DEFAULT '' COMMENT '操作人',
+  `ip` varchar(50) NOT NULL DEFAULT '' COMMENT '操作IP',
   `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `idx_code` (`code`),
@@ -150,8 +151,8 @@ CREATE TABLE `users` (
   `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `LastModificationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `unq_account` (`account`),
   UNIQUE KEY `unq_code` (`code`)
-  UNIQUE KEY `unq_account` (`account`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='员工信息表';
 
 /*Table structure for table `validcode` */

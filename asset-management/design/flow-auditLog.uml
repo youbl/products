@@ -1,0 +1,27 @@
+@startuml
+title 审计日志记录流程
+start
+:执行操作;
+note right
+  例如登录、信息编辑、
+  资产编辑等操作
+end note
+if(操作成功?)then(no)
+    end
+else(yes)
+endif
+
+:获取操作人和客户端IP;
+:设置事件类型;
+:发布事件;
+stop
+
+start
+:注入事件监听器;
+:开始监听事件;
+repeat
+    :根据事件类型，记录相关描述;
+    :保存操作人和客户端IP、操作时间;
+    :入库;
+repeat while(等待下一个事件)
+@enduml
