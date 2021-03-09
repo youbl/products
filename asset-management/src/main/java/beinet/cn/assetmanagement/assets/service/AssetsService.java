@@ -342,6 +342,12 @@ public class AssetsService {
         return ret.trim();
     }
 
+    /**
+     * 根据姓名查找account
+     *
+     * @param userName
+     * @return
+     */
     private String getAccountByName(String userName) {
         if (StringUtils.isEmpty(userName)) {
             return "";

@@ -79,6 +79,13 @@ public class UsersService {
         return result;
     }
 
+    /**
+     * 根据姓名查找用户，导入用
+     *
+     * @param userName
+     * @param hideSensitive
+     * @return
+     */
     public Users findByUserName(String userName, boolean hideSensitive) {
         Users result = usersRepository.findByUserName(userName);
         if (hideSensitive) {
@@ -87,16 +94,20 @@ public class UsersService {
         return result;
     }
 
-    public void resetPassword(int id) {
-        Users result = usersRepository.findById(id).orElseThrow(() -> new RuntimeException("指定id未找到用户:" + id));
+    public void resetPassword(String account) {
+        Users result = usersRepository.findByAccount(account);
+        if (result == null)
+            throw new RuntimeException("未找到用户:" + account);
         result.setPassword(getPwdEncoder().encode("123456"));
         save(result);
     }
 
-    public void changeUserStatus(int id) {
-        Users result = usersRepository.findById(id).orElseThrow(() -> new RuntimeException("指定id未找到用户:" + id));
+    public Users changeUserStatus(String account) {
+        Users result = usersRepository.findByAccount(account);
+        if (result == null)
+            throw new RuntimeException("未找到用户:" + account);
         result.setState(result.getState() == 8 ? 1 : 8);
-        save(result);
+        return save(result);
     }
 
     public Users save(Users item) {

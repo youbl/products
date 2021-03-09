@@ -20,6 +20,8 @@ public class OperatelogDto {
 
     private String operator;
 
+    private String ip;
+
     private java.time.LocalDateTime creationTime;
 
     public Operatelog mapTo() {
@@ -31,6 +33,7 @@ public class OperatelogDto {
         result.setSubType(this.getSubType());
         result.setDescription(this.getDescription());
         result.setOperator(this.getOperator());
+        result.setIp(this.getIp());
         result.setCreationTime(this.getCreationTime());
         return result;
     }

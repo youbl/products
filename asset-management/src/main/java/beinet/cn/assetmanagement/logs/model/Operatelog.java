@@ -29,6 +29,7 @@ public class Operatelog {
     @Column(columnDefinition = "varchar(50) COMMENT '关联用户'")
     private String account;
 
+    @Enumerated(EnumType.STRING) // 默认是 EnumType.ORDINAL，就是int类型的序号
     @Column(columnDefinition = "varchar(20) COMMENT '日志类型'")
     private OperateEnum type;
 
@@ -43,6 +44,9 @@ public class Operatelog {
     @Column(columnDefinition = "varchar(50) COMMENT '操作人'")
     private String operator;
 
+    @Column(columnDefinition = "varchar(50) COMMENT 'IP'")
+    private String ip;
+
     @Column(columnDefinition = "datetime COMMENT '创建时间'", insertable = false, updatable = false)
     private java.time.LocalDateTime creationTime;
 
@@ -55,6 +59,7 @@ public class Operatelog {
         result.setSubType(this.getSubType());
         result.setDescription(this.getDescription());
         result.setOperator(this.getOperator());
+        result.setIp(this.getIp());
         result.setCreationTime(this.getCreationTime());
         return result;
     }

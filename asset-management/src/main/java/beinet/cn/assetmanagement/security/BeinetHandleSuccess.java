@@ -1,13 +1,13 @@
 package beinet.cn.assetmanagement.security;
 
 import beinet.cn.assetmanagement.event.Publisher;
-import beinet.cn.assetmanagement.event.user.LoginDto;
+import beinet.cn.assetmanagement.event.EventDto;
+import beinet.cn.assetmanagement.logs.model.OperateEnum;
+import beinet.cn.assetmanagement.utils.RequestHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,16 +42,9 @@ public class BeinetHandleSuccess implements AuthenticationSuccessHandler {
     }
 
     private void publishEvent(HttpServletRequest request, Authentication authentication) {
-        String ip = request.getRemoteAddr();
-        String realIp = request.getHeader("X-Real-IP");
-        if (StringUtils.hasText(realIp)) {
-            ip += ";X-Real-IP:" + realIp;
-        }
-        String forwardIp = request.getHeader("X-Forwarded-For");
-        if (StringUtils.hasText(forwardIp)) {
-            ip += ";X-Forwarded-For:" + forwardIp;
-        }
-        LoginDto dto = LoginDto.builder()
+        String ip = RequestHelper.getFullIP(request);
+        EventDto dto = EventDto.builder()
+                .type(OperateEnum.Login)
                 .account(authentication.getName())
                 .ip(ip)
                 .build();

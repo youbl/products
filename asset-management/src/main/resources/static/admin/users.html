@@ -237,7 +237,7 @@
                     return;
                 }
 
-                let url = '/users/password/' + row.id;
+                let url = '/users/password/' + row.account;
                 axios.post(url).then(response => {
                     alert('成功重置为 123456');
                 }).catch(error => this.ajaxError(error));
@@ -247,7 +247,7 @@
                 if (!confirm('确认要 ' + txt + ' 该账户:' + row.account + '吗？')) {
                     return;
                 }
-                let url = '/users/state/' + row.id;
+                let url = '/users/state/' + row.account;
                 axios.post(url).then(response => {
                     if (row.state === 8) {
                         row.state = 1;
