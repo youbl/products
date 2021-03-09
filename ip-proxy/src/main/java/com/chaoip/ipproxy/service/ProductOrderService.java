@@ -213,6 +213,9 @@ public class ProductOrderService {
         if (product == null) {
             throw new RuntimeException("指定的商品id不存在：" + dto.getProductId());
         }
+        if (product.getType().equals(Product.PackageType.STREAM)) {
+            dto.setBuyNum(1); // 按量是按IP个数算钱，没有月数概念
+        }
         if (dto.getBuyIpTime() < 0 || dto.getBuyIpTime() >= product.getIpValidTime().length) {
             throw new RuntimeException("指定的IP时长有误：" + dto.getBuyIpTime());
         }

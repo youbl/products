@@ -114,7 +114,7 @@
                     <el-option v-for="(val,key,idx) in typeArr" :label="val" :value="key"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="每单位价格" label-width="200px" style="text-align: left" v-if="editData.type">
+            <el-form-item label="每千个IP价格" label-width="200px" style="text-align: left" v-if="editData.type">
                 <div v-for="(item, idx) in editData.ipValidTime">
                     <span style="display: inline-block; width: 340px;">
                         <input type="text" v-model="editData.ipValidTime[idx].price"
@@ -156,9 +156,7 @@
         el: '#divApp',
         data: {
             typeArr: {
-                MONTH: '包月',
-                QUARTER: '包季',
-                YEAR: '包年',
+                MONTH: '包年包月',
                 STREAM: '按量',
             },
             productData: [],

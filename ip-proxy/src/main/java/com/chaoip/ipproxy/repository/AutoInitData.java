@@ -54,8 +54,9 @@ public class AutoInitData {
     }
 
     private void addProduct(ProductRepository productRepository) {
-        if (productRepository.findByName(PRODUCT_NAME) != null) {
-            log.info("默认产品已存在，无需创建: {}", PRODUCT_NAME);
+        Product product = productRepository.findTopBy();
+        if (product != null) {
+            log.info("已有产品存在，无需创建: {}", product.getName());
             return;
         }
         log.info("准备创建产品记录");
@@ -71,7 +72,7 @@ public class AutoInitData {
                 100, 200, 300, 400
         };
 
-        Product product = Product.builder()
+        product = Product.builder()
                 .name(PRODUCT_NAME)
                 .type(Product.PackageType.MONTH)
                 .numPerDay(1000)

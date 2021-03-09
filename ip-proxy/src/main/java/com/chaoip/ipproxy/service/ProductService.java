@@ -57,6 +57,10 @@ public class ProductService {
         if (product.getIpValidTime() == null || product.getIpValidTime().length <= 0) {
             throw new RuntimeException("单价和IP有效时长不能为空");
         }
+        Product oldProduct = productRepository.findByName(product.getName());
+        if (oldProduct != null && oldProduct.getId() != product.getId()) {
+            throw new RuntimeException("产品名称已存在:" + product.getName());
+        }
         return productRepository.save(product);
     }
 }

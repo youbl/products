@@ -22,11 +22,11 @@
         <el-tabs v-model="tab.activeTab" @tab-click="handleTabClick">
             <el-tab-pane v-for="item in products" :label="item.name" :name="item.name" style="width:80%;">
                 <el-form :model="productBuyInfo" :rules="rulesProductBuyInfo" ref="productBuyInfoForm">
-                    <el-form-item label="购买份数" label-width="200px" prop="buyNum">
-                        <el-select v-model="productBuyInfo.buyNum" filterable placeholder="请选择购买份数">
+                    <el-form-item label="购买月数" label-width="200px" prop="buyNum" v-show="productBuyInfo.type==='MONTH'">
+                        <el-select v-model="productBuyInfo.buyNum" filterable placeholder="请选择购买月数">
                             <el-option
                                     v-for="index of 36"
-                                    :label="index + '份'"
+                                    :label="index + '个月'"
                                     :value="index">
                             </el-option>
                         </el-select>
@@ -52,8 +52,7 @@
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="每天IP量" label-width="200px">
-                        <el-input v-model="product.numPerDay" placeholder="请输入每天IP量" maxlength="20"
-                                  readonly class="noborder"></el-input>
+                        <el-input v-model="productBuyInfo.numPerDay" placeholder="请输入每天IP量" maxlength="20"></el-input>
                     </el-form-item>
                     <el-form-item label="购买价格" label-width="200px">
                         <el-input v-model="payMoneyChinese" readonly maxlength="20" class="noborder"></el-input>

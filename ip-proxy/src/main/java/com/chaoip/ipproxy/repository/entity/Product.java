@@ -36,7 +36,7 @@ public class Product {
     private String name;
 
     /**
-     * 支付类型，包月、包季度、包年、按量等
+     * 支付类型，包年包月、按量
      */
     private PackageType type;
 
@@ -79,7 +79,7 @@ public class Product {
         private int minuteMax;
 
         /**
-         * 单价，单位分（不是元)
+         * 每千个IP单价，单位分（不是元)
          */
         private int price;
     }
@@ -89,8 +89,6 @@ public class Product {
      */
     public enum PackageType {
         MONTH("包月"),
-        QUARTER("包季"),
-        YEAR("包年"),
         STREAM("按量");
 
         private final String title;

@@ -10,6 +10,8 @@ import com.chaoip.ipproxy.repository.entity.Product;
  * @date 2020/11/17 19:56
  */
 public interface ProductRepository extends BaseRepository<Product, Long> {
+    Product findTopBy();
+
     Product findByName(String name);
 
     Product findById(long id);
