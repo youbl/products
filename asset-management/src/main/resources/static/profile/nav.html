@@ -58,6 +58,7 @@
                         <el-menu-item index="3-4" @click.native="switchTab(34)" v-if="isAdmin || classId > 0">资产管理
                         </el-menu-item>
                         <el-menu-item index="3-5" @click.native="switchTab(35)" v-if="isAdmin">配置维护</el-menu-item>
+                        <el-menu-item index="3-6" @click.native="switchTab(36)" v-if="isAdmin">审计日志</el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
                 <el-submenu index="4" v-if="isAdmin || classId > 0">
@@ -116,6 +117,7 @@
                     33: '/admin/assetsClass.html',  // 资产分类管理页面
                     34: '/admin/assets.html',       // 资产管理页面
                     35: '/admin/configs.html',      // 配置管理页面
+                    36: '/report/log.html',         // 审计日志页面
                     41: '/report/assetsReport.html?ver=1&type=class',// 资产分类统计报表
                     42: '/report/assetsReport.html?ver=1&type=state',// 资产状态统计报表
                     43: '/report/assetsReport.html?ver=1&type=classGet',// 领用分类统计报表

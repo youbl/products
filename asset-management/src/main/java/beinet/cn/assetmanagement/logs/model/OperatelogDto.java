@@ -24,17 +24,7 @@ public class OperatelogDto {
 
     private java.time.LocalDateTime creationTime;
 
-    public Operatelog mapTo() {
-        Operatelog result = new Operatelog();
-        result.setId(this.getId());
-        result.setCode(this.getCode());
-        result.setAccount(this.getAccount());
-        result.setType(this.getType());
-        result.setSubType(this.getSubType());
-        result.setDescription(this.getDescription());
-        result.setOperator(this.getOperator());
-        result.setIp(this.getIp());
-        result.setCreationTime(this.getCreationTime());
-        return result;
-    }
+    private int pageNum;
+    private int pageSize;
+
 }

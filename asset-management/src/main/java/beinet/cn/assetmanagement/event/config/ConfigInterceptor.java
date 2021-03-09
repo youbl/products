@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class ConfigInterceptor implements LogInterceptor {
     @Override
     public boolean isSupported(Operatelog log) {
-        return log.getType().equals(OperateEnum.EditAssetClass) || log.getType().equals(OperateEnum.AddAssetClass);
+        return log.getType().equals(OperateEnum.EditConfig) || log.getType().equals(OperateEnum.AddConfig);
     }
 
     @Override

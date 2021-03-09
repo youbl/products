@@ -50,19 +50,6 @@ public class Operatelog {
     @Column(columnDefinition = "datetime COMMENT '创建时间'", insertable = false, updatable = false)
     private java.time.LocalDateTime creationTime;
 
-    public OperatelogDto mapTo() {
-        OperatelogDto result = new OperatelogDto();
-        result.setId(this.getId());
-        result.setCode(this.getCode());
-        result.setAccount(this.getAccount());
-        result.setType(this.getType());
-        result.setSubType(this.getSubType());
-        result.setDescription(this.getDescription());
-        result.setOperator(this.getOperator());
-        result.setIp(this.getIp());
-        result.setCreationTime(this.getCreationTime());
-        return result;
-    }
 /*
 INSERT INTO assets.Operatelog (
   code, userId, type, description, operator
