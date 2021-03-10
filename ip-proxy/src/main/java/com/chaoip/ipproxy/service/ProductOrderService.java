@@ -219,7 +219,7 @@ public class ProductOrderService {
         if (dto.getBuyIpTime() < 0 || dto.getBuyIpTime() >= product.getIpValidTime().length) {
             throw new RuntimeException("指定的IP时长有误：" + dto.getBuyIpTime());
         }
-        int money = dto.getBuyNum() * product.getIpValidTime()[dto.getBuyIpTime()].getPrice();
+        int money = countMoney(dto, product);
         if (money != dto.getPayMoney()) {
             throw new RuntimeException("后端价格计算与前端不一致：" + money);
         }
@@ -228,7 +228,7 @@ public class ProductOrderService {
                 .name(username)
                 .orderNo(AliBase.getTransId())
                 .productId(product.getId())
-                .ipNumPerDay(product.getNumPerDay())
+                .ipNumPerDay(dto.getNumPerDay())
                 .buyNum(dto.getBuyNum())
                 .using(dto.getUsing())
                 .description(dto.getDescription())
@@ -263,5 +263,24 @@ public class ProductOrderService {
         }
 
         return payOrder;
+    }
+
+    /**
+     * 计算订单价格
+     *
+     * @param dto     订单信息
+     * @param product 产品信息
+     * @return 价格
+     */
+    private int countMoney(ProductOrderDto dto, Product product) {
+        if (dto.getNumPerDay() < 1000 || dto.getNumPerDay() > product.getNumPerDay()) {
+            throw new RuntimeException("购买IP数量必须在1000~" + product.getNumPerDay() + "之间");
+        }
+        if (dto.getNumPerDay() % 1000 != 0) {
+            throw new RuntimeException("购买IP数量必须是1000的倍数");
+        }
+        int ret = dto.getBuyNum() * product.getIpValidTime()[dto.getBuyIpTime()].getPrice();
+
+        return ret * dto.getNumPerDay() / 1000;
     }
 }

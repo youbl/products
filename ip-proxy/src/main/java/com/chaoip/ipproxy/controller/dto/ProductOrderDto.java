@@ -31,11 +31,18 @@ public class ProductOrderDto {
     private int buyIpTime;
 
     /**
-     * 购买时长，几个月
+     * 购买时长，包月表示几个月，按量固定为1
      */
     @Min(value = 1, message = "购买时长最小为1")
     @Max(value = 36, message = "购买时长最大为36")
     private int buyNum;
+
+    /**
+     * 每天最多多少个IP
+     */
+    @Min(value = 1000, message = "购买IP数量最小为1000")
+    @Max(value = 10000000, message = "购买IP数量太大")
+    private int numPerDay;
 
     /**
      * 购买的产品id

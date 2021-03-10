@@ -22,7 +22,7 @@
         <el-tabs v-model="tab.activeTab" @tab-click="handleTabClick">
             <el-tab-pane v-for="item in products" :label="item.name" :name="item.name" style="width:80%;">
                 <el-form :model="productBuyInfo" :rules="rulesProductBuyInfo" ref="productBuyInfoForm">
-                    <el-form-item label="购买月数" label-width="200px" prop="buyNum" v-show="productBuyInfo.type==='MONTH'">
+                    <el-form-item label="购买月数" label-width="200px" prop="buyNum" v-show="item.type==='MONTH'">
                         <el-select v-model="productBuyInfo.buyNum" filterable placeholder="请选择购买月数">
                             <el-option
                                     v-for="index of 36"
@@ -51,8 +51,9 @@
                             </el-radio>
                         </el-radio-group>
                     </el-form-item>
-                    <el-form-item label="每天IP量" label-width="200px">
-                        <el-input v-model="productBuyInfo.numPerDay" placeholder="请输入每天IP量" maxlength="20"></el-input>
+                    <el-form-item label="每天IP量" label-width="200px" prop="numPerDay">
+                        <el-input v-model="productBuyInfo.numPerDay" placeholder="请输入每天IP量" maxlength="20"
+                                  @change="formatIpNum"></el-input>
                     </el-form-item>
                     <el-form-item label="购买价格" label-width="200px">
                         <el-input v-model="payMoneyChinese" readonly maxlength="20" class="noborder"></el-input>
@@ -100,14 +101,19 @@
                 products: [],
 
                 productBuyInfo: {
-                    buyNum: 12,
+                    buyNum: 1,
                     using: '',
                     description: '',
                     payType: 1,
+                    numPerDay: 1000,
                 },
                 rulesProductBuyInfo: {
                     description: [
                         {required: true, message: '用途必填', trigger: 'blur'},
+                    ],
+                    numPerDay: [
+                        {required: true, message: 'IP数量必填', trigger: 'blur'},
+                        {type: 'number', message: 'IP数量必须为数字值'}
                     ],
                 },
                 usingArr: [
@@ -155,8 +161,15 @@
                 if (this.productBuyInfo.buyIpTime === undefined) {
                     return 0;
                 }
+                // IP个数，按千个计算
+                let ipThousand = Math.floor(this.productBuyInfo.numPerDay / 1000);
+                if (!ipThousand || isNaN(ipThousand)) {
+                    ipThousand = 0;
+                }
+
                 let price = this.product.ipValidTime[this.productBuyInfo.buyIpTime].price;
-                return (this.productBuyInfo.buyNum * price / 100);
+
+                return (this.productBuyInfo.buyNum * price * ipThousand / 100);
             },
             payMoneyChinese: function () {
                 return this.payMoney + '元     【您的账户余额:' + this.user.money / 100 + '元】';
@@ -164,7 +177,7 @@
         },
         methods: {
             handleTabClick: function (tab, event) {
-                this.product = this.products[tab.index]; // 切换tab页
+                this.initData(tab.index);
                 this.tab.tabIndex = tab.index;
             },
             loadProductDatas: function () {
@@ -176,13 +189,32 @@
                     }
                     this.products = (response.data.content);
                     if (this.products.length > 0) {
-                        this.product = this.products[0];
+                        this.initData(0);
 
                         this.tab.activeTab = this.product.name;
                         this.productBuyInfo.using = this.usingArr[0].value;
                         this.productBuyInfo.description = '用于' + this.usingArr[0].name;
                     }
                 }).catch(error => this.ajaxError(error));
+            },
+            initData: function (idx) {
+                this.product = this.products[idx]; // 切换tab页
+                if (this.product.type === 'STREAM') {
+                    this.productBuyInfo.buyNum = 1;
+                }
+                this.formatIpNum();
+            },
+            formatIpNum: function () {
+                if (this.productBuyInfo.numPerDay < 1000) {
+                    this.productBuyInfo.numPerDay = 1000;
+                } else if (this.productBuyInfo.numPerDay > this.product.numPerDay) {
+                    this.productBuyInfo.numPerDay = this.product.numPerDay;
+                } else {
+                    this.productBuyInfo.numPerDay = Math.ceil(this.productBuyInfo.numPerDay / 1000) * 1000;
+                    if (isNaN(this.productBuyInfo.numPerDay)) {
+                        this.productBuyInfo.numPerDay = 1000;
+                    }
+                }
             },
             doBuy: function (form) {
                 this.$refs[form][this.tab.tabIndex].validate(valid => {
