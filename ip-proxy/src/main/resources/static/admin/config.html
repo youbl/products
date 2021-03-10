@@ -113,6 +113,9 @@
                         <el-form-item label="回调地址" label-width="200px" prop="callback">
                             <el-input v-model="alipayConfig.callback" placeholder="请输入回调地址" maxlength="300"></el-input>
                         </el-form-item>
+                        <el-form-item label="成功网页地址" label-width="200px" prop="callbackHtmlUrl">
+                            <el-input v-model="alipayConfig.callbackHtmlUrl" placeholder="请输入成功网页地址" maxlength="300"></el-input>
+                        </el-form-item>
                     </el-form>
                     <div style="text-align: center">
                         <el-button type="primary" @click="saveAliPayConfig('alipayConfigForm')">保存配置</el-button>
@@ -148,6 +151,9 @@
                         </el-form-item>
                         <el-form-item label="回调地址" label-width="200px" prop="callback">
                             <el-input v-model="wechatConfig.callback" placeholder="请输入回调地址" maxlength="300"></el-input>
+                        </el-form-item>
+                        <el-form-item label="成功网页地址" label-width="200px" prop="callbackHtmlUrl">
+                            <el-input v-model="wechatConfig.callbackHtmlUrl" placeholder="请输入成功网页地址" maxlength="300"></el-input>
                         </el-form-item>
                     </el-form>
                     <div style="text-align: center">

@@ -25,7 +25,7 @@ public abstract class AliBase {
         this.configService = configService;
     }
 
-    protected abstract AliConfigBase getConfig() throws Exception;
+    public abstract AliConfigBase getConfig() throws Exception;
 
     protected AlipayClient getClient() throws Exception {
         if (this.config == null) {

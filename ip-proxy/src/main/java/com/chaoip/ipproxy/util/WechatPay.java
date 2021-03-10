@@ -41,7 +41,7 @@ public class WechatPay {
         this.configService = configService;
     }
 
-    protected WechatConfig getConfig() throws Exception {
+    public WechatConfig getConfig() throws Exception {
         return configService.getWechatConfig();
     }
 

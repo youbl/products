@@ -158,6 +158,15 @@ public class PayService {
         return ret;
     }
 
+    public String getJumpHtmlUrl(String orderNo) throws Exception {
+        PayOrder order = findByOrder(orderNo);
+
+        if (order.getPayType() == 1) {
+            return aliPayHelper.getConfig().getCallbackHtmlUrl();
+        }
+        return wechatPay.getConfig().getCallbackHtmlUrl();
+    }
+
     /**
      * 管理员给用户加订单并充值
      *

@@ -33,7 +33,7 @@ public class VerifyHelper extends AliBase {
     }
 
     @Override
-    protected AliConfigBase getConfig() throws Exception {
+    public AliConfigBase getConfig() throws Exception {
         return configService.getVerifyConfig();
     }
 

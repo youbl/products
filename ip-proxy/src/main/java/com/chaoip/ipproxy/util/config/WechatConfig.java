@@ -20,4 +20,5 @@ public class WechatConfig {
     private String apiV3Key;    // V3秘钥
 
     private String callback;    // 回调地址
+    private String callbackHtmlUrl;  // 回调处理完成后的html跳转地址
 }

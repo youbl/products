@@ -31,7 +31,7 @@ public class AliPayHelper extends AliBase {
     }
 
     @Override
-    protected AliConfigBase getConfig() throws Exception {
+    public AliConfigBase getConfig() throws Exception {
         return configService.getAliPayConfig();
     }
 

@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -208,7 +207,8 @@ public class UserController {
             return phoneStr("订单号不能为空", request);
         }
         if (payService.queryOrderStatus(orderNo)) {
-            return jumpBack(request); // 充值是在pc，可以直接jump跳回去
+            String jumpHmtlUrl = payService.getJumpHtmlUrl(orderNo);
+            return jumpBack(request, jumpHmtlUrl); // 充值是在pc，可以直接jump跳回去
             // return phoneStr("您的充值已完成成功。<p>请回到充值页面，进行刷新。</p>");
         }
         return phoneStr("您的充值过程中出现问题，请稍候重试，如果已支付成功，请稍候刷新页面", request);
@@ -220,10 +220,13 @@ public class UserController {
         return "<html><body style='font-size:50px;'>" + msg + "</body></html>";
     }
 
-    private String jumpBack(HttpServletRequest request) {
+    private String jumpBack(HttpServletRequest request, String jumpHmtlUrl) {
         if (isAjax(request))
             return "充值成功，请刷新页面";
-        return "<html><body style='font-size:50px;'><script>location.href='/profile/user.html';</script></body></html>";
+        if (StringUtils.isEmpty(jumpHmtlUrl)) {
+            jumpHmtlUrl = "/profile/user.html";
+        }
+        return "<html><body style='font-size:50px;'><script>location.href='" + jumpHmtlUrl + "';</script></body></html>";
     }
 
     private boolean isAjax(HttpServletRequest request) {

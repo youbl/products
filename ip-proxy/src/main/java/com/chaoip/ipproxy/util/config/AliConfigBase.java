@@ -20,4 +20,5 @@ public class AliConfigBase {
     private String format;
 
     private String callback;  // 回调地址
+    private String callbackHtmlUrl;  // 回调处理完成后的html跳转地址
 }
