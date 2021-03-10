@@ -289,12 +289,13 @@ public class BeinetUserService implements UserDetailsService {
     /**
      * 设置或取消用户管理员状态
      *
-     * @param id 用户id
+     * @param id     用户id
+     * @param newpwd 用户新密码
      * @return 成功失败
      */
-    public boolean resetUserPassword(long id) {
+    public boolean resetUserPassword(long id, String newpwd) {
         BeinetUser user = findById(id);
-        user.setPassword(encoder.encode("123456"));
+        user.setPassword(encoder.encode(newpwd));
         userRepository.save(user);
         return true;
     }

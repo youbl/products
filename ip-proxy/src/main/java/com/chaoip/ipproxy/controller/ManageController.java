@@ -121,8 +121,8 @@ public class ManageController {
      * @return 成功失败
      */
     @PostMapping("user/password/{id}")
-    public boolean resetUserPassword(@PathVariable long id) {
-        return userService.resetUserPassword(id);
+    public boolean resetUserPassword(@PathVariable long id, @RequestParam String newpwd) {
+        return userService.resetUserPassword(id, newpwd);
     }
 
 

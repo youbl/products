@@ -143,17 +143,29 @@
                 this.showAllUser();
             },
             handleResetPwd: function (index, row) {
-                if (!confirm('确认要把该账户:' + row.name + ' 的密码重置为 123456 吗？')) {
+                this.$prompt('请输入要使用的新密码:', '重置密码', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputPattern: /^.{6,}$/,
+                    inputErrorMessage: '密码长度6位以上'
+                }).then(({value}) => {
+                    this.doResetPwd(value, row.name, row.id);
+                }).catch(() => {
+                    this.$message({type: 'info', message: '取消重置密码'});
+                });
+            },
+            doResetPwd: function (val, name, id) {
+                if (!confirm('确认要把该账户:' + name + ' 的密码重置为 ' + val + ' 吗？')) {
                     return;
                 }
 
-                let url = '/manage/user/password/' + row.id;
+                let url = '/manage/user/password/' + id + '?newpwd=' + encodeURIComponent(val);
                 axios.post(url).then(response => {
                     if (!response || !response.data) {
                         alert('重置失败');
                         return;
                     }
-                    alert('成功重置为 123456');
+                    alert(name + ' 已成功重置密码');
                 }).catch(error => this.ajaxError(error));
             },
             handleSetAdmin: function (index, row) {

@@ -101,7 +101,7 @@ public class UserController {
         if (!codeService.validByCodeAndSn(dto.getSmsCode(), dto.getSmsSn())) {
             throw new IllegalArgumentException("短信验证码错误");
         }
-        userService.resetUserPassword(user.getId());
+        userService.resetUserPassword(user.getId(), "123456");
     }
 
     /**
