@@ -124,16 +124,18 @@ public class ProductOrderService {
         if (LocalDateTime.now().isAfter(order.getEndTime())) {
             throw new IllegalArgumentException("订单已过期:" + orderNo);
         }
-        order.setIpNumToday(getIpGetToday(orderNo));
+
+        int ipGetTotal = getIpGetTotal(orderNo, order.getProductId());
+        order.setIpNumToday(ipGetTotal);
         if (order.getIpNumToday() >= order.getIpNumPerDay()) {
-            throw new RuntimeException("今天IP提取总数已达限制:" + order.getIpNumToday());
+            throw new RuntimeException("当天IP提取总数已达限制:" + order.getIpNumToday());
         }
 
         return order;
     }
 
     /**
-     * 获取指定订单，今天的IP提取总数
+     * 获取指定订单，今天的IP提取总数，用于包月订单
      *
      * @param orderNo 订单号
      * @return 数量
@@ -143,6 +145,24 @@ public class ProductOrderService {
         LocalDateTime beign = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 0, 0, 0);
         LocalDateTime end = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 23, 59, 59, 999);
         return productOrderDetailRepository.countByOrderNoAndCreationTimeBetween(orderNo, beign, end);
+    }
+
+    /**
+     * 获取指定订单，总的IP提取总数
+     *
+     * @param orderNo 订单号
+     * @return 数量
+     */
+    private int getIpGetTotal(String orderNo, long productId) {
+        Product product = productService.findById(productId);
+        if (product == null) {
+            throw new RuntimeException("指定订单" + orderNo + "的产品" + productId + "已不存在");
+        }
+        if (product.getType().equals(Product.PackageType.STREAM)) {
+            // 用于按量订单
+            return productOrderDetailRepository.countByOrderNo(orderNo);
+        }
+        return getIpGetToday(orderNo);
     }
 
     /**

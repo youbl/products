@@ -15,6 +15,14 @@ import java.util.List;
  */
 public interface ProductOrderDetailRepository extends BaseRepository<ProductOrderDetail, Long> {
     /**
+     * 统计某订单的总记录数
+     *
+     * @param orderNo 订单
+     * @return 总数
+     */
+    int countByOrderNo(String orderNo);
+
+    /**
      * 统计时间范围内，某订单的记录数
      *
      * @param orderNo   订单
