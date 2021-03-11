@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,11 @@ public class BeinetHandleLogout implements LogoutSuccessHandler {
         response.setContentType("application/json; charset=utf-8");
 
         Map<String, Object> data = new HashMap<>();
-        data.put("msg", authentication.getName() + " 成功退出登录");
+        if (authentication == null || StringUtils.isEmpty(authentication.getName())) {
+            data.put("msg", " 当前没有登录");
+        } else {
+            data.put("msg", authentication.getName() + " 成功退出登录");
+        }
         response.getOutputStream().write(new ObjectMapper().writeValueAsString(data).getBytes("UTF-8"));
     }
 }

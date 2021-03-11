@@ -90,7 +90,7 @@ public class UserController {
     }
 
     @PostMapping("forgetPwd")
-    public void forgetPwd(@RequestBody UserDto dto) {
+    public String forgetPwd(@RequestBody UserDto dto) {
         if (StringUtils.isEmpty(dto.getPhone())) {
             throw new IllegalArgumentException("请提供手机号");
         }
@@ -101,7 +101,11 @@ public class UserController {
         if (!codeService.validByCodeAndSn(dto.getSmsCode(), dto.getSmsSn())) {
             throw new IllegalArgumentException("短信验证码错误");
         }
-        userService.resetUserPassword(user.getId(), "123456");
+        if (StringUtils.isEmpty(dto.getPassword()) || !dto.getPassword().equals(dto.getPasswordConfirm())) {
+            throw new IllegalArgumentException("新密码不能为空");
+        }
+        userService.resetUserPassword(user.getId(), dto.getPassword());
+        return user.getName();
     }
 
     /**

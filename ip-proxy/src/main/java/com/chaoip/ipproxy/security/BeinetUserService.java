@@ -98,7 +98,7 @@ public class BeinetUserService implements UserDetailsService {
         BeinetUser user = userDto.mapTo();
         // 使用登录的密码加密器进行加密
         user.setPassword(encoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        return save(user);
     }
 
     /**
@@ -154,7 +154,7 @@ public class BeinetUserService implements UserDetailsService {
             throw new RuntimeException("输入的旧密码不匹配: " + username);
         }
         user.setPassword(encoder.encode(dto.getPassword()));
-        userRepository.save(user);
+        save(user);
         return true;
     }
 
@@ -193,7 +193,7 @@ public class BeinetUserService implements UserDetailsService {
             }
             user.setRealName(code.getRealName());
             user.setIdentity(code.getIdentity());
-            userRepository.save(user);
+            save(user);
         }
         return ret;
     }
@@ -259,7 +259,7 @@ public class BeinetUserService implements UserDetailsService {
     public boolean changeStatus(long id) {
         BeinetUser user = findById(id);
         user.setStatus(user.getStatus() == 0 ? 1 : 0);
-        userRepository.save(user);
+        save(user);
         return true;
     }
 
@@ -282,7 +282,7 @@ public class BeinetUserService implements UserDetailsService {
             roles += (roles.endsWith(",") ? "" : ",") + admin;
         }
         user.setRoles(roles);
-        userRepository.save(user);
+        save(user);
         return true;
     }
 
@@ -296,7 +296,7 @@ public class BeinetUserService implements UserDetailsService {
     public boolean resetUserPassword(long id, String newpwd) {
         BeinetUser user = findById(id);
         user.setPassword(encoder.encode(newpwd));
-        userRepository.save(user);
+        save(user);
         return true;
     }
 
@@ -309,6 +309,10 @@ public class BeinetUserService implements UserDetailsService {
     }
 
     public BeinetUser save(BeinetUser user) {
+        if (user.getPhone().contains("****")) {
+            throw new RuntimeException("手机号变成星号了……" + user.getName());
+        }
+
         return userRepository.save(user);
     }
 }
