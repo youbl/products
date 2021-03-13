@@ -144,6 +144,12 @@
             <el-form-item label="单次最大IP数" label-width="200px" prop="numPerTime" style="text-align: left;">
                 <el-input v-model="editData.numPerTime" placeholder="请输入单次最大IP数"></el-input>
             </el-form-item>
+            <el-form-item label="产品优惠配置" label-width="200px" prop="disCount" style="text-align: left">
+                <el-select v-model="editData.disCount" multiple filterable placeholder="请选择产品优惠">
+                    <el-option v-for="(val,key,idx) in typeArr" :label="val" :value="key"></el-option>
+                </el-select>
+                <el-link @click="window.open('disCount.html')">优惠项编辑</el-link>
+            </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button icon="el-icon-success" type="primary" @click="saveData('editForm')">保 存</el-button>

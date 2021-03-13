@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>产品优惠项</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script src="/res/unpkg/elemeIndex.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+</head>
+
+<body>
+<div id="divApp">
+    <h1 style="text-align: center">
+        产品优惠项列表页
+    </h1>
+    <div>
+        <div style="float: left;">
+            <el-button type="primary" icon="el-icon-edit" @click="showAddDialog">添加记录</el-button>
+
+            <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
+            <el-button @click="getAfterPage" :disabled="disCountData.length<pageSize">下一页</el-button>
+            <span>&nbsp;第 {{page+1}}/{{Math.ceil(disCountTotalNum/pageSize)}} 页，总记录数 {{disCountTotalNum}} 条</span>
+
+            <button onclick="location.reload()">刷新</button>
+        </div>
+        <div style="float: right">
+            <el-link type="warning" href="/logout">退出登录</el-link>
+        </div>
+        <div style="float: right; width:200px;">&nbsp;</div>
+    </div>
+    <div style="clear: both"></div>
+    <br>
+    <div class="tab-content">
+        <template>
+            <el-table
+                    :data="disCountData"
+                    stripe
+                    border
+                    style="width: 100%">
+                <el-table-column
+                        prop="id"
+                        label="ID"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="protocal"
+                        label="协议"
+                        width="80">
+                </el-table-column>
+                <el-table-column
+                        prop="ip"
+                        label="IP地址"
+                        width="200">
+                </el-table-column>
+                <el-table-column
+                        prop="port"
+                        label="端口"
+                        width="80">
+                </el-table-column>
+                <el-table-column
+                        prop="expireTime"
+                        label="过期时间"
+                        width="250">
+                </el-table-column>
+                <el-table-column
+                        prop="operators"
+                        label="运营商"
+                        width="100">
+                </el-table-column>
+                <el-table-column
+                        prop="area"
+                        label="区号"
+                        width="80">
+                </el-table-column>
+                <el-table-column
+                        prop="areaName"
+                        label="地域"
+                        width="120">
+                </el-table-column>
+                <el-table-column
+                        prop="modifyTime"
+                        label="更新时间"
+                        width="250">
+                </el-table-column>
+            </el-table>
+        </template>
+    </div>
+
+    <el-dialog title="编辑优惠项" :visible.sync="openEditDialog">
+        <el-form>
+            <el-form-item label="协议" label-width="200px">
+                <el-select v-model="newRecord.protocal" placeholder="请选择协议">
+                    <el-option label="http/https" value="http"></el-option>
+                    <el-option label="socks4/socks5" value="socks"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="IP" label-width="200px">
+                <el-input v-model="newRecord.ip" placeholder="请输入IP"></el-input>
+            </el-form-item>
+            <el-form-item label="端口" label-width="200px">
+                <el-input v-model="newRecord.port" placeholder="请输入端口"></el-input>
+            </el-form-item>
+            <el-form-item label="运营商" label-width="200px">
+                <el-input v-model="newRecord.operators" placeholder="请输入运营商 unicom,mobile,telecom"></el-input>
+            </el-form-item>
+            <el-form-item label="城市区号" label-width="200px">
+                <el-input v-model="newRecord.area" placeholder="请输入城市区号"></el-input>
+            </el-form-item>
+            <el-form-item label="过期时间-秒" label-width="200px">
+                <el-input v-model="newRecord.expireTime" placeholder="请输入过期时间，单位秒"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button icon="el-icon-success" type="primary" @click="saveDisCount">保 存</el-button>
+            <el-button @click="hideAddDialog">取 消</el-button>
+        </div>
+    </el-dialog>
+</div>
+<script>
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: {
+            disCountData: [],
+            disCountTotalNum: 0,
+            page: 0,
+            pageSize: 12,
+            openEditDialog: false,
+            newRecord: {
+                protocal: 'http',
+                ip: '',
+                port: 8080,
+                operators: '',
+                area: '',
+                expireTime: 1800,
+            },
+        },
+        created: function () {
+            this.showAllDisCount();
+        },
+        computed: {},
+        methods: {
+            showAllDisCount: function () {
+                let url = '/manage/routes?pageNum=' + this.page + '&pageSize=' + this.pageSize;
+                axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.content || response.data.content.length <= 0) {
+                        this.disCountData = [];
+                        alert('无数据');
+                        return;
+                    }
+                    this.disCountData = response.data.content;
+                    this.disCountTotalNum = response.data.totalElements;
+                }).catch(error => this.ajaxError(error));
+            },
+            getPrevPage: function () {
+                if (this.page > 0) {
+                    this.page--;
+                    this.showAllDisCount();
+                }
+            },
+            getAfterPage: function () {
+                this.page++;
+                this.showAllDisCount();
+            },
+            showAddDialog: function () {
+                this.openEditDialog = true;
+            },
+            hideAddDialog: function () {
+                this.openEditDialog = false;
+            },
+            saveDisCount: function () {
+                let url = '/manage/route';
+                axios.post(url, this.newRecord).then(response => {
+                    if (response.data !== 1) {
+                        alert(response.data);
+                        return;
+                    }
+                    alert('添加成功');
+                    this.showAllDisCount();
+                    this.hideAddDialog();
+                }).catch(error => this.ajaxError(error));
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    let msg = error.response.data['Msg'];
+                    if (msg === 'Unauthorized') {
+                        location.href = '/login?r=%2Fadmin%23%2FserverStatus.html';
+                        return;
+                    }
+                    console.log(JSON.stringify(error.response.data));
+                    alert('出错了');
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+
+
+    /**
+     * 滚动到窗口底部
+     */
+    function toWindowBottom() {
+        window.scrollTo(0, getWindowHeight());
+    }
+
+    /**
+     * 获取窗口高度
+     * @return {number} 窗口高度值
+     */
+    function getWindowHeight() {
+        // body是chrome，documentElement是IE和Firefox
+        return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    }
+
+    /**
+     * 获取url里的变量值
+     * @param {string} name 变量名
+     * @return {string} 变量值
+     */
+    function getQueryString(name) {
+        if (typeof (name) !== 'string') {
+            return '';
+        }
+        name = name.trim();
+        if (name.length === 0) {
+            return '';
+        }
+        let localSearch = location.search.toLocaleLowerCase();
+        name = name.toLowerCase() + '=';
+        let tmpName = '?' + name;
+        let idx = localSearch.indexOf(tmpName);
+        if (idx < 0) {
+            tmpName = '&' + name;
+            idx = localSearch.indexOf(tmpName);
+            if (idx < 0) {
+                return '';
+            }
+        }
+        name = tmpName;
+        let tmp = location.search.substr(idx + name.length);
+        idx = tmp.indexOf('&');
+        if (idx === 0)
+            return '';
+        let ret;
+        if (idx < 0) {
+            ret = tmp;
+        } else {
+            ret = tmp.substr(0, idx);
+        }
+        return decodeURIComponent(ret.trim());
+    }
+</script>
+</body>
+
+</html>
