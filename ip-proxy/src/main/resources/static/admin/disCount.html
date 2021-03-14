@@ -26,10 +26,6 @@
 
             <button onclick="location.reload()">刷新</button>
         </div>
-        <div style="float: right">
-            <el-link type="warning" href="/logout">退出登录</el-link>
-        </div>
-        <div style="float: right; width:200px;">&nbsp;</div>
     </div>
     <div style="clear: both"></div>
     <br>
@@ -46,43 +42,25 @@
                         width="100">
                 </el-table-column>
                 <el-table-column
-                        prop="protocal"
-                        label="协议"
-                        width="80">
-                </el-table-column>
-                <el-table-column
-                        prop="ip"
-                        label="IP地址"
+                        prop="name"
+                        label="优惠名称"
                         width="200">
                 </el-table-column>
                 <el-table-column
-                        prop="port"
-                        label="端口"
-                        width="80">
+                        prop="status"
+                        label="状态"
+                        width="50">
                 </el-table-column>
                 <el-table-column
-                        prop="expireTime"
-                        label="过期时间"
-                        width="250">
+                        label="明细"
+                        width="400">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.status===0?'启用':'禁用'}}</div>
+                    </template>
                 </el-table-column>
                 <el-table-column
-                        prop="operators"
-                        label="运营商"
-                        width="100">
-                </el-table-column>
-                <el-table-column
-                        prop="area"
-                        label="区号"
-                        width="80">
-                </el-table-column>
-                <el-table-column
-                        prop="areaName"
-                        label="地域"
-                        width="120">
-                </el-table-column>
-                <el-table-column
-                        prop="modifyTime"
-                        label="更新时间"
+                        prop="creationTime"
+                        label="创建时间"
                         width="250">
                 </el-table-column>
             </el-table>

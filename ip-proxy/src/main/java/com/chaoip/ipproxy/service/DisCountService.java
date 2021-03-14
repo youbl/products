@@ -4,6 +4,7 @@ import com.chaoip.ipproxy.controller.dto.ProductDto;
 import com.chaoip.ipproxy.repository.DisCountRepository;
 import com.chaoip.ipproxy.repository.ProductRepository;
 import com.chaoip.ipproxy.repository.entity.DisCount;
+import com.chaoip.ipproxy.repository.entity.DisCountDto;
 import com.chaoip.ipproxy.repository.entity.Product;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -24,7 +25,7 @@ public class DisCountService {
         this.disCountRepository = disCountRepository;
     }
 
-    public Page<DisCount> findAll(DisCount dto) {// 不使用的属性，必须要用 withIgnorePaths 忽略，否则会列入条件
+    public Page<DisCount> findAll(DisCountDto dto) {// 不使用的属性，必须要用 withIgnorePaths 忽略，否则会列入条件
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withIgnorePaths("id", "type", "ipValidTime", "numPerDay", "numPerTime", "status", "creationTime");
         if (StringUtils.hasText(dto.getName())) {
@@ -39,7 +40,7 @@ public class DisCountService {
         return disCountRepository.pageSearch(example, dto.getPageNum(), dto.getPageSize(), "creationTime", true);
     }
 
-    public DisCount save(DisCount disCount) {
+    public DisCount save(DisCountDto disCount) {
         if (disCount == null) {
             throw new RuntimeException("参数为空");
         }
@@ -50,6 +51,6 @@ public class DisCountService {
         if (old != null && old.getId() != disCount.getId()) {
             throw new RuntimeException("产品名称已存在:" + disCount.getName());
         }
-        return disCountRepository.save(disCount);
+        return disCountRepository.save(disCount.mapTo());
     }
 }
