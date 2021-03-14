@@ -3,6 +3,7 @@ package com.chaoip.ipproxy;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.util.AliPayHelper;
 import com.chaoip.ipproxy.util.WechatPay;
+import com.chaoip.ipproxy.util.config.WechatConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +24,17 @@ public class WechatPayTest {
 
     @Test
     public void test_verify() throws Exception {
-        PayOrder url = wechatPay.getPayUrl("", 1, "我在单元测试 支付一下");
+        WechatConfig config = new WechatConfig();
+        config.setPayurl("https://api.mch.weixin.qq.com/v3/pay/transactions/native");
+        config.setQueryurl("https://api.mch.weixin.qq.com/v3/pay/transactions/id/{transaction_id}?mchid={mchid} ");
+        config.setAppId("wx开头的一串");
+        config.setPrivateKey("特别长的一串，导出证书里apiclient_key.pem的内容");
+        config.setMchId("商户id，一串数字");
+        config.setMchSerialNo("证书号");
+        config.setApiV3Key("API V3版本的密钥");
+        config.setCallback("http://localhost:8801/user/payback");
+
+        PayOrder url = wechatPay.getPayUrl("", 1, "我在单元测试 支付一下", config);
         System.out.println(url);
     }
 

@@ -3,8 +3,13 @@ package com.chaoip.ipproxy.util;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.service.SiteConfigService;
 import com.chaoip.ipproxy.util.config.WechatConfig;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
 import com.wechat.pay.contrib.apache.httpclient.auth.AutoUpdateCertificatesVerifier;
 import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
@@ -12,10 +17,14 @@ import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Credentials;
 import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Validator;
 import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -33,7 +42,21 @@ import java.security.PrivateKey;
 @Component
 @Slf4j
 public class WechatPay {
-    private static ObjectMapper mapper = new ObjectMapper();
+    private static ObjectMapper mapper;
+
+    static {
+        mapper = Jackson2ObjectMapperBuilder.json()
+                .modules(new SimpleModule())
+                .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)  // 禁用写时间戳，Could not read JSON: Cannot construct instance of `java.time.LocalDateTime`
+                .featuresToEnable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES) // 反序列化时，忽略大小写
+                .featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)// 忽略未知属性
+                .featuresToDisable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .featuresToDisable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE)   // 忽略未知的类型，比如本项目里不存在的class
+                .serializationInclusion(JsonInclude.Include.NON_NULL)
+                // .featuresToDisable(MapperFeature.USE_ANNOTATIONS)
+                .featuresToEnable()
+                .build();
+    }
 
     protected final SiteConfigService configService;
 
@@ -56,6 +79,20 @@ public class WechatPay {
      */
     public PayOrder getPayUrl(String account, int moneyCent, String description) throws Exception {
         WechatConfig config = getConfig();
+        return getPayUrl(account, moneyCent, description, config);
+    }
+
+    /**
+     * 调用支付接口.
+     * 注意：金额单位为分
+     *
+     * @param account   支付人账号
+     * @param moneyCent 支付金额，单位分
+     * @param config    支付配置
+     * @return 支付宝支付url
+     * @throws Exception 异常
+     */
+    public PayOrder getPayUrl(String account, int moneyCent, String description, WechatConfig config) throws Exception {
         if (StringUtils.isEmpty(config.getPayurl()) ||
                 StringUtils.isEmpty(config.getAppId()) ||
                 StringUtils.isEmpty(config.getPrivateKey())) {
@@ -66,7 +103,9 @@ public class WechatPay {
         request.setHeader("Content-Type", "application/json;charset=UTF-8");
         request.setHeader("Accept", "application/json");
 
-        StringEntity se = new StringEntity(getJson(config, moneyCent, description));
+        // 生成的json，不允许有null值，否则会报错
+        String jsonPara = getJson(config, moneyCent, description);
+        StringEntity se = new StringEntity(jsonPara);
         se.setContentType("text/json");
         request.setEntity(se);
 
@@ -83,8 +122,21 @@ public class WechatPay {
                 .withMerchant(config.getMchId(), config.getMchSerialNo(), merchantPrivateKey)
                 .withValidator(new WechatPay2Validator(verifier)).build()) {
             CloseableHttpResponse response = httpClient.execute(request);
-            System.out.println(response);
+
+            StringBuilder sb = new StringBuilder("响应Headers:\n");
+            for (Header header : response.getAllHeaders()) {
+                sb.append("  ")
+                        .append(header.getName())
+                        .append(": ")
+                        .append(header.getValue())
+                        .append("\n");
+            }
+            HttpEntity entity = response.getEntity();
+            sb.append("响应内容:\n").append(EntityUtils.toString(entity));
+
+            System.out.println(sb);
         }
+
         return null;
     }
 
@@ -105,6 +157,7 @@ public class WechatPay {
 
     private String getJson(WechatConfig config, int moneyCent, String description) throws Exception {
         WebchatPayDto dto = new WebchatPayDto();
+        //dto.setTimeExpire("2021-06-08T10:34:56+08:00");
         dto.setAppid(config.getAppId());
         dto.setMchid(config.getMchId());
 
@@ -115,6 +168,10 @@ public class WechatPay {
         WebchatPayDto.AmountDTO amountDTO = new WebchatPayDto.AmountDTO();
         dto.setAmount(amountDTO);
         amountDTO.setTotal(moneyCent);
+        amountDTO.setCurrency("CNY");
+
+        //dto.setGoodsTag("WXG");
+        //dto.setAttach("p");
 
         return mapper.writeValueAsString(dto);
         /*

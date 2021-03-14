@@ -13,6 +13,8 @@ import lombok.Data;
 public class WechatConfig {
     private String payurl;      // 下单接口API地址
     private String queryurl;    // 查询接口API地址
+
+    // api必备的几个参数
     private String appId;       // 商户AppId
     private String privateKey;  // 商户私钥
     private String mchId;       // 商户号
