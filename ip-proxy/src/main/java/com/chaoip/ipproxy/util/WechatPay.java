@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.util;
 
+import com.chaoip.ipproxy.repository.entity.OrderStatus;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
 import com.chaoip.ipproxy.service.SiteConfigService;
 import com.chaoip.ipproxy.util.config.WechatConfig;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -77,9 +79,9 @@ public class WechatPay {
      * @return 支付宝支付url
      * @throws Exception 异常
      */
-    public PayOrder getPayUrl(String account, int moneyCent, String description) throws Exception {
+    public PayOrder getPayUrl(String account, int moneyCent, String title, String description) throws Exception {
         WechatConfig config = getConfig();
-        return getPayUrl(account, moneyCent, description, config);
+        return getPayUrl(account, moneyCent, title, description, config);
     }
 
     /**
@@ -92,19 +94,34 @@ public class WechatPay {
      * @return 支付宝支付url
      * @throws Exception 异常
      */
-    public PayOrder getPayUrl(String account, int moneyCent, String description, WechatConfig config) throws Exception {
+    public PayOrder getPayUrl(String account, int moneyCent, String title, String description, WechatConfig config) throws Exception {
         if (StringUtils.isEmpty(config.getPayurl()) ||
                 StringUtils.isEmpty(config.getAppId()) ||
                 StringUtils.isEmpty(config.getPrivateKey())) {
             throw new RuntimeException("请先进行微信支付相关配置");
         }
+        String orderNo = AliBase.getTransId();
+        String payUrl = createPayUrl(moneyCent, title, orderNo, config);
+        log.info("getPayUrl账号:{} 参数:{} 成功结果:{}", account, moneyCent, payUrl);
+        return PayOrder.builder()
+                .orderNo(orderNo)
+                .name(account)
+                .money(moneyCent)
+                .payType(2)
+                .payUrl(payUrl)
+                .title(title)
+                .description(description)
+                .status(OrderStatus.NO_PAY)
+                .build();
+    }
 
+    private String createPayUrl(int moneyCent, String description, String orderNo, WechatConfig config) throws Exception {
         HttpPost request = new HttpPost(config.getPayurl());
         request.setHeader("Content-Type", "application/json;charset=UTF-8");
         request.setHeader("Accept", "application/json");
 
         // 生成的json，不允许有null值，否则会报错
-        String jsonPara = getJson(config, moneyCent, description);
+        String jsonPara = getJson(config, moneyCent, description, orderNo);
         StringEntity se = new StringEntity(jsonPara);
         se.setContentType("text/json");
         request.setEntity(se);
@@ -122,6 +139,79 @@ public class WechatPay {
                 .withMerchant(config.getMchId(), config.getMchSerialNo(), merchantPrivateKey)
                 .withValidator(new WechatPay2Validator(verifier)).build()) {
             CloseableHttpResponse response = httpClient.execute(request);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException("微信支付接口报错:" + EntityUtils.toString(response.getEntity()));
+            }
+
+//            StringBuilder sb = new StringBuilder("响应Headers:\n");
+//            for (Header header : response.getAllHeaders()) {
+//                sb.append("  ")
+//                        .append(header.getName())
+//                        .append(": ")
+//                        .append(header.getValue())
+//                        .append("\n");
+//            }
+            HttpEntity entity = response.getEntity();
+            String url = EntityUtils.toString(entity);
+//            sb.append("响应内容:\n").append(url);
+//
+//            System.out.println(sb);
+            return url;
+        }
+            /*
+成功响应的Headers:
+  Server: nginx
+  Date: Mon, 15 Mar 2021 15:17:48 GMT
+  Content-Type: application/json; charset=utf-8
+  Content-Length: 52
+  Connection: keep-alive
+  Keep-Alive: timeout=8
+  Cache-Control: no-cache, must-revalidate
+  X-Content-Type-Options: nosniff
+  Request-ID: 089CF5BD820610F80118B3C78C58209D0628D3D303-0
+  Content-Language: zh-CN
+  Wechatpay-Nonce: 83708e51607856da275b819f827e51e4
+  Wechatpay-Signature: iMJGu7MA8pu1gD8tKNY9hZZRUIVt4g6jtfQi6jfUP3dernN/+l8Syv3WQpfEXMYtRS6XacR49P1TLvVf6my4VBgFdZ2rRrHEiMU9lwqj5jWTjXjplPDbMuFuCuyHMklnbwG5BSmXcE7XFhiBUEGv40zBjxXLGZinyAQPnr+PP/6v4b3vAy/unfXS0fxgRDCwHwT45drpIoSD9J3JsWYjWR/LjTQBP8D8q0ay7o6CAx29IlYwMcvTUPnkIKBTCyEYNjiLt4NeV+++6P0HnxQ4zX/6WmgcEPaylzclGIhZn1+TVw4VexPPysUfPMzcjeO1fpNpByqPmZpE/jKVWp+J8g==
+  Wechatpay-Timestamp: 1615821468
+  Wechatpay-Serial: 312114998B8088EF41EF1C5753EABAF3A4F02310
+响应内容:
+{"code_url":"weixin://wxpay/bizpayurl?pr=NLDxVDczz"}
+            * */
+    }
+
+    /**
+     * 查询支付状态
+     *
+     * @param order
+     * @return
+     */
+    public boolean queryPayResult(PayOrder order) throws Exception {
+        // https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_4_2.shtml
+        // https://api.mch.weixin.qq.com/v3/pay/transactions/out-trade-no/{out_trade_no}?mchid={mchid}
+        WechatConfig config = getConfig();
+        String queryUrl = config.getQueryurl()
+                .replace("{out_trade_no}", order.getOrderNo())
+                .replace("{mchid}", config.getMchId());
+
+        HttpGet request = new HttpGet(queryUrl);
+        request.setHeader("Accept", "application/json");
+
+        // 加载商户私钥（privateKey：私钥字符串） pem文件，或p12文件里解析出来的
+        PrivateKey merchantPrivateKey = PemUtil
+                .loadPrivateKey(new ByteArrayInputStream(config.getPrivateKey().getBytes("utf-8")));
+
+        // 加载平台证书（mchId：商户号,mchSerialNo：商户证书序列号,apiV3Key：V3秘钥）
+        AutoUpdateCertificatesVerifier verifier = new AutoUpdateCertificatesVerifier(
+                new WechatPay2Credentials(config.getMchId(), new PrivateKeySigner(config.getMchSerialNo(), merchantPrivateKey)), config.getApiV3Key().getBytes("utf-8"));
+
+        // 初始化httpClient
+        try (CloseableHttpClient httpClient = WechatPayHttpClientBuilder.create()
+                .withMerchant(config.getMchId(), config.getMchSerialNo(), merchantPrivateKey)
+                .withValidator(new WechatPay2Validator(verifier)).build()) {
+            CloseableHttpResponse response = httpClient.execute(request);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException("微信支付接口报错:" + EntityUtils.toString(response.getEntity()));
+            }
 
             StringBuilder sb = new StringBuilder("响应Headers:\n");
             for (Header header : response.getAllHeaders()) {
@@ -132,37 +222,23 @@ public class WechatPay {
                         .append("\n");
             }
             HttpEntity entity = response.getEntity();
-            sb.append("响应内容:\n").append(EntityUtils.toString(entity));
+            String content = EntityUtils.toString(entity);
+            sb.append("响应内容:\n").append(content);
 
             System.out.println(sb);
         }
 
-        return null;
-    }
-
-    /**
-     * 查询支付状态
-     *
-     * @param order
-     * @return
-     */
-    public boolean queryPayResult(PayOrder order) throws Exception {
-        // https://api.mch.weixin.qq.com/v3/pay/transactions/id/{transaction_id}?mchid={mchid}
-        WechatConfig config = getConfig();
-        String queryUrl = config.getQueryurl()
-                .replace("{transaction_id}", order.getOrderNo())
-                .replace("{mchid}", config.getMchId());
         return false;
     }
 
-    private String getJson(WechatConfig config, int moneyCent, String description) throws Exception {
+    private String getJson(WechatConfig config, int moneyCent, String description, String orderNo) throws Exception {
         WebchatPayDto dto = new WebchatPayDto();
         //dto.setTimeExpire("2021-06-08T10:34:56+08:00");
         dto.setAppid(config.getAppId());
         dto.setMchid(config.getMchId());
 
         dto.setDescription(description);
-        dto.setOutTradeNo(AliBase.getTransId());
+        dto.setOutTradeNo(orderNo);
         dto.setNotifyUrl(config.getCallback());
 
         WebchatPayDto.AmountDTO amountDTO = new WebchatPayDto.AmountDTO();

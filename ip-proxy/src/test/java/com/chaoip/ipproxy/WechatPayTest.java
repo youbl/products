@@ -34,7 +34,7 @@ public class WechatPayTest {
         config.setApiV3Key("API V3版本的密钥");
         config.setCallback("http://localhost:8801/user/payback");
 
-        PayOrder url = wechatPay.getPayUrl("", 1, "我在单元测试 支付一下", config);
+        PayOrder url = wechatPay.getPayUrl("", 1, "WXPay", "我在单元测试 支付一下", config);
         System.out.println(url);
     }
 

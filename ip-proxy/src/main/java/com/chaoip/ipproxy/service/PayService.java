@@ -54,7 +54,7 @@ public class PayService {
         if (money.getPayType() == 1) {
             order = aliPayHelper.getPayUrl(name, money.getMoney(), money.getTitle(), money.getDescription());
         } else {
-            order = wechatPay.getPayUrl(name, money.getMoney(), money.getTitle() + money.getDescription());
+            order = wechatPay.getPayUrl(name, money.getMoney(), money.getTitle(), money.getDescription());
         }
         return save(order);
     }
