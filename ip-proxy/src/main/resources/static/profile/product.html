@@ -7,6 +7,7 @@
     <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
     <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
     <script src="/res/unpkg/elemeIndex.js"></script>
+    <script src="/res/unpkg/qrcode.min.js"></script>
 
     <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
     <style>
@@ -62,7 +63,7 @@
                         <el-radio-group v-model="productBuyInfo.payType">
                             <el-radio :label="0" :disabled="!isUserMoneyCanPay">余额支付</el-radio>
                             <el-radio :label="1">支付宝</el-radio>
-                            <el-radio :label="2" v-show="false">微信</el-radio>
+                            <el-radio :label="2">微信</el-radio>
                         </el-radio-group>
                     </el-form-item>
                 </el-form>
@@ -78,8 +79,11 @@
         </el-tabs>
     </template>
 
-    <el-dialog title="支付成功？" :visible.sync="openPayConfirm" width="400px">
-        <div slot="footer" class="dialog-footer">
+    <el-dialog :title="payConfirmTitle" :visible.sync="openPayConfirm" width="400px">
+        <div id="divQrCode" name="divQrCodeName" class="divQrCodeCss" v-show="payConfirmType===2">
+        </div>
+        <br>
+        <div>
             <el-button type="primary" @click="doPayConfirm">确认已支付</el-button>
             <el-button @click="openPayConfirm=false">取消支付</el-button>
             <el-button @click="location.reload()">刷新</el-button>
@@ -132,10 +136,15 @@
                 ],
 
                 openPayConfirm: false,  // 是否弹窗显示支付成功的对话框
+                payConfirmTitle: '',    // 弹窗标题
                 payConfirmOrderNo: '',  // 点击确认时，用于确认的订单号
+                payConfirmType: 1,      // 弹窗的支付类型，1支付宝，2微信
+                qrCode: null,           // 二维码数据
             }
         },
         created: function () {
+            this.showQrCode(null);
+
             let url = '/user';
             axios.get(url).then(response => {
                 if (!response || !response.data) {
@@ -227,8 +236,8 @@
                     args.productId = this.product.id;
                     args.payMoney = this.payMoney * 100; // 接口单位是分
 
-                    // 默认情况下Chrome会阻止ajax弹窗，用这个方法解决
-                    let newWindown = args.payType === 0 ? null : window.open('about:blank', '_blank');
+                    // 默认情况下Chrome会阻止ajax弹窗，用这个方法解决; 0表示余额支付,不用弹窗;1表示支付宝,需要弹窗;2表示微信要展示二维码,不用弹窗;
+                    let newWindown = args.payType !== 1 ? null : window.open('about:blank', '_blank');
 
                     axios.post(url, args).then(response => {
                         if (!response) {
@@ -244,9 +253,8 @@
                         }
 
                         // 返回充值地址，跳转过去付钱
-                        if (newWindown) {
-                            newWindown.location.href = response.data.payUrl;
-                            this.showConfirmDialog(response.data.orderNo);
+                        if (args.payType !== 0) {
+                            this.showConfirmDialog(response.data.orderNo, response.data.payUrl, args.payType, newWindown);
                         }
                     }).catch(error => {
                         if (newWindown)
@@ -256,13 +264,40 @@
                 });
             },
             // 弹窗跳转到支付宝后，本页面弹出是否支付成功的对话框，以便用户点击查询支付结果
-            showConfirmDialog: function (orderNo) {
+            showConfirmDialog: function (orderNo, payUrl, payType, newWindow) {
                 if (!orderNo) {
                     alert('订单号为空，出啥错了？');
                     return;
                 }
+                this.payConfirmTitle = '支付宝支付成功确认:';
+                if (payType === 2) {
+                    this.payConfirmTitle = '请打开手机微信扫描并支付:';
+                    // 微信，直接展示二维码
+                    this.showQrCode(payUrl);
+                } else if (newWindow) {
+                    // ajax弹窗会被拦截，要提前new一个窗口
+                    newWindow.location.href = payUrl;
+                } else {
+                    window.open(payUrl, '_blank');
+                }
+                this.payConfirmType = payType;
                 this.payConfirmOrderNo = orderNo;
                 this.openPayConfirm = true;
+            },
+            showQrCode: function (url) {
+                if (url) {
+                    if (this.qrCode === null) {
+                        this.qrCode = new QRCode(document.getElementById('divQrCode'), url);
+                    } else {
+                        this.qrCode.clear(); // clear the code.
+                        this.qrCode.makeCode(url); // make another code.
+                    }
+                } else {
+                    this.openPayConfirm = true;
+                    this.$nextTick(function () {
+                        this.openPayConfirm = false; // 让div渲染一下后再关闭
+                    });
+                }
             },
             doPayConfirm: function () {
                 let url = '/user/payback/' + this.payConfirmOrderNo;
