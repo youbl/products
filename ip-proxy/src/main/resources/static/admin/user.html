@@ -31,12 +31,12 @@
                     stripe
                     border
                     style="width: 100%">
-                <el-table-column
-                        label="序号"
-                        type="index"
-                        width="50"
-                        align="center">
-                </el-table-column>
+                <!--                <el-table-column-->
+                <!--                        label="序号"-->
+                <!--                        type="index"-->
+                <!--                        width="50"-->
+                <!--                        align="center">-->
+                <!--                </el-table-column>-->
                 <el-table-column
                         prop="id"
                         label="ID"
@@ -53,14 +53,12 @@
                         width="150">
                 </el-table-column>
                 <el-table-column
-                        prop="realName"
-                        label="实名"
-                        width="100">
-                </el-table-column>
-                <el-table-column
-                        prop="identity"
-                        label="身份证"
-                        width="300">
+                        label="实名/身份证"
+                        width="200">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.realName}}</div>
+                        <div>{{scope.row.identity}}</div>
+                    </template>
                 </el-table-column>
                 <el-table-column
                         prop="creationTime"
@@ -78,6 +76,10 @@
                                 size="mini"
                                 @click="handleResetPwd(scope.$index, scope.row)">密码重置
                         </el-button>
+                        <el-button
+                                size="mini"
+                                @click="handleRealname(scope.$index, scope.row)">编辑实名
+                        </el-button>
                         <el-button v-text="getAdminTxt(scope.row.roles)"
                                    size="mini"
                                    type="danger"
@@ -92,11 +94,17 @@
         </template>
     </div>
 
-    <el-dialog title="用户详情" :visible.sync="openEditDialog">
-        <el-form>
+    <el-dialog title="用户实名" :visible.sync="openEditDialog">
+        <el-form :model="changeName" :rules="rulesChangeName" ref="changeNameForm">
+            <el-form-item label="实名信息" label-width="200px" prop="realName">
+                <el-input v-model="changeName.realName" placeholder="请输入姓名" maxlength="30"></el-input>
+            </el-form-item>
+            <el-form-item label="身份证号" label-width="200px" prop="identity">
+                <el-input v-model="changeName.identity" placeholder="请输入身份证号" maxlength="30"></el-input>
+            </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button icon="el-icon-success" type="primary">保 存</el-button>
+            <el-button icon="el-icon-success" type="primary" @click="saveRealName">保 存</el-button>
             <el-button @click="hideAddDialog">取 消</el-button>
         </div>
     </el-dialog>
@@ -109,7 +117,21 @@
             userTotalNum: 0,
             page: 0,
             pageSize: 12,
+
             openEditDialog: false,
+            changeName: {
+                name: '',
+                realName: '',
+                identity: '',
+            },
+            rulesChangeName: {
+                realName: [
+                    {required: true, message: '姓名必填', trigger: 'blur'},
+                ],
+                identity: [
+                    {required: true, message: '身份证必填', trigger: 'blur'},
+                ],
+            },
         },
         created: function () {
             this.showAllUser();
@@ -153,6 +175,17 @@
                 }).catch(() => {
                     this.$message({type: 'info', message: '取消重置密码'});
                 });
+            },
+            handleRealname: function (index, row) {
+                this.changeName = row;
+                this.showAddDialog();
+            },
+            saveRealName: function () {
+                let url = '/manage/user/realName';
+                axios.post(url, this.changeName).then(response => {
+                    alert(name + ' 已成功修改实名信息');
+                    this.hideAddDialog();
+                }).catch(error => this.ajaxError(error));
             },
             doResetPwd: function (val, name, id) {
                 if (!confirm('确认要把该账户:' + name + ' 的密码重置为 ' + val + ' 吗？')) {

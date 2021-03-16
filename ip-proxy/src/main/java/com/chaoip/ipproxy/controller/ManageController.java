@@ -126,6 +126,11 @@ public class ManageController {
     }
 
 
+    @PostMapping("user/realName")
+    public void editUserRealName(@RequestBody UserDto dto) {
+        userService.saveUserRealName(dto);
+    }
+
     // 以下为读写配置的方法
     @GetMapping("config/sms")
     public SmsConfig smsConfig() throws Exception {

@@ -300,6 +300,19 @@ public class BeinetUserService implements UserDetailsService {
         return true;
     }
 
+    public void saveUserRealName(UserDto dto) {
+        if (StringUtils.isEmpty(dto.getName())) {
+            throw new RuntimeException("账号不能为空");
+        }
+        BeinetUser user = userRepository.findByName(dto.getName());
+        if (user == null) {
+            throw new RuntimeException("指定的账号找不到用户：" + dto.getName());
+        }
+        user.setRealName(dto.getRealName());
+        user.setIdentity(dto.getIdentity());
+        save(user);
+    }
+
     private BeinetUser findById(long id) {
         Optional<BeinetUser> opnUser = userRepository.findById(id);
         if (!opnUser.isPresent()) {
