@@ -17,6 +17,7 @@ import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
 import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Credentials;
 import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Validator;
 import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
+import java.net.URLEncoder;
 import java.security.PrivateKey;
 
 /**
@@ -121,6 +123,8 @@ public class WechatPay {
         request.setHeader("Accept", "application/json");
 
         // 生成的json，不允许有null值，否则会报错
+        // 中文会乱码，描述改成英文
+        description = "Pay from chaodaili.com";
         String jsonPara = getJson(config, moneyCent, description, orderNo);
         StringEntity se = new StringEntity(jsonPara);
         se.setContentType("text/json");
@@ -152,11 +156,12 @@ public class WechatPay {
 //                        .append("\n");
 //            }
             HttpEntity entity = response.getEntity();
-            String url = EntityUtils.toString(entity);
+            String urlJson = EntityUtils.toString(entity);
+            WxPayUrl wxPayUrl = mapper.readValue(urlJson, WxPayUrl.class);
 //            sb.append("响应内容:\n").append(url);
 //
 //            System.out.println(sb);
-            return url;
+            return wxPayUrl.getCode_url();
         }
             /*
 成功响应的Headers:
@@ -179,6 +184,7 @@ public class WechatPay {
             * */
     }
 
+
     /**
      * 查询支付状态
      *
@@ -186,6 +192,8 @@ public class WechatPay {
      * @return
      */
     public boolean queryPayResult(PayOrder order) throws Exception {
+        // https://api.mch.weixin.qq.com/v3/pay/transactions/id/{transaction_id}?mchid={mchid}
+
         // https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_4_2.shtml
         // https://api.mch.weixin.qq.com/v3/pay/transactions/out-trade-no/{out_trade_no}?mchid={mchid}
         WechatConfig config = getConfig();
@@ -210,25 +218,61 @@ public class WechatPay {
                 .withValidator(new WechatPay2Validator(verifier)).build()) {
             CloseableHttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() != 200) {
-                throw new RuntimeException("微信支付接口报错:" + EntityUtils.toString(response.getEntity()));
+                String errMsg = EntityUtils.toString(response.getEntity());
+                throw new RuntimeException("微信支付接口报错:" + errMsg);
             }
 
-            StringBuilder sb = new StringBuilder("响应Headers:\n");
-            for (Header header : response.getAllHeaders()) {
-                sb.append("  ")
-                        .append(header.getName())
-                        .append(": ")
-                        .append(header.getValue())
-                        .append("\n");
-            }
             HttpEntity entity = response.getEntity();
             String content = EntityUtils.toString(entity);
-            sb.append("响应内容:\n").append(content);
-
-            System.out.println(sb);
+            WxPayResult result = mapper.readValue(content, WxPayResult.class);
+            if (result == null) {
+                throw new RuntimeException("微信支付接口返回格式有变化:" + content);
+            }
+            if (!result.getOut_trade_no().equals(order.getOrderNo())) {
+                throw new RuntimeException("微信支付接口返回订单号不符:" + result.getOut_trade_no());
+            }
+            return result.getTrade_state().equals("SUCCESS");
+            /*
+响应Headers:
+  Server: nginx
+  Date: Tue, 16 Mar 2021 15:16:09 GMT
+  Content-Type: application/json; charset=utf-8
+  Content-Length: 446
+  Connection: keep-alive
+  Keep-Alive: timeout=8
+  Cache-Control: no-cache, must-revalidate
+  X-Content-Type-Options: nosniff
+  Request-ID: 08B997C3820610D30118B3C78C5820E32F28F3C004-0
+  Content-Language: zh-CN
+  Wechatpay-Nonce: ece00eb67800b92e898d39603f35d98d
+  Wechatpay-Signature: VSW2cbnJolom3blD1WHu0BreJZOB3DJwJQjA2iyngHZlDfLPUfctvJudTVW4J4kauhaaujCQvRMSLybZK+UTiDB1sPcqmoec3kk/NUft23EJwe9tfyW5cSOPLxmsupPV+j/S3QV5V/iFwRg99IUujYcOe4xUIawkK7oE/FJF/bS0AVZRFVQUBmfyoLRc20H2jbkyFhux1gmq6uLO/6yyV2TjqKSOhdwCRkI6HgR5ip/O9TkhL+QO1d26RkWQ1VM0Kt1QcveagYAFV8Fox8Y2Rpmarri/T3SbF6Bd9wGRpIXYiZPn8NmOsoAUuugjFanKmIahRNpczluwxbQTqCVjBQ==
+  Wechatpay-Timestamp: 1615907769
+  Wechatpay-Serial: 312114998B8088EF41EF1C5753EABAF3A4F02310
+响应内容:
+{
+	"amount": {
+		"currency": "CNY",
+		"payer_currency": "CNY",
+		"payer_total": 2,
+		"total": 2
+	},
+	"appid": "xxx",
+	"attach": "",
+	"bank_type": "OTHERS",
+	"mchid": "xxx",
+	"out_trade_no": "xxx",
+	"payer": {
+		"openid": "xxx"
+	},
+	"promotion_detail": [],
+	"success_time": "2021-03-16T23:09:57+08:00",
+	"trade_state": "SUCCESS",
+	"trade_state_desc": "支付成功",
+	"trade_type": "NATIVE",
+	"transaction_id": "xxx"
+}
+            * */
         }
-
-        return false;
     }
 
     private String getJson(WechatConfig config, int moneyCent, String description, String orderNo) throws Exception {
@@ -237,9 +281,9 @@ public class WechatPay {
         dto.setAppid(config.getAppId());
         dto.setMchid(config.getMchId());
 
-        dto.setDescription(description);
+        dto.setDescription(description);//(URLEncoder.encode(description, "UTF-8"));
         dto.setOutTradeNo(orderNo);
-        dto.setNotifyUrl(config.getCallback());
+        dto.setNotifyUrl(getCallback(config.getCallback(), orderNo));
 
         WebchatPayDto.AmountDTO amountDTO = new WebchatPayDto.AmountDTO();
         dto.setAmount(amountDTO);
@@ -314,5 +358,50 @@ public class WechatPay {
     private static int transMoneyToCent(String moneyStr) {
         float money = Float.parseFloat(moneyStr) * 100;
         return (int) money;
+    }
+
+    /**
+     * 获取回调地址
+     *
+     * @param callbackUrl 回调地址
+     * @param orderNo     订单号
+     * @return url
+     */
+    public String getCallback(String callbackUrl, String orderNo) {
+        String callback = checkUrl(callbackUrl);
+
+        return callback + orderNo;
+    }
+
+    /**
+     * 检查并完善地址
+     *
+     * @param url 地址
+     * @return 修复的地址
+     */
+    protected String checkUrl(String url) {
+        assert url != null;
+        url = url.trim();
+        assert !url.isEmpty();
+        if (url.charAt(url.length() - 1) != '/')
+            url += '/';
+        return url;
+    }
+
+    /**
+     * 创建支付订单的返回类
+     */
+    @Data
+    private static class WxPayUrl {
+        private String code_url;
+    }
+
+    /**
+     * 查询支付订单结果的返回类
+     */
+    @Data
+    private static class WxPayResult {
+        private String out_trade_no;
+        private String trade_state;
     }
 }
