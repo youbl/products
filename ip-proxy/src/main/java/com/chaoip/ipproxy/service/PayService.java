@@ -144,12 +144,11 @@ public class PayService {
         } else {
             ret = wechatPay.queryPayResult(order);
         }
-        order.setPayTime(LocalDateTime.now());
-        if (ret) {
-            order.setStatus(OrderStatus.SUCCESS);
-        } else {
-            order.setStatus(OrderStatus.FAIL);
+        if (!ret) {
+            return false;
         }
+        order.setPayTime(LocalDateTime.now());
+        order.setStatus(OrderStatus.SUCCESS);
         order = payOrderRepository.save(order);
         if (order.getStatus() == OrderStatus.SUCCESS) {
             // 发送成功事件，要保存后，有id
