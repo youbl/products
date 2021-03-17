@@ -33,8 +33,15 @@ public class DisCountController {
         return disCountService.findAll(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("")
     public void saveData(@RequestBody DisCountDto dto) {
         disCountService.save(dto);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PostMapping("status/{id}")
+    public void changeStatus(@PathVariable long id) {
+        disCountService.changeStatus(id);
     }
 }

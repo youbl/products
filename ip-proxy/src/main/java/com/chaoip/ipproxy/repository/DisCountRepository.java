@@ -13,4 +13,5 @@ public interface DisCountRepository extends BaseRepository<DisCount, Long> {
 
     DisCount findByName(String name);
 
+    DisCount findById(long id);
 }

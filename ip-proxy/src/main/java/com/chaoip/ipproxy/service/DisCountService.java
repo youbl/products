@@ -27,7 +27,7 @@ public class DisCountService {
 
     public Page<DisCount> findAll(DisCountDto dto) {// 不使用的属性，必须要用 withIgnorePaths 忽略，否则会列入条件
         ExampleMatcher matcher = ExampleMatcher.matching()
-                .withIgnorePaths("id", "type", "ipValidTime", "numPerDay", "numPerTime", "status", "creationTime");
+                .withIgnorePaths("id", "offConfigs", "status", "creationTime");
         if (StringUtils.hasText(dto.getName())) {
             matcher = matcher.withMatcher("name", ExampleMatcher.GenericPropertyMatchers.exact());
         } else {
@@ -49,8 +49,17 @@ public class DisCountService {
         }
         DisCount old = disCountRepository.findByName(disCount.getName());
         if (old != null && old.getId() != disCount.getId()) {
-            throw new RuntimeException("产品名称已存在:" + disCount.getName());
+            throw new RuntimeException("优惠名称已存在:" + disCount.getName());
         }
         return disCountRepository.save(disCount.mapTo());
+    }
+
+    public void changeStatus(long id) {
+        DisCount disCount = disCountRepository.findById(id);
+        if (disCount == null) {
+            throw new RuntimeException("优惠未找到:" + id);
+        }
+        disCount.setStatus(disCount.getStatus() == 0 ? 1 : 0);
+        disCountRepository.save(disCount);
     }
 }

@@ -9,6 +9,11 @@
     <script src="/res/unpkg/elemeIndex.js"></script>
 
     <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .el-select {
+            width: 150px;
+        }
+    </style>
 </head>
 
 <body>
@@ -18,7 +23,7 @@
     </h1>
     <div>
         <div style="float: left;">
-            <el-button type="primary" icon="el-icon-edit" @click="showAddDialog">添加记录</el-button>
+            <el-button type="primary" icon="el-icon-edit" @click="showAddDialog(null)">添加记录</el-button>
 
             <el-button @click="getPrevPage" :disabled="page<=0">上一页</el-button>
             <el-button @click="getAfterPage" :disabled="disCountData.length<pageSize">下一页</el-button>
@@ -39,7 +44,7 @@
                 <el-table-column
                         prop="id"
                         label="ID"
-                        width="100">
+                        width="50">
                 </el-table-column>
                 <el-table-column
                         prop="name"
@@ -47,21 +52,38 @@
                         width="200">
                 </el-table-column>
                 <el-table-column
-                        prop="status"
                         label="状态"
                         width="50">
-                </el-table-column>
-                <el-table-column
-                        label="明细"
-                        width="400">
                     <template slot-scope="scope">
                         <div>{{scope.row.status===0?'启用':'禁用'}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column
+                        label="明细"
+                        width="400">
+                    <template slot-scope="scope">
+                        <div v-for="(item, idx) in scope.row.offConfigs">
+                            {{disCountSourceArr[item.disCountSource]}} 超过 {{item.num}} 时，
+                            {{disCountTypeArr[item.type]}} {{item.off}}
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column
                         prop="creationTime"
                         label="创建时间"
-                        width="250">
+                        width="230">
+                </el-table-column>
+                <el-table-column
+                        label=""
+                        width="400">
+                    <template slot-scope="scope">
+                        <el-button icon="el-icon-setting" type="warning" @click="changeStatus(scope.row)">
+                            {{scope.row.status===0?'禁用':'启用'}}
+                        </el-button>
+                        <el-button icon="el-icon-edit" type="primary" @click="showAddDialog(scope.row)">
+                            编辑
+                        </el-button>
+                    </template>
                 </el-table-column>
             </el-table>
         </template>
@@ -69,26 +91,33 @@
 
     <el-dialog title="编辑优惠项" :visible.sync="openEditDialog">
         <el-form>
-            <el-form-item label="协议" label-width="200px">
-                <el-select v-model="newRecord.protocal" placeholder="请选择协议">
-                    <el-option label="http/https" value="http"></el-option>
-                    <el-option label="socks4/socks5" value="socks"></el-option>
-                </el-select>
+            <el-form-item label="优惠名称" label-width="200px">
+                <el-input v-model="editData.name" placeholder="请输入名称"></el-input>
             </el-form-item>
-            <el-form-item label="IP" label-width="200px">
-                <el-input v-model="newRecord.ip" placeholder="请输入IP"></el-input>
-            </el-form-item>
-            <el-form-item label="端口" label-width="200px">
-                <el-input v-model="newRecord.port" placeholder="请输入端口"></el-input>
-            </el-form-item>
-            <el-form-item label="运营商" label-width="200px">
-                <el-input v-model="newRecord.operators" placeholder="请输入运营商 unicom,mobile,telecom"></el-input>
-            </el-form-item>
-            <el-form-item label="城市区号" label-width="200px">
-                <el-input v-model="newRecord.area" placeholder="请输入城市区号"></el-input>
-            </el-form-item>
-            <el-form-item label="过期时间-秒" label-width="200px">
-                <el-input v-model="newRecord.expireTime" placeholder="请输入过期时间，单位秒"></el-input>
+            <el-form-item label="优惠配置" label-width="200px" style="text-align: left">
+                <div v-for="(item, idx) in editData.offConfigs">
+                    <span style="display: inline-block; width: 650px;">
+                        <el-select v-model="item.disCountSource" filterable placeholder="请选择优惠依据">
+                            <el-option v-for="(val, key, idx) in disCountSourceArr" :value="key"
+                                       :label="val"></el-option>
+                        </el-select>
+                        <el-input v-model="item.num" placeholder="请输入购买数量" style="width:150px;"></el-input>
+
+                        <el-select v-model="item.type" filterable placeholder="请选择优惠类型">
+                            <el-option v-for="(val, key, idx) in disCountTypeArr" :value="key"
+                                       :label="val"></el-option>
+                        </el-select>
+                        <el-input v-model="item.off" placeholder="请输入优惠数量" style="width:150px;"></el-input>
+                    </span>
+                    <el-link icon="el-icon-minus" type="danger" @click="delConfig(editData, idx)"></el-link>
+                    &nbsp;
+                    <el-link icon="el-icon-plus" type="primary" @click="addConfig(editData)"
+                             v-show="idx===0"></el-link>
+                </div>
+                <div>
+                    <el-link icon="el-icon-plus" type="primary" @click="addConfig(editData)"
+                             v-show="!editData.offConfigs || editData.offConfigs.length<=0"></el-link>
+                </div>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -101,19 +130,23 @@
     const vueApp = new Vue({
         el: '#divApp',
         data: {
+            disCountSourceArr: {
+                Num: '购买IP数',
+                Month: '购买月数',
+                Price: '购买总价',
+            },
+            disCountTypeArr: {
+                Percent: '打折',
+                Reduce: '立减',
+            },
+
             disCountData: [],
             disCountTotalNum: 0,
             page: 0,
             pageSize: 12,
+
             openEditDialog: false,
-            newRecord: {
-                protocal: 'http',
-                ip: '',
-                port: 8080,
-                operators: '',
-                area: '',
-                expireTime: 1800,
-            },
+            editData: {},
         },
         created: function () {
             this.showAllDisCount();
@@ -121,7 +154,7 @@
         computed: {},
         methods: {
             showAllDisCount: function () {
-                let url = '/manage/routes?pageNum=' + this.page + '&pageSize=' + this.pageSize;
+                let url = '/disCount/all?pageNum=' + this.page + '&pageSize=' + this.pageSize;
                 axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.content || response.data.content.length <= 0) {
                         this.disCountData = [];
@@ -142,20 +175,45 @@
                 this.page++;
                 this.showAllDisCount();
             },
-            showAddDialog: function () {
+            showAddDialog: function (row) {
+                if (row) {
+                    this.editData = row;
+                } else {
+                    this.editData = {};
+                }
                 this.openEditDialog = true;
             },
             hideAddDialog: function () {
                 this.openEditDialog = false;
             },
+            // 禁用 启用
+            changeStatus: function (row) {
+                let txt = (row.status === 0 ? '禁用' : '启用');
+                if (!confirm('确认要 ' + txt + ' 该产品吗?')) {
+                    return;
+                }
+                let url = '/disCount/status/' + row.id;
+                axios.post(url).then(response => {
+                    row.status = (row.status === 0 ? 1 : 0);
+                    alert(txt + '成功');
+                }).catch(error => this.ajaxError(error));
+            },
+            addConfig: function (item) {
+                if (!item.offConfigs) {
+                    Vue.set(item, 'offConfigs', []);
+                }
+                item.offConfigs.push({});
+            },
+            delConfig: function (item, idx) {
+                item.offConfigs.splice(idx, 1);
+            },
             saveDisCount: function () {
-                let url = '/manage/route';
-                axios.post(url, this.newRecord).then(response => {
-                    if (response.data !== 1) {
-                        alert(response.data);
-                        return;
-                    }
+                let url = '/disCount';
+                axios.post(url, this.editData).then(response => {
                     alert('添加成功');
+                    if (opener) {
+                        opener.window.vueApp.loadDisCounts();
+                    }
                     this.showAllDisCount();
                     this.hideAddDialog();
                 }).catch(error => this.ajaxError(error));

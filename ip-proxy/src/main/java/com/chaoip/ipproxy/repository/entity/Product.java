@@ -64,6 +64,11 @@ public class Product {
      */
     private LocalDateTime creationTime;
 
+    /**
+     * 采用的优惠id
+     */
+    private Integer[] disCount;
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor

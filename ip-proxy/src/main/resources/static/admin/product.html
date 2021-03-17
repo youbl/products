@@ -144,9 +144,9 @@
             <el-form-item label="单次最大IP数" label-width="200px" prop="numPerTime" style="text-align: left;">
                 <el-input v-model="editData.numPerTime" placeholder="请输入单次最大IP数"></el-input>
             </el-form-item>
-            <el-form-item label="产品优惠配置" label-width="200px" prop="disCount" style="text-align: left" v-show="false">
+            <el-form-item label="产品优惠配置" label-width="200px" prop="disCount" style="text-align: left">
                 <el-select v-model="editData.disCount" multiple filterable placeholder="请选择产品优惠">
-                    <el-option v-for="(val,key,idx) in typeArr" :label="val" :value="key"></el-option>
+                    <el-option v-for="item in disCountData" :label="item.name" :value="item.id"></el-option>
                 </el-select>
                 <el-link @click="window.open('disCount.html')">优惠项编辑</el-link>
             </el-form-item>
@@ -165,6 +165,7 @@
                 MONTH: '包年包月',
                 STREAM: '按量',
             },
+            disCountData: [],
             productData: [],
             productTotalNum: 0,
             page: 0,
@@ -191,13 +192,28 @@
             },
         },
         created: function () {
-            this.showAllProduct();
+            this.loadDisCounts().then(this.showAllProduct);
         },
         computed: {},
         methods: {
+            loadDisCounts: function () {
+                this.disCountData = [];
+                let url = '/disCount/all?pageNum=0&pageSize=100';
+                return axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.content || response.data.content.length <= 0) {
+                        return;
+                    }
+                    for (let i = 0, j = response.data.content.length; i < j; i++) {
+                        let item = response.data.content[i];
+                        if (item.status === 0) {
+                            this.disCountData.push(item);
+                        }
+                    }
+                }).catch(error => this.ajaxError(error));
+            },
             showAllProduct: function () {
                 let url = '/product/all?pageNum=' + this.page + '&pageSize=' + this.pageSize;
-                axios.get(url).then(response => {
+                return axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.content || response.data.content.length <= 0) {
                         this.productData = [];
                         alert('无数据');
