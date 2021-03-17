@@ -53,6 +53,12 @@ public class ProductOrderController {
         return productOrderService.buy(dto, details.getUserName());
     }
 
+    // 计算价格，跟buy一样，但是不创建订单
+    @PostMapping("/price")
+    public int countPrice(@Valid @RequestBody ProductOrderDto dto) throws Exception {
+        return productOrderService.countPrice(dto, null);
+    }
+
     /**
      * 获取当前登录用户的所有产品订单
      *

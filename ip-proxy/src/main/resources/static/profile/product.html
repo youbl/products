@@ -102,6 +102,7 @@
                 },
                 user: {},
                 product: {},
+                payMoney: 0,
                 products: [],
 
                 productBuyInfo: {
@@ -166,22 +167,16 @@
                 }
                 return ret;
             },
-            payMoney: function () {
-                if (this.productBuyInfo.buyIpTime === undefined) {
-                    return 0;
-                }
-                // IP个数，按千个计算
-                let ipThousand = Math.floor(this.productBuyInfo.numPerDay / 1000);
-                if (!ipThousand || isNaN(ipThousand)) {
-                    ipThousand = 0;
-                }
-
-                let price = this.product.ipValidTime[this.productBuyInfo.buyIpTime].price;
-
-                return (this.productBuyInfo.buyNum * price * ipThousand / 100);
-            },
             payMoneyChinese: function () {
                 return this.payMoney + '元     【您的账户余额:' + this.user.money / 100 + '元】';
+            },
+        },
+        watch: {
+            'productBuyInfo.numPerDay': function () {
+                this.getPayMoney();
+            },
+            'productBuyInfo.buyIpTime': function () {
+                this.getPayMoney();
             },
         },
         methods: {
@@ -227,6 +222,22 @@
                         this.productBuyInfo.numPerDay = 1000;
                     }
                 }
+            },
+            getPayMoney: function () {
+                this.payMoney = 0;
+                if (this.productBuyInfo.buyIpTime === undefined) {
+                    return;
+                }
+                let url = '/order/price';
+                let args = JSON.parse(JSON.stringify(this.productBuyInfo));
+                args.productId = this.product.id;
+                axios.post(url, args).then(response => {
+                    if (response.data) {
+                        this.payMoney = response.data / 100;
+                    }
+                }).catch(error => {
+                    //this.ajaxError(error); 计价不需要弹窗
+                });
             },
             doBuy: function (form) {
                 this.$refs[form][this.tab.tabIndex].validate(valid => {

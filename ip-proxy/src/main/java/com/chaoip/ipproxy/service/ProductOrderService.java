@@ -229,17 +229,9 @@ public class ProductOrderService {
         if (StringUtils.isEmpty(user.getRealName()) || StringUtils.isEmpty(user.getIdentity())) {
             throw new RuntimeException("用户未实名认证，不能购买：" + username);
         }
+
         Product product = productService.findById(dto.getProductId());
-        if (product == null) {
-            throw new RuntimeException("指定的商品id不存在：" + dto.getProductId());
-        }
-        if (product.getType().equals(Product.PackageType.STREAM)) {
-            dto.setBuyNum(1); // 按量是按IP个数算钱，没有月数概念
-        }
-        if (dto.getBuyIpTime() < 0 || dto.getBuyIpTime() >= product.getIpValidTime().length) {
-            throw new RuntimeException("指定的IP时长有误：" + dto.getBuyIpTime());
-        }
-        int money = countMoney(dto, product);
+        int money = countPrice(dto, product);
         if (money != dto.getPayMoney()) {
             throw new RuntimeException("后端价格计算与前端不一致：" + money);
         }
@@ -283,6 +275,22 @@ public class ProductOrderService {
         }
 
         return payOrder;
+    }
+
+    public int countPrice(ProductOrderDto dto, Product product) {
+        if (product == null) {
+            product = productService.findById(dto.getProductId());
+        }
+        if (product == null) {
+            throw new RuntimeException("指定的商品id不存在：" + dto.getProductId());
+        }
+        if (product.getType().equals(Product.PackageType.STREAM)) {
+            dto.setBuyNum(1); // 按量是按IP个数算钱，没有月数概念
+        }
+        if (dto.getBuyIpTime() < 0 || dto.getBuyIpTime() >= product.getIpValidTime().length) {
+            throw new RuntimeException("指定的IP时长有误：" + dto.getBuyIpTime());
+        }
+        return countMoney(dto, product);
     }
 
     /**
