@@ -152,7 +152,7 @@
                     return;
                 }
                 this.user = response.data;
-                this.loadProductDatas();
+                this.loadProductDatas().then(this.loadedProductOK);
             }).catch(error => this.ajaxError(error));
         },
         computed: {
@@ -185,29 +185,32 @@
             },
         },
         methods: {
+            loadedProductOK: function () {
+                if (this.products.length > 0) {
+                    this.initData(0);
+
+                    this.tab.activeTab = this.product.name;
+                    this.productBuyInfo.using = this.usingArr[0].value;
+                    this.productBuyInfo.description = '用于' + this.usingArr[0].name;
+                }
+            },
             handleTabClick: function (tab, event) {
                 this.initData(tab.index);
                 this.tab.tabIndex = tab.index;
             },
             loadProductDatas: function () {
                 let url = '/product/all';
-                axios.get(url).then(response => {
+                return axios.get(url).then(response => {
                     if (!response || !response.data) {
                         alert('获取失败');
                         return;
                     }
                     this.products = (response.data.content);
-                    if (this.products.length > 0) {
-                        this.initData(0);
-
-                        this.tab.activeTab = this.product.name;
-                        this.productBuyInfo.using = this.usingArr[0].value;
-                        this.productBuyInfo.description = '用于' + this.usingArr[0].name;
-                    }
                 }).catch(error => this.ajaxError(error));
             },
             initData: function (idx) {
                 this.product = this.products[idx]; // 切换tab页
+
                 if (this.product.type === 'STREAM') {
                     this.productBuyInfo.buyNum = 1;
                 }
