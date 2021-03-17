@@ -17,7 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 产品包服务类
@@ -31,19 +34,22 @@ public class ProductOrderService {
     private final PayService payService;
     private final UserMoneyService userMoneyService;
     private final ProductOrderDetailRepository productOrderDetailRepository;
+    private final DisCountService disCountService;
 
     public ProductOrderService(ProductService productService,
                                ProductOrderRepository productOrderRepository,
                                BeinetUserService userService,
                                PayService payService,
                                UserMoneyService userMoneyService,
-                               ProductOrderDetailRepository productOrderDetailRepository) {
+                               ProductOrderDetailRepository productOrderDetailRepository,
+                               DisCountService disCountService) {
         this.productService = productService;
         this.productOrderRepository = productOrderRepository;
         this.userService = userService;
         this.payService = payService;
         this.userMoneyService = userMoneyService;
         this.productOrderDetailRepository = productOrderDetailRepository;
+        this.disCountService = disCountService;
     }
 
     public ProductOrder close(long id, String account) {
@@ -309,6 +315,55 @@ public class ProductOrderService {
         }
         int ret = dto.getBuyNum() * product.getIpValidTime()[dto.getBuyIpTime()].getPrice();
 
-        return ret * dto.getNumPerDay() / 1000;
+        int totalMoney = ret * dto.getNumPerDay() / 1000;
+
+        // 开始计算优惠
+        Integer[] disCountIds = product.getDisCount();
+        if (disCountIds == null || disCountIds.length == 0) {
+            return totalMoney;
+        }
+
+        // 每个优惠项的计算结果金额
+        HashMap<Integer, DisCount.OffConfig> disCountMoneyList = new HashMap<>();
+        List<DisCount.OffConfig> configs = disCountService.findDiscountDetail(disCountIds);
+        for (DisCount.OffConfig config : configs) {
+            switch (config.getDisCountSource()) {
+                case Month:
+                    if (dto.getBuyNum() >= config.getNum()) {
+                        int money = countMoneyByType(config.getType(), config.getOff(), totalMoney);
+                        disCountMoneyList.put(money, config);
+                    }
+                    break;
+                case Num:
+                    if (dto.getNumPerDay() >= config.getNum()) {
+                        int money = countMoneyByType(config.getType(), config.getOff(), totalMoney);
+                        disCountMoneyList.put(money, config);
+                    }
+                    break;
+                case Price:
+                    if (totalMoney >= config.getNum()) {
+                        int money = countMoneyByType(config.getType(), config.getOff(), totalMoney);
+                        disCountMoneyList.put(money, config);
+                    }
+                    break;
+            }
+        }
+        if (disCountMoneyList.isEmpty()) {
+            return totalMoney;
+        }
+        return disCountMoneyList.entrySet().stream()
+                .sorted(Comparator.comparingInt(Map.Entry::getKey)) // 选择金额最小的一个
+                .findFirst()
+                .get().getKey();
+    }
+
+    private int countMoneyByType(DisCount.DisCountType type, int offNum, int totalMoney) {
+        switch (type) {
+            case Percent:
+                return totalMoney * offNum / 100;
+            case Reduce:
+                return totalMoney - offNum;
+        }
+        return totalMoney;
     }
 }

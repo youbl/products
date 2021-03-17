@@ -2,6 +2,8 @@ package com.chaoip.ipproxy.repository;
 
 import com.chaoip.ipproxy.repository.entity.DisCount;
 
+import java.util.List;
+
 /**
  * 优惠项表仓储
  *
@@ -14,4 +16,6 @@ public interface DisCountRepository extends BaseRepository<DisCount, Long> {
     DisCount findByName(String name);
 
     DisCount findById(long id);
+
+    List<DisCount> findAllByIdIn(Integer[] idList);
 }

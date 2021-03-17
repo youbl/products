@@ -13,6 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * 产品包服务类
  */
@@ -61,5 +65,27 @@ public class DisCountService {
         }
         disCount.setStatus(disCount.getStatus() == 0 ? 1 : 0);
         disCountRepository.save(disCount);
+    }
+
+    /**
+     * 根据优惠id，返回优惠明细
+     *
+     * @param idList 优惠id列表
+     * @return 优惠明细
+     */
+    public List<DisCount.OffConfig> findDiscountDetail(Integer[] idList) {
+        List<DisCount.OffConfig> ret = new ArrayList<>();
+
+        List<DisCount> disCountList = disCountRepository.findAllByIdIn(idList);
+        for (DisCount disCount : disCountList) {
+            if (disCount.getStatus() != 0 || disCount.getOffConfigs() == null) {
+                continue;
+            }
+            for (DisCount.OffConfig item : disCount.getOffConfigs()) {
+                ret.add(item);
+            }
+        }
+
+        return ret;//.stream().sorted((o1, o2) -> o2.getOff() - o1.getOff()).collect(Collectors.toList());
     }
 }
