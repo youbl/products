@@ -74,6 +74,23 @@ public class ProductOrderService {
     }
 
     /**
+     * 订单延期
+     *
+     * @param id 订单id
+     */
+    public void delayOrders(long id, int days) {
+        if (id <= 0 || days <= 0) {
+            throw new RuntimeException("参数有误");
+        }
+        ProductOrder order = productOrderRepository.findById(id).orElse(null);
+        if (order == null) {
+            throw new RuntimeException("指定的订单id不存在：" + id);
+        }
+        order.setEndTime(order.getEndTime().plusDays(days));
+        productOrderRepository.save(order);
+    }
+
+    /**
      * 根据用户名查找所有购买订单
      *
      * @param dto 条件
@@ -228,10 +245,7 @@ public class ProductOrderService {
     @Synchronized
     @Transactional
     public PayOrder buy(ProductOrderDto dto, String username) throws Exception {
-        BeinetUser user = userService.findByName(username, false);
-        if (user == null) {
-            throw new RuntimeException("用户未找到：" + username);
-        }
+        BeinetUser user = userService.loadUserByUsername(username);
         if (StringUtils.isEmpty(user.getRealName()) || StringUtils.isEmpty(user.getIdentity())) {
             throw new RuntimeException("用户未实名认证，不能购买：" + username);
         }

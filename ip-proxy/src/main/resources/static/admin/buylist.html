@@ -35,14 +35,12 @@
                     show-summary
                     style="width: 100%">
                 <el-table-column
-                        prop="name"
-                        label="用户名"
-                        width="100">
-                </el-table-column>
-                <el-table-column
-                        prop="orderNo"
-                        label="订单号"
+                        label="用户名/订单号"
                         width="250">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.name}}</div>
+                        <div>{{scope.row.orderNo}}</div>
+                    </template>
                 </el-table-column>
                 <el-table-column
                         prop="productName"
@@ -60,14 +58,12 @@
                         width="100">
                 </el-table-column>
                 <el-table-column
-                        prop="money"
                         label="支付金额"
                         width="100">
-                </el-table-column>
-                <el-table-column
-                        prop="payTypeName"
-                        label="渠道"
-                        width="100">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.money}}</div>
+                        <div>{{scope.row.payTypeName}}</div>
+                    </template>
                 </el-table-column>
                 <el-table-column
                         prop="statusName"
@@ -85,14 +81,12 @@
                         width="300">
                 </el-table-column>
                 <el-table-column
-                        prop="payTime"
-                        label="支付时间"
+                        label="支付时间/过期时间"
                         width="230">
-                </el-table-column>
-                <el-table-column
-                        prop="endTime"
-                        label="过期时间"
-                        width="230">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.payTime}}</div>
+                        <div>{{scope.row.endTime}}</div>
+                    </template>
                 </el-table-column>
                 <el-table-column
                         prop="disabled"
@@ -104,11 +98,32 @@
                         <el-button v-show="scope.row.disabled !== 1" size="mini"
                                    @click="closeOrder(scope.$index, scope.row)">关闭订单
                         </el-button>
+                        <el-button v-show="scope.row.disabled !== 1 && scope.row.endTime" size="mini"
+                                   @click="delayOrder(scope.$index, scope.row)">订单续期
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
         </el-tab-pane>
     </el-tabs>
+
+    <el-dialog title="订单延期" :visible.sync="openDelayOrderDialog" width="40%">
+        <el-form>
+            <el-form-item label="要延期的天数" label-width="200px">
+                <el-input v-model="delayDays" placeholder="请输入要延期的天数" maxlength="4"></el-input>
+            </el-form-item>
+            <el-form-item label="当前过期时间" label-width="200px">
+                <el-input v-model="delayRow.endTime" readonly class="noborder"></el-input>
+            </el-form-item>
+            <el-form-item label="修改后的过期时间" label-width="200px">
+                <el-input v-model="delayNewDays" readonly class="noborder"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="doDelayOrder">提 交</el-button>
+            <el-button @click="openForgetPwdOption=false">取 消</el-button>
+        </div>
+    </el-dialog>
 </div>
 
 <script>
@@ -125,7 +140,21 @@
                 orderTotalNum: 0,
                 pageNum: 0,
                 pageSize: 12,
+
+                openDelayOrderDialog: false,
+                delayRow: {},           // 待延期的记录
+                delayDays: 0,           // 要延期的天数
             }
+        },
+        computed: {
+            delayNewDays: function () { // 延期后的过期时间
+                if (!this.delayRow || !this.delayRow.endTime) {
+                    return '-';
+                }
+                let dt = new Date(this.delayRow.endTime);
+                dt.setDate(dt.getDate() + parseInt(this.delayDays, 10));
+                return formatDate(dt);
+            },
         },
         created: function () {
             let url = '/user';
@@ -151,6 +180,22 @@
                     }
                     alert('禁用成功');
                     item.disabled = 1;
+                }).catch(error => this.ajaxError(error));
+            },
+            delayOrder: function (idx, item) {
+                this.delayRow = item;
+                this.openDelayOrderDialog = true;
+            },
+            doDelayOrder: function () {
+                let days = parseInt(this.delayDays, 10);
+                if (!days || days <= 0) {
+                    return alert('请正确输入天数');
+                }
+                let url = '/manage/order/delay?id=' + this.delayRow.id + '&days=' + days;
+                return axios.post(url).then(response => {
+                    alert('延期成功');
+                    this.openDelayOrderDialog = false;
+                    this.loadOrderDatas();
                 }).catch(error => this.ajaxError(error));
             },
             getPrevPage: function () {
@@ -237,6 +282,22 @@
             },
         },
     });
+
+    function formatDate(date) {
+        let year = date.getFullYear(),
+            month = date.getMonth() + 1,//月份是从0开始的
+            day = date.getDate(),
+            hour = date.getHours(),
+            min = date.getMinutes(),
+            sec = date.getSeconds();
+        let newTime = year + '-' +
+            (month > 9 ? '' : '0') + month + '-' +
+            (day > 9 ? '' : '0') + day + 'T' +
+            (hour > 9 ? '' : '0') + hour + ':' +
+            (min > 9 ? '' : '0') + min + ':' +
+            (sec > 9 ? '' : '0') + sec;
+        return newTime;
+    };
 </script>
 </body>
 </html>

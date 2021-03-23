@@ -46,6 +46,7 @@ public class AutoInitData {
                 .name(ADMIN)
                 .password(encoder.encode(PASSWORD))
                 .roles("USER,ADMIN")
+                .security("abcdefghijkl")
                 .realName("超级管理员")
                 .phone("13000000000")
                 .build();

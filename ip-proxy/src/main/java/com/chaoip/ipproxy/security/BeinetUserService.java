@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -55,7 +56,7 @@ public class BeinetUserService implements UserDetailsService {
      * @throws UsernameNotFoundException exp
      */
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public BeinetUser loadUserByUsername(String username) {
         if (username == null || username.isEmpty())
             throw new IllegalArgumentException("username can't be empty.");
 
@@ -128,7 +129,7 @@ public class BeinetUserService implements UserDetailsService {
             }
             // 隐藏SecurityKey
             if (!StringUtils.isEmpty(user.getSecurity())) {
-                user.setSecurity(user.getSecurity().replaceAll("^(.{4}).+(.{4})$", replace));
+                user.setSecurity(user.getSecurity().replaceAll("^(.{2}).+(.{2})$", replace));
             }
             // 隐藏身份证
             if (!StringUtils.isEmpty(user.getIdentity())) {
@@ -139,6 +140,23 @@ public class BeinetUserService implements UserDetailsService {
     }
 
     /**
+     * 根据账号，生成新的SecurityKey，并保存
+     *
+     * @param username 账号
+     * @return 新的SecurityKey
+     */
+    public String changeSecurityKey(String username) {
+        BeinetUser user = loadUserByUsername(username);
+        String ret = BeinetUser.countSecurity(username, user.getPassword(), LocalDateTime.now());
+        if (ret.length() > 10) {
+            ret = ret.substring(0, 10);
+        }
+        user.setSecurity(ret);
+        save(user);
+        return ret;
+    }
+
+    /**
      * 根据账号和旧密码，修改密码
      *
      * @param dto      dto
@@ -146,10 +164,7 @@ public class BeinetUserService implements UserDetailsService {
      * @return 修改成功失败
      */
     public boolean changePassword(PasswordDto dto, String username) {
-        BeinetUser user = userRepository.findByName(username);
-        if (user == null) {
-            throw new RuntimeException(noUserMsg + username);
-        }
+        BeinetUser user = loadUserByUsername(username);
         if (!encoder.matches(dto.getPasswordOld(), user.getPassword())) {
             throw new RuntimeException("输入的旧密码不匹配: " + username);
         }
@@ -167,10 +182,7 @@ public class BeinetUserService implements UserDetailsService {
      * @return 实名认证的短码地址
      */
     public String realNameIdentify(IdentifyDto dto, String username) throws Exception {
-        BeinetUser user = userRepository.findByName(username);
-        if (user == null) {
-            throw new RuntimeException(noUserMsg + username);
-        }
+        loadUserByUsername(username);
         RealOrder code = verifyHelper.getVerifyData(username, dto.getRealName(), dto.getIdentity());
         realOrderService.addOrder(code);
 
@@ -187,10 +199,7 @@ public class BeinetUserService implements UserDetailsService {
     public boolean realNameResultQuery(RealOrder code) throws Exception {
         boolean ret = verifyHelper.queryValidate(code.getCertId(), code.getName());
         if (ret) {
-            BeinetUser user = userRepository.findByName(code.getName());
-            if (user == null) {
-                throw new RuntimeException("指定的账号不存在，实名认证有误？？" + code.getName());
-            }
+            BeinetUser user = loadUserByUsername(code.getName());
             user.setRealName(code.getRealName());
             user.setIdentity(code.getIdentity());
             save(user);
@@ -301,13 +310,7 @@ public class BeinetUserService implements UserDetailsService {
     }
 
     public void saveUserRealName(UserDto dto) {
-        if (StringUtils.isEmpty(dto.getName())) {
-            throw new RuntimeException("账号不能为空");
-        }
-        BeinetUser user = userRepository.findByName(dto.getName());
-        if (user == null) {
-            throw new RuntimeException("指定的账号找不到用户：" + dto.getName());
-        }
+        BeinetUser user = loadUserByUsername(dto.getName());
         user.setRealName(dto.getRealName());
         user.setIdentity(dto.getIdentity());
         save(user);

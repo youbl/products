@@ -1,13 +1,13 @@
 package com.chaoip.ipproxy.controller;
 
 import com.chaoip.ipproxy.controller.dto.RouteDto;
+import com.chaoip.ipproxy.repository.entity.BeinetUser;
 import com.chaoip.ipproxy.repository.entity.ProductOrder;
 import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.service.ProductOrderService;
 import com.chaoip.ipproxy.service.RouteService;
-import com.chaoip.ipproxy.util.CityHelper;
 import com.chaoip.ipproxy.util.SecurityHelper;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,8 +47,11 @@ public class IpController {
         if (details == null || StringUtils.isEmpty(details.getUserName())) {
             throw new IllegalArgumentException("获取登录信息失败");
         }
-        String md5 = getSign(details.getUserName(), condition.getOrderNo());
-        return "/ip/search?sign=" + md5 + '&' + request.getQueryString();
+        BeinetUser user = userService.loadUserByUsername(details.getUserName());
+        if (StringUtils.isEmpty(user.getSecurity())) {
+            throw new IllegalArgumentException("请先去个人信息重置SecurityKey");
+        }
+        return "/ip/search?sign=" + user.getSecurity() + '&' + request.getQueryString();
     }
 
     @GetMapping("search")
@@ -57,16 +60,13 @@ public class IpController {
             throw new IllegalArgumentException("签名或订单号不能为空");
         }
         ProductOrder order = productOrderService.findValidOrder(condition.getOrderNo());
-        if (order == null) {
-            throw new IllegalArgumentException("订单号不存在:" + condition.getOrderNo());
-        }
-        String sign = getSign(order.getName(), order.getOrderNo());
-        if (!sign.equals(condition.getSign())) {
-            throw new IllegalArgumentException("签名错误:" + condition.getSign());
+        BeinetUser user = userService.loadUserByUsername(order.getName());
+        if (!user.getSecurity().equals(condition.getSign())) {
+            throw new IllegalArgumentException("签名不匹配:" + condition.getSign());
         }
 
         int leftNum = (order.getIpNumPerDay() - order.getIpNumToday());// 剩余可提取个数
-        int limitNum = leftNum > condition.getPageSize() ? condition.getPageSize() : leftNum;
+        int limitNum = Math.min(leftNum, condition.getPageSize());
         if (limitNum <= 0) {
             limitNum = 10;
         }
@@ -97,9 +97,5 @@ public class IpController {
     @GetMapping("citys")
     public Map<String, String[]> getCitys() {
         return routeService.getAllUsingCity();
-    }
-
-    private String getSign(String username, String orderNo) {
-        return SecurityHelper.md5(username, orderNo);
     }
 }

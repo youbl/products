@@ -25,10 +25,7 @@ public class UserMoneyService {
      * @return 用户
      */
     public BeinetUser addMoney(String name, int money) {
-        BeinetUser user = userService.findByName(name, false);
-        if (user == null) {
-            throw new RuntimeException("充值失败：用户未找到:" + name);
-        }
+        BeinetUser user = userService.loadUserByUsername(name);
         user.setMoney(user.getMoney() + money);
 
         return userService.save(user);

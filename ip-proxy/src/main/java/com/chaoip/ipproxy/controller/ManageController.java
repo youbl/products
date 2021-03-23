@@ -219,4 +219,9 @@ public class ManageController {
     public ProductOrder closeOrders(int id) {
         return productOrderService.close(id);
     }
+
+    @PostMapping("order/delay")
+    public void delayOrders(int id, int days) {
+        productOrderService.delayOrders(id, days);
+    }
 }

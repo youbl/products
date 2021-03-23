@@ -89,6 +89,15 @@ public class UserController {
         return userService.changePassword(dto, details.getUserName());
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("sk")
+    public String changeSK(AuthDetails details) {
+        if (details == null) {
+            throw new IllegalArgumentException("获取登录信息失败");
+        }
+        return userService.changeSecurityKey(details.getUserName());
+    }
+
     @PostMapping("forgetPwd")
     public String forgetPwd(@RequestBody UserDto dto) {
         if (StringUtils.isEmpty(dto.getPhone())) {

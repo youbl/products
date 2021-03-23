@@ -95,7 +95,8 @@
                         <el-input :value="user.identity" class="noborder" readonly></el-input>
                     </el-form-item>
                     <el-form-item label="SecurityKey" label-width="200px">
-                        <el-input :value="user.security" class="noborder" readonly></el-input>
+                        <el-input :value="user.security" class="noborder" readonly style="width:200px;"></el-input>
+                        <el-link @click="doChangeSK">更换</el-link>
                     </el-form-item>
                     <el-form-item label="注册时间" label-width="200px">
                         <el-input :value="user.creationTime" class="noborder" readonly></el-input>
@@ -337,17 +338,32 @@
                 let url = '/logout';
                 location.href = url;
             },
+            doChangeSK: function () {
+                alert('此操作将导致以前的SecurityKey失效，请谨慎操作');
+                if (!confirm("确认要获取新的SecurityKey吗")) {
+                    return;
+                }
+                let url = '/user/sk';
+                return axios.post(url).then(response => {
+                    if (!response || !response.data) {
+                        alert('SecurityKey修改失败');
+                        return;
+                    }
+                    this.user.security = response.data.replace(/^(.{2}).+(.{2})$/, '$1****$2')
+                    this.$alert(response.data, '新的SecurityKey，请您牢记');
+                }).catch(error => this.ajaxError(error));
+            },
             doChangePwd: function (form) {
                 this.$refs[form].validate(valid => {
                     if (!valid)
                         return false;
                     let url = '/user/pwd';
-                    axios.post(url, this.changePwd).then(response => {
+                    return axios.post(url, this.changePwd).then(response => {
                         if (!response || !response.data) {
-                            alert('修改失败');
+                            alert('密码修改失败');
                             return;
                         }
-                        alert('修改成功');
+                        alert('密码修改成功');
                     }).catch(error => this.ajaxError(error));
                 });
             },
