@@ -1,6 +1,7 @@
 package com.chaoip.ipproxy.service;
 
 import com.chaoip.ipproxy.controller.dto.ChargeDto;
+import com.chaoip.ipproxy.event.PublishHelper;
 import com.chaoip.ipproxy.repository.PayOrderRepository;
 import com.chaoip.ipproxy.repository.entity.OrderStatus;
 import com.chaoip.ipproxy.repository.entity.PayOrder;
@@ -9,7 +10,6 @@ import com.chaoip.ipproxy.util.AliPayHelper;
 import com.chaoip.ipproxy.util.WechatPay;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -30,16 +30,13 @@ public class PayService {
     private final WechatPay wechatPay;
 
     private final PayOrderRepository payOrderRepository;
-    private final ApplicationEventPublisher eventPublisher; // 发送支付事件用
 
     public PayService(AliPayHelper aliPayHelper,
                       WechatPay wechatPay,
-                      PayOrderRepository payOrderRepository,
-                      ApplicationEventPublisher eventPublisher) {
+                      PayOrderRepository payOrderRepository) {
         this.aliPayHelper = aliPayHelper;
         this.wechatPay = wechatPay;
         this.payOrderRepository = payOrderRepository;
-        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -152,7 +149,7 @@ public class PayService {
         order = payOrderRepository.save(order);
         if (order.getStatus() == OrderStatus.SUCCESS) {
             // 发送成功事件，要保存后，有id
-            eventPublisher.publishEvent(order);
+            PublishHelper.publish(order);
         }
         return ret;
     }
@@ -185,7 +182,7 @@ public class PayService {
                 .status(OrderStatus.SUCCESS)
                 .build();
         save(order);// 发送事件
-        eventPublisher.publishEvent(order);
+        PublishHelper.publish(order);
     }
 
 }
