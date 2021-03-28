@@ -13,6 +13,8 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 public class IdentifyDto {
+    private String account;
+
     @NotBlank(message = "姓名不能为空")
     private String realName;
     @NotBlank(message = "身份证不能为空")

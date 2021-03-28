@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.service;
 
+import com.chaoip.ipproxy.event.PublishHelper;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +27,13 @@ public class UserMoneyService {
      */
     public BeinetUser addMoney(String name, int money) {
         BeinetUser user = userService.loadUserByUsername(name);
-        user.setMoney(user.getMoney() + money);
+        int moneyReal = user.getMoney() + money;
+        user.setMoney(moneyReal);
 
-        return userService.save(user);
+        user = userService.save(user);
+        String message = name + " 充值 " + money + " 充值后余额 " + moneyReal;
+        PublishHelper.publish(PublishHelper.EventType.AddMoney, message);
+        return user;
     }
 
 }

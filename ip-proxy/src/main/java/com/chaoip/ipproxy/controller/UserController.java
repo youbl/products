@@ -134,7 +134,8 @@ public class UserController {
         if (details == null) {
             throw new IllegalArgumentException("获取登录信息失败");
         }
-        String url = userService.realNameIdentify(dto, details.getUserName());
+        dto.setAccount(details.getUserName());
+        String url = userService.realNameIdentify(dto);
         return new QrcodeHelper().getQrcode(url);
     }
 

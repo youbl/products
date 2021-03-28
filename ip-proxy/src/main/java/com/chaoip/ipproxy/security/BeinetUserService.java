@@ -4,6 +4,7 @@ import com.alipay.api.AlipayApiException;
 import com.chaoip.ipproxy.controller.dto.IdentifyDto;
 import com.chaoip.ipproxy.controller.dto.PasswordDto;
 import com.chaoip.ipproxy.controller.dto.UserDto;
+import com.chaoip.ipproxy.event.PublishHelper;
 import com.chaoip.ipproxy.repository.BeinetUserRepository;
 import com.chaoip.ipproxy.repository.entity.BeinetUser;
 import com.chaoip.ipproxy.repository.entity.RealOrder;
@@ -99,6 +100,7 @@ public class BeinetUserService implements UserDetailsService {
         BeinetUser user = userDto.mapTo();
         // 使用登录的密码加密器进行加密
         user.setPassword(encoder.encode(user.getPassword()));
+        PublishHelper.publish(PublishHelper.EventType.NewUser, user);
         return save(user);
     }
 
@@ -153,6 +155,7 @@ public class BeinetUserService implements UserDetailsService {
         }
         user.setSecurity(ret);
         save(user);
+        PublishHelper.publish(PublishHelper.EventType.ChangeSK, user);
         return ret;
     }
 
@@ -170,6 +173,7 @@ public class BeinetUserService implements UserDetailsService {
         }
         user.setPassword(encoder.encode(dto.getPassword()));
         save(user);
+        PublishHelper.publish(PublishHelper.EventType.ChangePwd, user);
         return true;
     }
 
@@ -177,14 +181,14 @@ public class BeinetUserService implements UserDetailsService {
      * 实名认证，通过后保存用户名。
      * 注：要使用短码，因为阿里返回的url太长，生成的二维码可能无法扫描
      *
-     * @param dto      dto
-     * @param username 账号
+     * @param dto dto
      * @return 实名认证的短码地址
      */
-    public String realNameIdentify(IdentifyDto dto, String username) throws Exception {
-        loadUserByUsername(username);
-        RealOrder code = verifyHelper.getVerifyData(username, dto.getRealName(), dto.getIdentity());
+    public String realNameIdentify(IdentifyDto dto) throws Exception {
+        loadUserByUsername(dto.getAccount());
+        RealOrder code = verifyHelper.getVerifyData(dto.getAccount(), dto.getRealName(), dto.getIdentity());
         realOrderService.addOrder(code);
+        PublishHelper.publish(PublishHelper.EventType.CreateRealNameOrder, dto);
 
         return verifyHelper.getShortUrl(code.getOrderNo());
     }
@@ -203,6 +207,7 @@ public class BeinetUserService implements UserDetailsService {
             user.setRealName(code.getRealName());
             user.setIdentity(code.getIdentity());
             save(user);
+            PublishHelper.publish(PublishHelper.EventType.SuccessRealName, user);
         }
         return ret;
     }
@@ -269,6 +274,8 @@ public class BeinetUserService implements UserDetailsService {
         BeinetUser user = findById(id);
         user.setStatus(user.getStatus() == 0 ? 1 : 0);
         save(user);
+        PublishHelper.EventType type = user.getStatus() == 0 ? PublishHelper.EventType.EnableUser : PublishHelper.EventType.DisableUser;
+        PublishHelper.publish(type, user);
         return true;
     }
 
@@ -292,6 +299,7 @@ public class BeinetUserService implements UserDetailsService {
         }
         user.setRoles(roles);
         save(user);
+        PublishHelper.publish(PublishHelper.EventType.ChangeRole, user);
         return true;
     }
 
@@ -306,6 +314,7 @@ public class BeinetUserService implements UserDetailsService {
         BeinetUser user = findById(id);
         user.setPassword(encoder.encode(newpwd));
         save(user);
+        PublishHelper.publish(PublishHelper.EventType.ResetPwd, user);
         return true;
     }
 
@@ -314,6 +323,7 @@ public class BeinetUserService implements UserDetailsService {
         user.setRealName(dto.getRealName());
         user.setIdentity(dto.getIdentity());
         save(user);
+        PublishHelper.publish(PublishHelper.EventType.SetRealName, user);
     }
 
     private BeinetUser findById(long id) {
