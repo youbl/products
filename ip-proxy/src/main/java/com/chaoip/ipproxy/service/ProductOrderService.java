@@ -329,7 +329,7 @@ public class ProductOrderService {
         }
         int ret = dto.getBuyNum() * product.getIpValidTime()[dto.getBuyIpTime()].getPrice();
 
-        int totalMoney = ret * dto.getNumPerDay() / 1000;
+        int totalMoney = ret * (dto.getNumPerDay() / 1000);
 
         // 开始计算优惠
         Integer[] disCountIds = product.getDisCount();
