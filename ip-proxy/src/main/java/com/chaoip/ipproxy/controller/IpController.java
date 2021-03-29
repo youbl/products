@@ -66,10 +66,14 @@ public class IpController {
         }
 
         int leftNum = (order.getIpNumPerDay() - order.getIpNumToday());// 剩余可提取个数
-        int limitNum = Math.min(leftNum, condition.getPageSize());
+        if (leftNum <= 0) {
+            throw new IllegalArgumentException("IP已提取完毕:" + condition.getOrderNo());
+        }
+        int limitNum = condition.getPageSize();
         if (limitNum <= 0) {
             limitNum = 10;
         }
+        limitNum = Math.min(leftNum, limitNum);
         condition.setPageSize(limitNum);
 
         // 查路由数据
