@@ -82,10 +82,9 @@ public class ProductOrder {
     private int ipNumPerDay;
 
     /**
-     * 今天已提取IP数，不属于数据库字段
+     * 今天已提取IP数,提取时要实时更新
      */
-    @Transient
-    private int ipNumToday;
+    private Integer ipNumToday;
 
     /**
      * 支付成功时间
