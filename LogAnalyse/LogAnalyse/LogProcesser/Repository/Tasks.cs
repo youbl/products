@@ -14,9 +14,9 @@ namespace LogAnalyse.LogProcesser.Repository
         [GeneratedValue(Strategy = GenerationType.IDENTITY)]
         public int Id { get; set; }
 
-        public string FileName;
+        public string FileName { get; set; }
 
-        public int State;
+        public int State { get; set; }
 
         [Column(Insertable = false, Updatable = false)]
         public DateTime CreationTime { get; set; }

@@ -68,8 +68,10 @@
   <ItemGroup>
     <Compile Include="IJob.cs" />
     <Compile Include="JobOperator.cs" />
-    <Compile Include="LogProcesser\NginxLog.cs" />
+    <Compile Include="LogProcesser\NginxLogProcesser.cs" />
+    <Compile Include="LogProcesser\Repository\NginxLog.cs" />
     <Compile Include="LogProcesser\Repository\Tasks.cs" />
+    <Compile Include="LogProcesser\Repository\NginxLogRepository.cs" />
     <Compile Include="LogProcesser\Repository\TasksRepository.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -78,7 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Content Include="NLog.config" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
