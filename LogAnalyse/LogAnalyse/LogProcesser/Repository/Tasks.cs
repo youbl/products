@@ -18,6 +18,8 @@ namespace LogAnalyse.LogProcesser.Repository
 
         public int State { get; set; }
 
+        public int Num { get; set; }
+
         [Column(Insertable = false, Updatable = false)]
         public DateTime CreationTime { get; set; }
 

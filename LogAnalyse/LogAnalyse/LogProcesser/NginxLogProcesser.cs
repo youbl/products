@@ -17,10 +17,10 @@ namespace LogAnalyse.LogProcesser
         private string logFileDir = ConfigurationManager.AppSettings["nginxLogDir"] ?? "";
 
         // 任务仓储类
-        private TasksRepository tasksRepository = ProxyLoader.GetProxy<TasksRepository>();
+        private readonly TasksRepository tasksRepository = ProxyLoader.GetProxy<TasksRepository>();
 
         // Nginx日志仓储类
-        private NginxLogRepository nginxLogRepository = ProxyLoader.GetProxy<NginxLogRepository>();
+        private readonly NginxLogRepository nginxLogRepository = ProxyLoader.GetProxy<NginxLogRepository>();
 
         private int threadNum = 0;
 
@@ -40,19 +40,27 @@ namespace LogAnalyse.LogProcesser
             var arrNewFiles = UnzipFiles(allProcessedTasks);
             logger.Info($"本次待处理任务数：{arrNewFiles.Count.ToString()}");
 
-            var insertNum = 0;
+            var insertNumAll = 0;
             foreach (var file in arrNewFiles)
             {
                 var taskId = AddTask(file);
-                insertNum += ImportFile(file);
-                FinishTask(taskId);
+
+                var insertNum = ImportFile(file);
+                insertNumAll += insertNum;
+
+                FinishTask(taskId, insertNum);
+
+                DeleteFile(file);
             }
 
-            logger.Info($"本次任务完成，插入数：{insertNum}");
+            logger.Info($"本次任务完成，插入数：{insertNumAll}");
         }
 
         private List<string> UnzipFiles(HashSet<string> allProcessedTasks)
         {
+            // 只处理昨天的数据
+            var day = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
+
             var ret = new List<string>();
             foreach (var item in logDir)
             {
@@ -65,21 +73,25 @@ namespace LogAnalyse.LogProcesser
 
                 foreach (var file in Directory.GetFiles(dir, "*.gz", SearchOption.TopDirectoryOnly))
                 {
-                    var txtFile = file.Substring(0, file.Length - 3); // 移除.gz
-                    if (allProcessedTasks.Contains(txtFile))
+                    if (file.StartsWith("error.log"))
                     {
-                        if (File.Exists(txtFile))
-                        {
-                            File.Delete(txtFile);
-                        }
+                        continue;
+                    }
 
-                        // 已处理
+                    var txtFile = file.Substring(0, file.Length - 3); // 移除.gz
+                    // 不是昨天的日志，或者 已处理
+                    if (!txtFile.EndsWith(day) || allProcessedTasks.Contains(txtFile))
+                    {
+                        DeleteFile(txtFile);
                         continue;
                     }
 
                     try
                     {
-                        DoUnZip(file, Path.GetDirectoryName(txtFile));
+                        if (!File.Exists(txtFile))
+                        {
+                            DoUnZip(file, Path.GetDirectoryName(txtFile));
+                        }
                     }
                     catch (Exception exp)
                     {
@@ -109,6 +121,7 @@ namespace LogAnalyse.LogProcesser
                     }
 
                     var arrFields = ParseLog(line);
+                    // 计算最大长度
 //                    for (var i = 0; i < arrFields.Count; i++)
 //                    {
 //                        var len = arrFields[i].Length;
@@ -136,6 +149,11 @@ namespace LogAnalyse.LogProcesser
                             Interlocked.Decrement(ref threadNum);
                         }
                     }, null);
+
+                    if (ret % 10000 == 0)
+                    {
+                        logger.Info(file + " 已导入行数:" + ret);
+                    }
                 }
             }
 
@@ -192,7 +210,7 @@ namespace LogAnalyse.LogProcesser
             return tasksRepository.Save(task).Id;
         }
 
-        private void FinishTask(int id)
+        private void FinishTask(int id, int insertNum)
         {
             var task = tasksRepository.FindById(id);
             if (task == null)
@@ -208,6 +226,7 @@ namespace LogAnalyse.LogProcesser
             }
 
             task.State = 2;
+            task.Num = insertNum;
             tasksRepository.Save(task);
         }
 
@@ -269,7 +288,7 @@ namespace LogAnalyse.LogProcesser
             logger.Info(command + " " + args);
             using (var process = Process.Start(command, args))
             {
-                process.WaitForExit();
+                process?.WaitForExit();
             }
         }
 
@@ -277,6 +296,14 @@ namespace LogAnalyse.LogProcesser
         {
             var arr = tasksRepository.findAllFileName();
             return new HashSet<string>(arr);
+        }
+
+        private void DeleteFile(String file)
+        {
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
         }
     }
 }
