@@ -54,6 +54,13 @@ public class IpController {
         return "/ip/search?sign=" + user.getSecurity() + '&' + request.getQueryString();
     }
 
+    /**
+     * IP提取接口
+     * @param condition 条件
+     * @param response 响应上下文
+     * @return IP
+     * @throws IOException 异常
+     */
     @GetMapping("search")
     public List<Route> search(RouteDto condition, HttpServletResponse response) throws IOException {
         if (StringUtils.isEmpty(condition.getSign()) || StringUtils.isEmpty(condition.getOrderNo())) {
