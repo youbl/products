@@ -56,8 +56,9 @@ public class IpController {
 
     /**
      * IP提取接口
+     *
      * @param condition 条件
-     * @param response 响应上下文
+     * @param response  响应上下文
      * @return IP
      * @throws IOException 异常
      */
@@ -89,7 +90,7 @@ public class IpController {
             return null;
         }
 
-        productOrderService.addIpGetRecord(order.getOrderNo(), ret);
+        productOrderService.updateIpGetRecord(order, ret);
 
         if (condition.getOutputType().equalsIgnoreCase("json")) {
             return ret;

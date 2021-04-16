@@ -2,8 +2,9 @@ package com.chaoip.ipproxy.repository.entity;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,6 +20,10 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @Document
+// 建联合索引, 1为正序，-1为倒序
+@CompoundIndexes({
+        @CompoundIndex(name = "idx_order_time", def = "{orderNo:1, creationTime:-1}", unique = false)
+})
 public class ProductOrderDetail {
     /**
      * 主键
@@ -29,7 +34,6 @@ public class ProductOrderDetail {
     /**
      * 订单号
      */
-    @Indexed
     private String orderNo;
 
     /**

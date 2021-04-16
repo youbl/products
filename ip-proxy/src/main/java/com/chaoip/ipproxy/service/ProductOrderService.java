@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -148,8 +149,7 @@ public class ProductOrderService {
             throw new IllegalArgumentException("订单已过期:" + orderNo);
         }
 
-        int ipGetTotal = getIpGetTotal(orderNo, order.getProductId());
-        order.setIpNumToday(ipGetTotal);
+        order.setIpNumToday(getIpGetTotal(orderNo, order.getProductId()));
         if (order.getIpNumToday() >= order.getIpNumPerDay()) {
             throw new RuntimeException("当天IP提取总数已达限制:" + order.getIpNumToday());
         }
@@ -188,13 +188,22 @@ public class ProductOrderService {
         return getIpGetToday(orderNo);
     }
 
+    @Transactional
+    @Async
+    public void updateIpGetRecord(ProductOrder order, List<Route> ips) {
+        this.addIpGetRecord(order.getOrderNo(), ips);
+
+        order.setIpNumToday(getIpGetTotal(order.getOrderNo(), order.getProductId()));
+        productOrderRepository.save(order);
+    }
+
     /**
      * 添加ip提取记录
      *
      * @param orderNo 订单
      * @param ips     提取的ip
      */
-    public void addIpGetRecord(String orderNo, List<Route> ips) {
+    private void addIpGetRecord(String orderNo, List<Route> ips) {
         for (Route item : ips) {
             ProductOrderDetail detail = ProductOrderDetail.builder()
                     .orderNo(orderNo)

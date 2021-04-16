@@ -42,7 +42,7 @@
                             width="250" align="center">
                         <template slot-scope="scope">
                             {{scope.row.orderNo}}<br>
-                            {{scope.row.creationTime}}<br>
+                            {{scope.row.creationTime}}
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -56,9 +56,12 @@
                             width="60">
                     </el-table-column>
                     <el-table-column
-                            prop="ipNumPerDay"
-                            label="每天IP数量"
+                            label="每天IP数量 今日IP数"
                             width="100">
+                        <template slot-scope="scope">
+                            {{scope.row.ipNumPerDay}}<br>
+                            {{scope.row.ipNumToday}}
+                        </template>
                     </el-table-column>
                     <el-table-column
                             prop="money"
