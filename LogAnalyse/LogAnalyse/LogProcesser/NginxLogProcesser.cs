@@ -59,6 +59,11 @@ namespace LogAnalyse.LogProcesser
                 DeleteFile(file);
             }
 
+            foreach (var parser in parserList)
+            {
+                parser.Finish();
+            }
+
             logger.Info($"本次任务完成，总处理行数：{processedNumAll}");
         }
 
@@ -79,7 +84,7 @@ namespace LogAnalyse.LogProcesser
 
                 foreach (var file in Directory.GetFiles(dir, "*.gz", SearchOption.TopDirectoryOnly))
                 {
-                    if (file.StartsWith("error.log"))
+                    if (file.Contains("error.log"))
                     {
                         continue;
                     }
@@ -173,10 +178,6 @@ namespace LogAnalyse.LogProcesser
             while (threadNum > 0)
             {
                 Thread.Sleep(20);
-            }
-            foreach (var parser in parserList)
-            {
-                parser.Finish();
             }
 
             logger.Info(file + "导入完成条数 " + ret);
