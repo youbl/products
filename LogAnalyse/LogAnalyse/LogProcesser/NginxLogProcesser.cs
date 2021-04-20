@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Beinet.Repository;
+using LogAnalyse.LogProcesser.Parsers;
 using LogAnalyse.LogProcesser.Repository;
 using NLog;
 
@@ -31,6 +32,13 @@ namespace LogAnalyse.LogProcesser
             @"172.18.41.193"
         };
 
+        private List<IParser> parserList = new List<IParser>();
+
+        public NginxLogProcesser()
+        {
+            parserList.Add(new InsertParser());
+        }
+
         public void Run()
         {
             logger.Info("Nginx日志处理启动...");
@@ -40,20 +48,20 @@ namespace LogAnalyse.LogProcesser
             var arrNewFiles = UnzipFiles(allProcessedTasks);
             logger.Info($"本次待处理任务数：{arrNewFiles.Count.ToString()}");
 
-            var insertNumAll = 0;
+            var processedNumAll = 0;
             foreach (var file in arrNewFiles)
             {
                 var taskId = AddTask(file);
 
-                var insertNum = ImportFile(file);
-                insertNumAll += insertNum;
+                var processedRowNum = ImportFile(file);
+                processedNumAll += processedRowNum;
 
-                FinishTask(taskId, insertNum);
+                FinishTask(taskId, processedRowNum);
 
                 DeleteFile(file);
             }
 
-            logger.Info($"本次任务完成，插入数：{insertNumAll}");
+            logger.Info($"本次任务完成，总处理行数：{processedNumAll}");
         }
 
         private List<string> UnzipFiles(HashSet<string> allProcessedTasks)
@@ -142,7 +150,10 @@ namespace LogAnalyse.LogProcesser
                     {
                         try
                         {
-                            InsertDB(arrFields, file);
+                            foreach (var parser in parserList)
+                            {
+                                parser.Parse(arrFields, file);
+                            }
                         }
                         finally
                         {
@@ -230,51 +241,6 @@ namespace LogAnalyse.LogProcesser
             tasksRepository.Save(task);
         }
 
-        private void InsertDB(List<string> arrFields, string fileName)
-        {
-            try
-            {
-                var log = new NginxLog();
-                int tmp;
-                double tmpd;
-
-                log.Timelocal = arrFields[0]; // '时间',
-                log.Remoteaddr = arrFields[1]; // 'ip',
-                log.Remoteuser = arrFields[2]; // '用户',
-                log.Host = arrFields[3]; // '主机',
-                log.Request = arrFields[4]; // '请求方法和地址',
-
-                int.TryParse(arrFields[5], out tmp);
-                log.Status = tmp; // '响应状态',
-                int.TryParse(arrFields[6], out tmp);
-                log.Requestlength = tmp; // '请求长度',
-                int.TryParse(arrFields[7], out tmp);
-                log.Bodybytessent = tmp; // '发送长度',
-                log.Referer = arrFields[8]; // 'referer',
-                log.Useragent = arrFields[9]; // 'ua',
-                log.Forwardedfor = arrFields[10]; // '代理ip',
-                log.Upstreamaddr = arrFields[11]; // '后端ip+端口',
-                double.TryParse(arrFields[12], out tmpd);
-                log.Requesttime = (int) Math.Floor(tmpd * 1000); // '请求时长',
-                double.TryParse(arrFields[13], out tmpd);
-                log.Upstreamtime = (int) Math.Floor(tmpd * 1000); // '后端响应时长',
-                int.TryParse(arrFields[14], out tmp);
-                log.Upstreamstatus = tmp; // '后端状态',
-                int.TryParse(arrFields[15], out tmp);
-                log.Contentlength = tmp; // '内容长度',
-                int.TryParse(arrFields[16], out tmp);
-                log.Httpcontentlength = tmp; // 'http内容长',
-                int.TryParse(arrFields[17], out tmp);
-                log.Sentcontentlength = tmp; // '发送内容长',
-                log.Filename = fileName; // '采集源文件',
-
-                nginxLogRepository.Save(log);
-            }
-            catch (Exception exp)
-            {
-                logger.Error(fileName + " " + exp);
-            }
-        }
 
         private void DoUnZip(string file, string targetDir)
         {
