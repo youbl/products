@@ -20,9 +20,6 @@ namespace LogAnalyse.LogProcesser
         // 任务仓储类
         private readonly TasksRepository tasksRepository = ProxyLoader.GetProxy<TasksRepository>();
 
-        // Nginx日志仓储类
-        private readonly NginxLogRepository nginxLogRepository = ProxyLoader.GetProxy<NginxLogRepository>();
-
         private int threadNum = 0;
 
         private string[] logDir = new[]
@@ -36,7 +33,8 @@ namespace LogAnalyse.LogProcesser
 
         public NginxLogProcesser()
         {
-            parserList.Add(new InsertParser());
+            // parserList.Add(new InsertParser());
+            parserList.Add(new GroupParser());
         }
 
         public void Run()
@@ -122,6 +120,14 @@ namespace LogAnalyse.LogProcesser
             {
                 while (!sr.EndOfStream)
                 {
+                    ret++;
+                    // 最多队列数限制，避免溢出
+                    Interlocked.Increment(ref threadNum);
+                    while (threadNum > 50)
+                    {
+                        Thread.Sleep(20);
+                    }
+
                     var line = sr.ReadLine();
                     if (string.IsNullOrEmpty(line))
                     {
@@ -129,6 +135,7 @@ namespace LogAnalyse.LogProcesser
                     }
 
                     var arrFields = ParseLog(line);
+                    var nginxLog = ConvertToNginxLog(arrFields, file);
                     // 计算最大长度
 //                    for (var i = 0; i < arrFields.Count; i++)
 //                    {
@@ -139,12 +146,6 @@ namespace LogAnalyse.LogProcesser
 //                            arrVal[i] = arrFields[i];
 //                        }
 //                    }
-                    ret++;
-                    Interlocked.Increment(ref threadNum);
-                    while (threadNum > 50)
-                    {
-                        Thread.Sleep(20);
-                    }
 
                     ThreadPool.UnsafeQueueUserWorkItem(state =>
                     {
@@ -152,7 +153,7 @@ namespace LogAnalyse.LogProcesser
                         {
                             foreach (var parser in parserList)
                             {
-                                parser.Parse(arrFields, file);
+                                parser.Parse(nginxLog);
                             }
                         }
                         finally
@@ -166,6 +167,16 @@ namespace LogAnalyse.LogProcesser
                         logger.Info(file + " 已导入行数:" + ret);
                     }
                 }
+            }
+
+            // 等待所有线程完成
+            while (threadNum > 0)
+            {
+                Thread.Sleep(20);
+            }
+            foreach (var parser in parserList)
+            {
+                parser.Finish();
             }
 
             logger.Info(file + "导入完成条数 " + ret);
@@ -211,6 +222,44 @@ namespace LogAnalyse.LogProcesser
             }
 
             return arrField;
+        }
+
+        private NginxLog ConvertToNginxLog(List<string> arrFields, string fileName)
+        {
+            var log = new NginxLog();
+            int tmp;
+            double tmpd;
+
+            log.Timelocal = arrFields[0]; // '时间',
+            log.Remoteaddr = arrFields[1]; // 'ip',
+            log.Remoteuser = arrFields[2]; // '用户',
+            log.Host = arrFields[3]; // '主机',
+            log.Request = arrFields[4]; // '请求方法和地址',
+
+            int.TryParse(arrFields[5], out tmp);
+            log.Status = tmp; // '响应状态',
+            int.TryParse(arrFields[6], out tmp);
+            log.Requestlength = tmp; // '请求长度',
+            int.TryParse(arrFields[7], out tmp);
+            log.Bodybytessent = tmp; // '发送长度',
+            log.Referer = arrFields[8]; // 'referer',
+            log.Useragent = arrFields[9]; // 'ua',
+            log.Forwardedfor = arrFields[10]; // '代理ip',
+            log.Upstreamaddr = arrFields[11]; // '后端ip+端口',
+            double.TryParse(arrFields[12], out tmpd);
+            log.Requesttime = (int) Math.Floor(tmpd * 1000); // '请求时长',
+            double.TryParse(arrFields[13], out tmpd);
+            log.Upstreamtime = (int) Math.Floor(tmpd * 1000); // '后端响应时长',
+            int.TryParse(arrFields[14], out tmp);
+            log.Upstreamstatus = tmp; // '后端状态',
+            int.TryParse(arrFields[15], out tmp);
+            log.Contentlength = tmp; // '内容长度',
+            int.TryParse(arrFields[16], out tmp);
+            log.Httpcontentlength = tmp; // 'http内容长',
+            int.TryParse(arrFields[17], out tmp);
+            log.Sentcontentlength = tmp; // '发送内容长',
+            log.Filename = fileName; // '采集源文件',
+            return log;
         }
 
         private int AddTask(string fileName)
