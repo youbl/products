@@ -81,6 +81,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\BaseSqlHelper.cs" />
     <Compile Include="Utils\MySqlHelper.cs" />
+    <Compile Include="Utils\StrHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

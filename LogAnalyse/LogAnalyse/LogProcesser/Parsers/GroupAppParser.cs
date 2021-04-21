@@ -48,18 +48,25 @@ namespace LogAnalyse.LogProcesser.Parsers
 
         public void Finish()
         {
-            if (groups.Count <= 0)
-                return;
-            var sql = new StringBuilder(groups.Count * 200);
+            Dictionary<string, int> groupsInner;
+            lock (groups)
+            {
+                if (groups.Count <= 0)
+                    return;
+                groupsInner = groups;
+                groups = new Dictionary<string, int>();
+            }
+
+            var sql = new StringBuilder(groupsInner.Count * 200);
             var num = 0;
             var totalNum = 0;
-            foreach (var row in groups)
+            foreach (var row in groupsInner)
             {
                 if (sql.Length > 0)
                     sql.Append(",");
                 sql.Append("(");
                 var arr = row.Key.Split('\n');
-                var app = arr[2].Replace("'", "");
+                var app = StrHelper.ProcessSqlVal(arr[2]);
                 if (app.Length > 200)
                 {
                     logger.Warn(app);
@@ -68,7 +75,7 @@ namespace LogAnalyse.LogProcesser.Parsers
 
                 sql.AppendFormat("{0},'{1}','{2}',{3}",
                     arr[0],
-                    arr[1].Replace("'", ""),
+                    StrHelper.ProcessSqlVal(arr[1]),
                     app,
                     row.Value);
                 sql.Append(")");
@@ -88,9 +95,16 @@ namespace LogAnalyse.LogProcesser.Parsers
 
         private int DoInsert(string sql)
         {
-            //Console.WriteLine("==="+sql+"===");
-            sql = "INSERT INTO nginxapplog(`hour`,`isfront`,`app`,`num`)VALUES" + sql;
-            return sqlHelper.ExecuteNonQuery(sql);
+            try
+            {
+                sql = "INSERT INTO nginxapplog(`hour`,`isfront`,`app`,`num`)VALUES" + sql;
+                return sqlHelper.ExecuteNonQuery(sql);
+            }
+            catch (Exception exp)
+            {
+                logger.Error(exp.Message + "\r\n" + sql);
+                return 0;
+            }
         }
 
         private string GetUriApp(string uri)
@@ -106,15 +120,28 @@ namespace LogAnalyse.LogProcesser.Parsers
                 return "-";
             }
 
+            // 去除 "GET /cc/test/ip.aspx" 前面的GET
             var idx = uri.IndexOf(' ');
             if (idx > 0)
             {
                 uri = uri.Substring(idx + 1);
             }
 
+            // 去除 "/cc/test/ip.aspx" 的第一个 /
             if (uri[0] == '/')
             {
                 uri = uri.Substring(1);
+            }
+
+            idx = uri.IndexOf('?');
+            if (idx == 0)
+            {
+                return "-";
+            }
+
+            if (idx > 0)
+            {
+                uri = uri.Substring(0, idx);
             }
 
             idx = uri.IndexOf('/');
@@ -130,7 +157,8 @@ namespace LogAnalyse.LogProcesser.Parsers
             }
 
             uri = uri.Trim();
-            if (uri.Length == 0)
+            // 还有这种请求 \x04\x01\x00Pg)\xA7\xEA\x00
+            if (uri.Length == 0 || uri.IndexOf('\\') >= 0)
                 return "-";
             return uri;
         }

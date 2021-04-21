@@ -53,10 +53,18 @@ namespace LogAnalyse.LogProcesser.Parsers
 
         public void Finish()
         {
-            var sql = new StringBuilder(groups.Count * 200);
+            Dictionary<string, int> groupsInner;
+            lock (groups)
+            {
+                if (groups.Count <= 0)
+                    return;
+                groupsInner = groups;
+                groups = new Dictionary<string, int>();
+            }
+            var sql = new StringBuilder(groupsInner.Count * 200);
             var num = 0;
             var totalNum = 0;
-            foreach (var row in groups)
+            foreach (var row in groupsInner)
             {
                 if (sql.Length > 0)
                     sql.Append(",");
@@ -64,8 +72,8 @@ namespace LogAnalyse.LogProcesser.Parsers
                 var arr = row.Key.Split('\n');
                 sql.AppendFormat("{0},'{1}','{2}',{3}",
                     arr[0],
-                    arr[1].Replace("'", ""),
-                    arr[2].Replace("'", ""),
+                    StrHelper.ProcessSqlVal(arr[1]),
+                    StrHelper.ProcessSqlVal(arr[2]),
                     row.Value);
                 sql.Append(")");
                 num++;
