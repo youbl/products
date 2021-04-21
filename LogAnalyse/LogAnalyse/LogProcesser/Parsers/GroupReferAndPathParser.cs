@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using LogAnalyse.LogProcesser.Repository;
@@ -19,16 +17,12 @@ namespace LogAnalyse.LogProcesser.Parsers
     {
         private static ILogger logger = LogManager.GetCurrentClassLogger();
 
-        private BaseSqlHelper sqlHelper =
+        private readonly BaseSqlHelper sqlHelper =
             BaseSqlHelper.GetConnection<MySqlHelper>(ConfigurationManager.AppSettings["DB_DEFAULT"]);
 
-        private Regex pathRgx = new Regex(@"(?<=/)\d+(?=(/|$))", RegexOptions.Compiled); // 数字匹配
-        private Regex longRgx = new Regex(@"(?<=/)[^/]{32,}(?=(/|$))", RegexOptions.Compiled); // 32位以上字符匹配
-        private Regex httpRgx = new Regex(@"\s+HTTP/\d\.\d\s*", RegexOptions.Compiled); // 请求里的协议匹配
-
-        // 这2个属性用于解析nginx日志里的时间
-        private CultureInfo cultureInfo = new System.Globalization.CultureInfo("en-us");
-        private string nginxTimeFormat = "dd/MMM/yyyy:HH:mm:ss +0800";
+        private readonly Regex pathRgx = new Regex(@"(?<=/)\d+(?=(/|$))", RegexOptions.Compiled); // 数字匹配
+        private readonly Regex longRgx = new Regex(@"(?<=/)[^/]{32,}(?=(/|$))", RegexOptions.Compiled); // 32位以上字符匹配
+        private readonly Regex httpRgx = new Regex(@"\s+HTTP/\d\.\d\s*", RegexOptions.Compiled); // 请求里的协议匹配
 
         private Dictionary<string, int> groups = new Dictionary<string, int>();
 
@@ -36,7 +30,7 @@ namespace LogAnalyse.LogProcesser.Parsers
         {
             try
             {
-                var time = ParseDate(ngingLog.Timelocal);
+                var time = ngingLog.Time.ToString("yyyyMMddHH");
                 var referer = GetUriPattern(ngingLog.Referer);
                 if (!referer.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
@@ -44,7 +38,7 @@ namespace LogAnalyse.LogProcesser.Parsers
                 }
 
                 var url = GetUriPattern(ngingLog.Request);
-                var identify = time.ToString() + '\n' + referer + '\n' + url;
+                var identify = time + '\n' + referer + '\n' + url;
                 lock (groups)
                 {
                     groups.TryGetValue(identify, out var num);
@@ -54,21 +48,6 @@ namespace LogAnalyse.LogProcesser.Parsers
             catch (Exception exp)
             {
                 logger.Error(ngingLog.Filename + " " + exp);
-            }
-        }
-
-        private int ParseDate(string timeLocal)
-        {
-            try
-            {
-                var dt = DateTime.ParseExact(timeLocal, nginxTimeFormat, cultureInfo);
-                // dt = dt.AddHours(8); // 要加8
-                return int.Parse(dt.ToString("yyyyMMddHH"));
-            }
-            catch (Exception exp)
-            {
-                logger.Error("{0} error:{1}", timeLocal, exp.Message);
-                return 0;
             }
         }
 
@@ -106,7 +85,7 @@ namespace LogAnalyse.LogProcesser.Parsers
         private int DoInsert(string sql)
         {
             sql = "INSERT INTO nginxtotallog(`date`,`referer`,`request`,`num`)VALUES" + sql;
-            return sqlHelper.ExecuteNonQuery(sql.ToString());
+            return sqlHelper.ExecuteNonQuery(sql);
         }
 
         private string GetUriPattern(string uri)

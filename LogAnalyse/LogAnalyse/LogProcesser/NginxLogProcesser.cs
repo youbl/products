@@ -40,39 +40,54 @@ namespace LogAnalyse.LogProcesser
 
         public void Run()
         {
+            RunWithYmd(null);
+        }
+
+        public void RunWithYmd(string ymd)
+        {
             logger.Info("Nginx日志处理启动...");
             var allProcessedTasks = GetTasks();
             logger.Info($"前次已处理任务数：{allProcessedTasks.Count.ToString()}");
 
-            var arrNewFiles = UnzipFiles(allProcessedTasks);
+            if (string.IsNullOrEmpty(ymd))
+            {
+                // 默认只处理昨天的数据
+                ymd = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
+            }
+
+            var arrNewFiles = UnzipFiles(allProcessedTasks, ymd);
             logger.Info($"本次待处理任务数：{arrNewFiles.Count.ToString()}");
+            if (arrNewFiles.Count <= 0)
+                return;
 
             var processedNumAll = 0;
             foreach (var file in arrNewFiles)
             {
                 var taskId = AddTask(file);
 
-                var processedRowNum = ImportFile(file);
+                var processedRowNum = ImportFile(file, ymd);
                 processedNumAll += processedRowNum;
 
                 FinishTask(taskId, processedRowNum);
-
-                DeleteFile(file);
             }
+
+            logger.Info($"导入文件任务，准备最后一步……{processedNumAll}");
 
             foreach (var parser in parserList)
             {
                 parser.Finish();
             }
 
+            logger.Info($"Finish工作完成，准备清理文件:{arrNewFiles.Count}个");
+
+            foreach (var file in arrNewFiles)
+                DeleteFile(file);
+
             logger.Info($"本次任务完成，总处理行数：{processedNumAll}");
         }
 
-        private List<string> UnzipFiles(HashSet<string> allProcessedTasks)
+        private List<string> UnzipFiles(HashSet<string> allProcessedTasks, string day)
         {
-            // 只处理昨天的数据
-            var day = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
-
             var ret = new List<string>();
             foreach (var item in logDir)
             {
@@ -118,7 +133,7 @@ namespace LogAnalyse.LogProcesser
             return ret;
         }
 
-        private int ImportFile(string file)
+        private int ImportFile(string file, String ymd)
         {
             int ret = 0;
             logger.Info("开始导入 " + file);
@@ -126,18 +141,18 @@ namespace LogAnalyse.LogProcesser
             {
                 while (!sr.EndOfStream)
                 {
+                    var line = sr.ReadLine();
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        continue;
+                    }
+
                     ret++;
                     // 最多队列数限制，避免溢出
                     Interlocked.Increment(ref threadNum);
                     while (threadNum > 50)
                     {
                         Thread.Sleep(20);
-                    }
-
-                    var line = sr.ReadLine();
-                    if (string.IsNullOrEmpty(line))
-                    {
-                        continue;
                     }
 
                     var arrFields = ParseLog(line);

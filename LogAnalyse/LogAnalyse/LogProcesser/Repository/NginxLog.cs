@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using Beinet.Repository.Entitys;
 using Newtonsoft.Json;
+using NLog;
 
 namespace LogAnalyse.LogProcesser.Repository
 {
@@ -10,11 +12,35 @@ namespace LogAnalyse.LogProcesser.Repository
     [Entity]
     public class NginxLog
     {
+        private static ILogger logger = LogManager.GetCurrentClassLogger();
+
+        // 这2个属性用于解析nginx日志里的时间
+        private static CultureInfo cultureInfo = new System.Globalization.CultureInfo("en-us");
+        private static string nginxTimeFormat = "dd/MMM/yyyy:HH:mm:ss +0800";
+
         [Id]
         [GeneratedValue(Strategy = GenerationType.IDENTITY)]
         public int Id { get; set; }
 
         public string Timelocal { get; set; } // '时间',
+
+        public DateTime Time
+        {
+            get
+            {
+                try
+                {
+                    return DateTime.ParseExact(Timelocal, nginxTimeFormat, cultureInfo);
+                    // dt = dt.AddHours(8); // 要加8
+                }
+                catch (Exception exp)
+                {
+                    logger.Error("{0} error:{1}", Timelocal, exp.Message);
+                    return DateTime.MinValue;
+                }
+            }
+        }
+
         public string Remoteaddr { get; set; } // 'ip',
         public string Remoteuser { get; set; } // '用户',
         public string Host { get; set; } // '主机',

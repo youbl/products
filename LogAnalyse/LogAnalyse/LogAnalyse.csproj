@@ -69,6 +69,10 @@
     <Compile Include="IJob.cs" />
     <Compile Include="JobOperator.cs" />
     <Compile Include="LogProcesser\NginxLogProcesser.cs" />
+    <Compile Include="LogProcesser\Parsers\GroupAppParser.cs" />
+    <Compile Include="LogProcesser\Parsers\GroupReferAndPathParser.cs" />
+    <Compile Include="LogProcesser\Parsers\InsertParser.cs" />
+    <Compile Include="LogProcesser\Parsers\IParser.cs" />
     <Compile Include="LogProcesser\Repository\NginxLog.cs" />
     <Compile Include="LogProcesser\Repository\Tasks.cs" />
     <Compile Include="LogProcesser\Repository\NginxLogRepository.cs" />

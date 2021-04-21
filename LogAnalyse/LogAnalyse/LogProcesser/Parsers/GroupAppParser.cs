@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
 using LogAnalyse.LogProcesser.Repository;
 using LogAnalyse.Utils;
 using NLog;
@@ -18,12 +16,8 @@ namespace LogAnalyse.LogProcesser.Parsers
     {
         private static ILogger logger = LogManager.GetCurrentClassLogger();
 
-        private BaseSqlHelper sqlHelper =
+        private readonly BaseSqlHelper sqlHelper =
             BaseSqlHelper.GetConnection<MySqlHelper>(ConfigurationManager.AppSettings["DB_DEFAULT"]);
-
-        // 这2个属性用于解析nginx日志里的时间
-        private CultureInfo cultureInfo = new System.Globalization.CultureInfo("en-us");
-        private string nginxTimeFormat = "dd/MMM/yyyy:HH:mm:ss +0800";
 
         private Dictionary<string, int> groups = new Dictionary<string, int>();
 
@@ -31,7 +25,7 @@ namespace LogAnalyse.LogProcesser.Parsers
         {
             try
             {
-                var time = ParseDate(ngingLog.Timelocal);
+                var time = ngingLog.Time.ToString("yyyyMMddHH");
                 // 有refer且是http开头
                 var isFront = (ngingLog.Referer != null &&
                                ngingLog.Referer.StartsWith("http", StringComparison.OrdinalIgnoreCase))
@@ -39,7 +33,7 @@ namespace LogAnalyse.LogProcesser.Parsers
                     : 0;
 
                 var app = GetUriApp(ngingLog.Request);
-                var identify = time.ToString() + '\n' + isFront + '\n' + app;
+                var identify = time + '\n' + isFront + '\n' + app;
                 lock (groups)
                 {
                     groups.TryGetValue(identify, out var num);
@@ -52,28 +46,10 @@ namespace LogAnalyse.LogProcesser.Parsers
             }
         }
 
-        /// <summary>
-        /// 返回年月日时，如2021-04-21 13:41:55，返回2021042113
-        /// </summary>
-        /// <param name="timeLocal"></param>
-        /// <returns></returns>
-        private int ParseDate(string timeLocal)
-        {
-            try
-            {
-                var dt = DateTime.ParseExact(timeLocal, nginxTimeFormat, cultureInfo);
-                // dt = dt.AddHours(8); // 要加8
-                return int.Parse(dt.ToString("yyyyMMddHH"));
-            }
-            catch (Exception exp)
-            {
-                logger.Error("{0} error:{1}", timeLocal, exp.Message);
-                return 0;
-            }
-        }
-
         public void Finish()
         {
+            if (groups.Count <= 0)
+                return;
             var sql = new StringBuilder(groups.Count * 200);
             var num = 0;
             var totalNum = 0;
@@ -83,10 +59,17 @@ namespace LogAnalyse.LogProcesser.Parsers
                     sql.Append(",");
                 sql.Append("(");
                 var arr = row.Key.Split('\n');
+                var app = arr[2].Replace("'", "");
+                if (app.Length > 200)
+                {
+                    logger.Warn(app);
+                    app = app.Substring(0, 200);
+                }
+
                 sql.AppendFormat("{0},'{1}','{2}',{3}",
                     arr[0],
                     arr[1].Replace("'", ""),
-                    arr[2].Replace("'", ""),
+                    app,
                     row.Value);
                 sql.Append(")");
                 num++;
@@ -105,6 +88,7 @@ namespace LogAnalyse.LogProcesser.Parsers
 
         private int DoInsert(string sql)
         {
+            //Console.WriteLine("==="+sql+"===");
             sql = "INSERT INTO nginxapplog(`hour`,`isfront`,`app`,`num`)VALUES" + sql;
             return sqlHelper.ExecuteNonQuery(sql);
         }
