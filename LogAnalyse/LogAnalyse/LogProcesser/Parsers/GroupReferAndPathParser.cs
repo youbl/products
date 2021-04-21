@@ -12,9 +12,10 @@ using NLog;
 namespace LogAnalyse.LogProcesser.Parsers
 {
     /// <summary>
-    /// 分类汇总的解析器
+    /// 按referer+path进行分类汇总的解析器，
+    /// 每天约60万行数据
     /// </summary>
-    class GroupParser : IParser
+    class GroupReferAndPathParser : IParser
     {
         private static ILogger logger = LogManager.GetCurrentClassLogger();
 
@@ -37,6 +38,11 @@ namespace LogAnalyse.LogProcesser.Parsers
             {
                 var time = ParseDate(ngingLog.Timelocal);
                 var referer = GetUriPattern(ngingLog.Referer);
+                if (!referer.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                {
+                    referer = "-"; // referer不应该没有http的
+                }
+
                 var url = GetUriPattern(ngingLog.Request);
                 var identify = time.ToString() + '\n' + referer + '\n' + url;
                 lock (groups)
@@ -56,7 +62,7 @@ namespace LogAnalyse.LogProcesser.Parsers
             try
             {
                 var dt = DateTime.ParseExact(timeLocal, nginxTimeFormat, cultureInfo);
-                dt = dt.AddHours(8); // 要加8
+                // dt = dt.AddHours(8); // 要加8
                 return int.Parse(dt.ToString("yyyyMMddHH"));
             }
             catch (Exception exp)
@@ -107,7 +113,7 @@ namespace LogAnalyse.LogProcesser.Parsers
         {
             if (string.IsNullOrEmpty(uri))
             {
-                return "";
+                return "-";
             }
 
             var idx = uri.IndexOf('?');
@@ -119,7 +125,10 @@ namespace LogAnalyse.LogProcesser.Parsers
             uri = pathRgx.Replace(uri, "*");
             uri = longRgx.Replace(uri, "*");
             uri = httpRgx.Replace(uri, "");
-            return uri.Trim();
+            uri = uri.Trim();
+            if (uri.Length == 0)
+                return "-";
+            return uri;
         }
     }
 }

@@ -34,7 +34,8 @@ namespace LogAnalyse.LogProcesser
         public NginxLogProcesser()
         {
             // parserList.Add(new InsertParser());
-            parserList.Add(new GroupParser());
+            // parserList.Add(new GroupReferAndPathParser());
+            parserList.Add(new GroupAppParser());
         }
 
         public void Run()
