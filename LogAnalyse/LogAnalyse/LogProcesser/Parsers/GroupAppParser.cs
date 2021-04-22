@@ -46,7 +46,7 @@ namespace LogAnalyse.LogProcesser.Parsers
             }
         }
 
-        public void Finish()
+        public void Finish(string day)
         {
             Dictionary<string, int> groupsInner;
             lock (groups)
@@ -62,6 +62,10 @@ namespace LogAnalyse.LogProcesser.Parsers
             var totalNum = 0;
             foreach (var row in groupsInner)
             {
+                // 每小时访问量太小，不入库
+                if (row.Value < 5)
+                    continue;
+
                 if (sql.Length > 0)
                     sql.Append(",");
                 sql.Append("(");
@@ -73,11 +77,12 @@ namespace LogAnalyse.LogProcesser.Parsers
                     app = app.Substring(0, 200);
                 }
 
-                sql.AppendFormat("{0},'{1}','{2}',{3}",
+                sql.AppendFormat("{0},'{1}','{2}',{3},{4}",
                     arr[0],
                     StrHelper.ProcessSqlVal(arr[1]),
                     app,
-                    row.Value);
+                    row.Value,
+                    day); // 因为nginx日志有2天重叠，避免问题
                 sql.Append(")");
                 num++;
                 if (num % 10000 == 0)
@@ -97,7 +102,7 @@ namespace LogAnalyse.LogProcesser.Parsers
         {
             try
             {
-                sql = "INSERT INTO nginxapplog(`hour`,`isfront`,`app`,`num`)VALUES" + sql;
+                sql = "INSERT INTO nginxapplog(`hour`,`isfront`,`app`,`num`, `day`)VALUES" + sql;
                 return sqlHelper.ExecuteNonQuery(sql);
             }
             catch (Exception exp)
@@ -107,42 +112,39 @@ namespace LogAnalyse.LogProcesser.Parsers
             }
         }
 
-        private string GetUriApp(string uri)
+        private string GetUriApp(string originUri)
         {
-            if (uri == null)
+            if (originUri == null)
             {
                 return "-";
             }
 
-            uri = uri.Trim();
+            var uri = originUri.Trim();
             if (uri.Length == 0)
             {
                 return "-";
             }
 
-            // 去除 "GET /cc/test/ip.aspx" 前面的GET
-            var idx = uri.IndexOf(' ');
-            if (idx > 0)
+            var arr = uri.Split(' ');
+            if (arr.Length <= 1)
             {
-                uri = uri.Substring(idx + 1);
+                return "-";
             }
 
-            // 去除 "/cc/test/ip.aspx" 的第一个 /
-            if (uri[0] == '/')
-            {
-                uri = uri.Substring(1);
-            }
-
-            idx = uri.IndexOf('?');
+            uri = arr[1]; // 去除 "GET /cc/test/ip.aspx HTTP1/1" 前面的GET和后面的HTTP
+            var idx = uri.IndexOf('?');
             if (idx == 0)
             {
                 return "-";
             }
 
+            // 移除问号
             if (idx > 0)
             {
                 uri = uri.Substring(0, idx);
             }
+
+            uri = uri.Trim('/');
 
             idx = uri.IndexOf('/');
             if (idx > 0)
@@ -150,17 +152,30 @@ namespace LogAnalyse.LogProcesser.Parsers
                 uri = uri.Substring(0, idx);
             }
 
-            idx = uri.IndexOf(' ');
-            if (idx > 0)
-            {
-                uri = uri.Substring(0, idx);
-            }
-
             uri = uri.Trim();
             // 还有这种请求 \x04\x01\x00Pg)\xA7\xEA\x00
-            if (uri.Length == 0 || uri.IndexOf('\\') >= 0)
+            if (uri.Length == 0 || uri.IndexOf('\\') >= 0 || uri.IndexOf('%') >= 0)
                 return "-";
+            if (IsStatic(uri))
+            {
+                return "front";
+            }
+
             return uri;
+        }
+
+        static bool IsStatic(string uri)
+        {
+            uri = uri.ToLower();
+            return uri.EndsWith(".js") ||
+                   uri.EndsWith(".ico") ||
+                   uri.EndsWith(".txt") ||
+                   uri.EndsWith(".png") ||
+                   uri.EndsWith(".css") ||
+                   uri.EndsWith(".xml") ||
+                   uri.EndsWith(".json") ||
+                   uri.EndsWith(".html") ||
+                   uri.EndsWith(".htm");
         }
     }
 }

@@ -27,7 +27,7 @@ namespace LogAnalyse.LogProcesser.Parsers
             }
         }
 
-        public void Finish()
+        public void Finish(string day)
         {
         }
     }

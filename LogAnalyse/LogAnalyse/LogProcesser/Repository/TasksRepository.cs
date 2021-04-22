@@ -8,7 +8,7 @@ namespace LogAnalyse.LogProcesser.Repository
     /// </summary>
     public interface TasksRepository : JpaRepository<Tasks, int>
     {
-        [Query("SELECT fileName FROM #{#entityName}")]
-        List<string> findAllFileName();
+        [Query("SELECT fileName FROM #{#entityName} where ymd=?1")]
+        List<string> findAllFileName(string ymd);
     }
 }

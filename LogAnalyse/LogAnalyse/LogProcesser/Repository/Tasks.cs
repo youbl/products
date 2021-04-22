@@ -15,6 +15,7 @@ namespace LogAnalyse.LogProcesser.Repository
         public int Id { get; set; }
 
         public string FileName { get; set; }
+        public string Ymd { get; set; }
 
         public int State { get; set; }
 

@@ -14,6 +14,6 @@ namespace LogAnalyse.LogProcesser.Parsers
         /// <summary>
         /// 所有行处理完毕时调用的方法
         /// </summary>
-        void Finish();
+        void Finish(string day);
     }
 }

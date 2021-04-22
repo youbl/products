@@ -29,6 +29,15 @@ namespace LogAnalyse.LogProcesser
             @"172.18.41.193"
         };
 
+        // 文件名包含这些内容，不处理
+        private string[] ignoreFiles = new[]
+        {
+            "error.log",
+            "agent.chidaoni.",
+            "api.chidaoni.",
+            "callback.chidaoni."
+        };
+
         private List<IParser> parserList = new List<IParser>();
 
         public NginxLogProcesser()
@@ -40,20 +49,28 @@ namespace LogAnalyse.LogProcesser
 
         public void Run()
         {
+//            var start = new DateTime(2021, 3, 4);
+//            while (start < DateTime.Now.AddDays(-1).Date)
+//            {
+//                RunWithYmd(start.ToString("yyyyMMdd"));
+//                start = start.AddDays(1);
+//            }
+
             RunWithYmd(null);
         }
 
         public void RunWithYmd(string ymd)
         {
             logger.Info("Nginx日志处理启动...");
-            var allProcessedTasks = GetTasks();
-            logger.Info($"前次已处理任务数：{allProcessedTasks.Count.ToString()}");
-
             if (string.IsNullOrEmpty(ymd))
             {
                 // 默认只处理昨天的数据
                 ymd = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
             }
+
+            var allProcessedTasks = GetTasks(ymd);
+            logger.Info($"前次已处理任务数：{allProcessedTasks.Count.ToString()}");
+
 
             var arrNewFiles = UnzipFiles(allProcessedTasks, ymd);
             logger.Info($"本次待处理任务数：{arrNewFiles.Count.ToString()}");
@@ -63,7 +80,7 @@ namespace LogAnalyse.LogProcesser
             var processedNumAll = 0;
             foreach (var file in arrNewFiles)
             {
-                var taskId = AddTask(file);
+                var taskId = AddTask(file, ymd);
 
                 var processedRowNum = ImportFile(file, ymd);
                 processedNumAll += processedRowNum;
@@ -75,7 +92,7 @@ namespace LogAnalyse.LogProcesser
 
             foreach (var parser in parserList)
             {
-                parser.Finish();
+                parser.Finish(ymd);
             }
 
             logger.Info($"Finish工作完成，准备清理文件:{arrNewFiles.Count}个");
@@ -86,6 +103,25 @@ namespace LogAnalyse.LogProcesser
             logger.Info($"本次任务完成，总处理行数：{processedNumAll}");
         }
 
+        private bool NeedIgnore(string file)
+        {
+            foreach (var ignoreFile in ignoreFiles)
+            {
+                if (file.Contains(ignoreFile))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 解压一天的文件，约3~4分钟
+        /// </summary>
+        /// <param name="allProcessedTasks"></param>
+        /// <param name="day"></param>
+        /// <returns></returns>
         private List<string> UnzipFiles(HashSet<string> allProcessedTasks, string day)
         {
             var ret = new List<string>();
@@ -100,7 +136,7 @@ namespace LogAnalyse.LogProcesser
 
                 foreach (var file in Directory.GetFiles(dir, "*.gz", SearchOption.TopDirectoryOnly))
                 {
-                    if (file.Contains("error.log"))
+                    if (NeedIgnore(file))
                     {
                         continue;
                     }
@@ -157,15 +193,9 @@ namespace LogAnalyse.LogProcesser
 
                     var arrFields = ParseLog(line);
                     var nginxLog = ConvertToNginxLog(arrFields, file);
-                    // 计算最大长度
-//                    for (var i = 0; i < arrFields.Count; i++)
+//                    if (nginxLog.Time.Day != 20)
 //                    {
-//                        var len = arrFields[i].Length;
-//                        if (len > arrLen[i])
-//                        {
-//                            arrLen[i] = len;
-//                            arrVal[i] = arrFields[i];
-//                        }
+//                        logger.Error(line);
 //                    }
 
                     ThreadPool.UnsafeQueueUserWorkItem(state =>
@@ -279,10 +309,11 @@ namespace LogAnalyse.LogProcesser
             return log;
         }
 
-        private int AddTask(string fileName)
+        private int AddTask(string fileName, string ymd)
         {
             var task = new Tasks();
             task.FileName = fileName;
+            task.Ymd = ymd;
             task.State = 1;
             return tasksRepository.Save(task).Id;
         }
@@ -324,9 +355,9 @@ namespace LogAnalyse.LogProcesser
             }
         }
 
-        private HashSet<string> GetTasks()
+        private HashSet<string> GetTasks(string ymd)
         {
-            var arr = tasksRepository.findAllFileName();
+            var arr = tasksRepository.findAllFileName(ymd);
             return new HashSet<string>(arr);
         }
 
