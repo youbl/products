@@ -73,9 +73,11 @@
     <Compile Include="LogProcesser\Parsers\GroupReferAndPathParser.cs" />
     <Compile Include="LogProcesser\Parsers\InsertParser.cs" />
     <Compile Include="LogProcesser\Parsers\IParser.cs" />
+    <Compile Include="LogProcesser\Repository\Configs.cs" />
     <Compile Include="LogProcesser\Repository\NginxLog.cs" />
     <Compile Include="LogProcesser\Repository\Tasks.cs" />
     <Compile Include="LogProcesser\Repository\NginxLogRepository.cs" />
+    <Compile Include="LogProcesser\Repository\ConfigsRepository.cs" />
     <Compile Include="LogProcesser\Repository\TasksRepository.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

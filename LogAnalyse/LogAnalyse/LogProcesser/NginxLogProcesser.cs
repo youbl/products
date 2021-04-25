@@ -49,24 +49,18 @@ namespace LogAnalyse.LogProcesser
 
         public void Run()
         {
-//            var start = new DateTime(2021, 3, 4);
-//            while (start < DateTime.Now.AddDays(-1).Date)
-//            {
-//                RunWithYmd(start.ToString("yyyyMMdd"));
-//                start = start.AddDays(1);
-//            }
-
-            RunWithYmd(null);
+            var today = DateTime.Now.Date;
+            var start = today.AddDays(-3); // 处理最近3天
+            while (start < today)
+            {
+                RunWithYmd(start.ToString("yyyyMMdd"));
+                start = start.AddDays(1);
+            }
         }
 
-        public void RunWithYmd(string ymd)
+        private void RunWithYmd(string ymd)
         {
             logger.Info("Nginx日志处理启动...");
-            if (string.IsNullOrEmpty(ymd))
-            {
-                // 默认只处理昨天的数据
-                ymd = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
-            }
 
             var allProcessedTasks = GetTasks(ymd);
             logger.Info($"前次已处理任务数：{allProcessedTasks.Count.ToString()}");

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Text;
+using Beinet.Repository;
 using LogAnalyse.LogProcesser.Repository;
 using LogAnalyse.Utils;
 using NLog;
@@ -21,6 +22,15 @@ namespace LogAnalyse.LogProcesser.Parsers
 
         private Dictionary<string, int> groups = new Dictionary<string, int>();
 
+        private static readonly ConfigsRepository configsRepository = ProxyLoader.GetProxy<ConfigsRepository>();
+
+        // 需要统计的app列表
+        private static readonly HashSet<string> knownApps = new HashSet<string>(configsRepository.findAllVal("app"));
+
+        // 被认为是前端请求的扩展名列表
+        private static readonly HashSet<string> frontExts =
+            new HashSet<string>(configsRepository.findAllVal("frontExt"));
+
         public void Parse(NginxLog ngingLog)
         {
             try
@@ -33,6 +43,11 @@ namespace LogAnalyse.LogProcesser.Parsers
                     : 0;
 
                 var app = GetUriApp(ngingLog.Request);
+                if (!IsKnownApp(app))
+                {
+                    app = "other";
+                }
+
                 var identify = time + '\n' + isFront + '\n' + app;
                 lock (groups)
                 {
@@ -112,6 +127,11 @@ namespace LogAnalyse.LogProcesser.Parsers
             }
         }
 
+        /// <summary>
+        /// 获取uri里的服务名，并转小写后返回。
+        /// </summary>
+        /// <param name="originUri"></param>
+        /// <returns></returns>
         private string GetUriApp(string originUri)
         {
             if (originUri == null)
@@ -131,7 +151,30 @@ namespace LogAnalyse.LogProcesser.Parsers
                 return "-";
             }
 
-            uri = arr[1]; // 去除 "GET /cc/test/ip.aspx HTTP1/1" 前面的GET和后面的HTTP
+            var realUri = arr[1]; // 去除 "GET /cc/test/ip.aspx HTTP1/1" 前面的GET和后面的HTTP
+            uri = GetFirstPath(realUri);
+            if (uri == "_")
+            {
+                realUri = realUri.Substring(realUri.IndexOf('_') + 1); // 对于 /_/xxx/ 要取得xxx
+                uri = GetFirstPath(realUri);
+            }
+
+            if (IsStatic(uri))
+            {
+                return "front";
+            }
+
+            return uri;
+        }
+
+        /// <summary>
+        /// 取得第一级目录
+        /// </summary>
+        /// <param name="originUri"></param>
+        /// <returns></returns>
+        private string GetFirstPath(string originUri)
+        {
+            var uri = originUri;
             var idx = uri.IndexOf('?');
             if (idx == 0)
             {
@@ -156,26 +199,22 @@ namespace LogAnalyse.LogProcesser.Parsers
             // 还有这种请求 \x04\x01\x00Pg)\xA7\xEA\x00
             if (uri.Length == 0 || uri.IndexOf('\\') >= 0 || uri.IndexOf('%') >= 0)
                 return "-";
-            if (IsStatic(uri))
-            {
-                return "front";
-            }
 
-            return uri;
+            return uri.ToLower();
+        }
+
+
+        static bool IsKnownApp(string app)
+        {
+            return knownApps.Contains(app);
         }
 
         static bool IsStatic(string uri)
         {
-            uri = uri.ToLower();
-            return uri.EndsWith(".js") ||
-                   uri.EndsWith(".ico") ||
-                   uri.EndsWith(".txt") ||
-                   uri.EndsWith(".png") ||
-                   uri.EndsWith(".css") ||
-                   uri.EndsWith(".xml") ||
-                   uri.EndsWith(".json") ||
-                   uri.EndsWith(".html") ||
-                   uri.EndsWith(".htm");
+            var idx = uri.LastIndexOf('.');
+            if (idx < 0)
+                return false;
+            return frontExts.Contains(uri.Substring(idx));
         }
     }
 }
