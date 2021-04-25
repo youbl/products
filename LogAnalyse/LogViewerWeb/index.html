@@ -1,0 +1,319 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>访问统计报表</title>
+    <script type="text/javascript" src="/res/unpkg/vue.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/axios.min.js"></script>
+    <script type="text/javascript" src="/res/unpkg/elemeIndex.js"></script>
+    <script type="text/javascript" src="/res/qs.min.js"></script>
+    <script type="text/javascript" src="/res/echarts.min.js"></script>
+
+    <link rel="stylesheet" href="/res/unpkg/elemeIndex.css">
+    <style>
+        .noborder input { border: none; }
+    </style>
+</head>
+<body>
+<div id="divApp" style="text-align: center; width: 98%;">
+
+    <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+        <el-tab-pane :label="labelName" name="accessTotal">
+            <div>
+                <el-form :inline="true" style="text-align: left">
+                    <el-form-item label="服务名:">
+                        <el-select v-model="searchApp" multiple filterable placeholder="请选择服务名">
+                            <el-option v-for="item in appList"
+                                       :key="item"
+                                       :label="item"
+                                       :value="item">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="时间:">
+                        <el-date-picker v-model="searchDate"
+                                        type="daterange"
+                                        align="right"
+                                        unlink-panels
+                                        range-separator="至"
+                                        start-placeholder="开始日期"
+                                        end-placeholder="结束日期"
+                                        :picker-options="pickerOptions">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="统计维度:">
+                        <el-radio-group v-model="totalUrl" @change="loadStateReport">
+                            <el-radio :label="'appLog/byDay'">按天</el-radio>
+                            <el-radio :label="'appLog/byHour'">按小时</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-button icon="el-icon-search" type="primary"
+                               @click="loadStateReport">
+                        查 询
+                    </el-button>
+                </el-form>
+            </div>
+            <template>
+                <div id="echarts_box" style="width: 99%; height: 400px;"></div>
+            </template>
+            <hr/>
+            <div style="font-weight: bold; font-size: 30px;">全部数据</div>
+            <div v-for="item in dataList" style="text-align: left">
+                <div style="text-align: left">
+                    <span style="display: inline-block; width: 200px; font-weight: bold">{{item.hour}}</span>
+                    <span style="display: inline-block; width: 200px; font-weight: bold">{{item.name}}</span>
+                    <span style="display: inline-block; width: 200px; font-weight: bold">{{item.num}}</span>
+                </div>
+                <hr>
+            </div>
+
+        </el-tab-pane>
+        <el-tab-pane label="导出" name="export">
+        </el-tab-pane>
+    </el-tabs>
+</div>
+<script type="text/javascript">
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function() {
+            return {
+                labelName: '访问统计报表',
+                activeName: 'accessTotal',
+                appList: [],
+
+                totalUrl: 'appLog/byDay',
+                searchApp: '',
+                searchDate: [new Date(new Date().getTime() - 3600 * 1000 * 24 * 9), new Date(new Date().getTime() - 3600 * 1000 * 24 * 2)],
+
+                dataList: [],
+                myChart: {},
+
+                pickerOptions: {
+                    shortcuts: [
+                        {
+                            text: '最近一周',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近一个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近三个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }
+                    ]
+                },
+            }
+        },
+        mounted: function() {
+            this.loadApps()
+                .then(this.loadStateReport);
+        },
+        computed: {
+            // 收集的所有x轴数据，避免某些服务有数据缺漏
+            xAxisList: function() {
+                // 用属性收集所有日期，避免重复
+                let arr = {};
+                for (let i = 0, j = this.dataList.length; i < j; i++) {
+                    arr[this.dataList[i].hour] = 0;
+                }
+                // 转成数组并排序后返回
+                let ret = [];
+                for (let att in arr) {
+                    if (arr.hasOwnProperty(att)) {
+                        ret.push(att);
+                    }
+                }
+                ret.sort();
+                return ret;
+            }
+        },
+        methods: {
+            loadApps: function() {
+                let url = '/appLog/apps';
+                return window.axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    response.data.splice(0, 0, '');
+                    this.appList = response.data;
+                }).catch(error => this.ajaxError(error));
+            },
+            handleClick: function(tab) {
+                if (tab.label === '导出') {
+                    //let url = '/report/total?export=1&type=' + this.type;
+                    //window.open(url);
+                    // this.doExport();
+                }
+                setTimeout(() => {
+                        this.activeName = 'accessTotal';
+                    },
+                    100);
+            },
+            loadStateReport: function() {
+                this.dataList = [];
+                let start = getYmd(this.searchDate[0]) * 100;
+                let end = getYmd(this.searchDate[1]) * 100 + 23;
+                let url = this.totalUrl + '?app=' + this.searchApp + '&start=' + start + '&end=' + end;
+                return window.axios.get(url).then(response => {
+                    if (!response || !response.data || !response.data.length) {
+                        return;
+                    }
+                    Vue.set(this, 'dataList', this.groupData(response.data));
+
+                    this.showEChart();
+                }).catch(error => this.ajaxError(error));
+            },
+            groupData: function(arrData) {
+                let ret = [];
+                for (let i = 0, j = arrData.length; i < j; i++) {
+                    let item = arrData[i];
+                    ret.push({
+                        name: item.App ? item.App : '全部',
+                        hour: item.Hour,
+                        num: item.Num,
+                    });
+                }
+                return ret;
+            },
+            showEChart: function() {
+                let xAxis = this.xAxisList;
+                if (!xAxis || !xAxis.length)
+                    return;
+                let titleAndVals = {};
+
+                for (let i = 0, j = this.dataList.length; i < j; i++) {
+                    let item = this.dataList[i];
+                    if (!titleAndVals[item.name]) {
+                        titleAndVals[item.name] = {};
+                    }
+                    titleAndVals[item.name][item.hour] = item.num;
+                }
+
+                let legend = [];
+                let legendData = [];
+                for (let att in titleAndVals) {
+                    if (titleAndVals.hasOwnProperty(att)) {
+                        legend.push(att);
+                        let itemData = [];
+                        legendData.push(itemData);
+                        for (let i = 0, j = xAxis.length; i < j; i++) {
+                            let day = xAxis[i];
+                            if (titleAndVals[att][day]) {
+                                itemData.push(titleAndVals[att][day]);
+                            } else {
+                                itemData.push(0);
+                            }
+                        }
+                    }
+                }
+
+                // 初始化图表
+                this.myChart = window.echarts.init(document.getElementById('echarts_box'));
+                // 指定图表的配置项和数据
+                let option = this.echartOptions(legend, xAxis, legendData);
+
+                // 使用刚指定的配置项和数据显示图表。
+                this.myChart.setOption(option);
+            },
+            // legend   所有的曲线列表，如 ['cc', 'mike-platform']
+            // xAxis    所有的X轴点，如 ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+            // dataList 对应legend的所有数据，如 [[11,22],[33,44]]
+            echartOptions: function(legend, xAxis, dataList) {
+                let opn = {
+                    title: {
+                        text: '增长曲线图',
+                        //x: 'center',
+                        textAlign: 'left',
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: legend,
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: xAxis,
+                        axisLabel: {
+                            interval: 0, //让所有坐标值全部显示
+                            rotate: 15, //让坐标值旋转一定的角度
+                        },
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: []
+                };
+                for (let i = 0, j = legend.length; i < j; i++) {
+                    opn.series.push(
+                        {
+                            name: legend[i],
+                            type: 'line',
+                            data: dataList.length > i ? dataList[i] : [],
+                            show: true,
+//                            label: {
+//                                normal: {
+//                                    show: true,
+//                                    position: 'top',
+//                                }
+//                            }
+                        });
+                }
+                return opn;
+            },
+            goLogin: function() {
+                top.location.href = '/login/index.html?returnUrl=' + encodeURIComponent(location.href);
+            },
+            ajaxError: function(error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (msg && msg === 'Unauthorized') {
+                        this.goLogin();
+                    } else {
+                        alert(msg ? msg : '出错了');
+                    }
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+
+    function getYmd(date) {
+        if (!date) {
+            date = new Date();
+        }
+        return date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+    }
+</script>
+</body>
+</html>

@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Http;
-using System.Web.Routing;
 
 namespace LogViewerWeb
 {
@@ -11,6 +6,9 @@ namespace LogViewerWeb
     {
         protected void Application_Start()
         {
+            // Consoller输出 关闭XML支持
+            GlobalConfiguration.Configuration?.Formatters?.XmlFormatter?.SupportedMediaTypes?.Clear();
+
             GlobalConfiguration.Configure(WebApiConfig.Register);
         }
     }

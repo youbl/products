@@ -7,9 +7,9 @@ namespace LogViewerWeb.Controllers
         // GET api/<controller>/5
         [HttpGet]
         [Route("home")]
-        public string Get(int id)
+        public string Get()
         {
-            return "value";
+            return "Hello world.";
         }
     }
 }

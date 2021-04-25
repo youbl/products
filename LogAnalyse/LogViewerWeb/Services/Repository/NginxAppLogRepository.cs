@@ -1,4 +1,5 @@
-﻿using Beinet.Repository.Repositories;
+﻿using System.Collections.Generic;
+using Beinet.Repository.Repositories;
 
 namespace LogViewerWeb.Services.Repository
 {
@@ -7,5 +8,27 @@ namespace LogViewerWeb.Services.Repository
     /// </summary>
     public interface NginxAppLogRepository : JpaRepository<NginxAppLog, int>
     {
+        [Query(
+            "SELECT app,FLOOR(HOUR/100) hour,sum(num) num FROM #{#entityName} " +
+            "WHERE app in (?1) AND hour BETWEEN ?2 AND ?3 " +
+            "GROUP BY app,FLOOR(HOUR/100) ORDER BY app,hour")]
+        List<NginxAppLog> GroupByAppAndDay(List<string> app, int start, int end);
+
+        [Query(
+            "SELECT FLOOR(HOUR/100) hour,sum(num) num FROM #{#entityName} " +
+            "WHERE hour BETWEEN ?1 AND ?2 " +
+            "GROUP BY FLOOR(HOUR/100) ORDER BY hour")]
+        List<NginxAppLog> GroupByAppAndDay(int start, int end);
+
+
+        [Query("SELECT app,hour,sum(num) num FROM #{#entityName} " +
+               "WHERE app in (?1) AND hour BETWEEN ?2 AND ?3 " +
+               "GROUP BY app,hour ORDER BY app,hour")]
+        List<NginxAppLog> GroupByAppAndHour(List<string> app, int start, int end);
+
+        [Query("SELECT hour,sum(num) num FROM #{#entityName} " +
+               "WHERE hour BETWEEN ?1 AND ?2 " +
+               "GROUP BY hour ORDER BY hour")]
+        List<NginxAppLog> GroupByAppAndHour(int start, int end);
     }
 }

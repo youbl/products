@@ -87,10 +87,21 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="index.html" />
+    <Content Include="res\echarts.min.js" />
+    <Content Include="res\include.js" />
+    <Content Include="res\qrcode.min.js" />
+    <Content Include="res\qs.min.js" />
+    <Content Include="res\unpkg\axios.min.js" />
+    <Content Include="res\unpkg\elemeIndex.css" />
+    <Content Include="res\unpkg\elemeIndex.js" />
+    <Content Include="res\unpkg\vue.min.js" />
+    <Content Include="res\xlsx.core.min.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\AppLogController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -104,6 +115,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <Content Include="res\unpkg\fonts\element-icons.ttf" />
+    <Content Include="res\unpkg\fonts\element-icons.woff" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
