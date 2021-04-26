@@ -47,6 +47,12 @@
                             <el-radio :label="'appLog/byHour'">按小时</el-radio>
                         </el-radio-group>
                     </el-form-item>
+                    <el-form-item label="访问来源:">
+                        <el-radio-group v-model="isFront" @change="loadStateReport">
+                            <el-radio :label="1">前端</el-radio>
+                            <el-radio :label="0">后端</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
                     <el-button icon="el-icon-search" type="primary"
                                @click="loadStateReport">
                         查 询
@@ -68,7 +74,7 @@
             </div>
 
         </el-tab-pane>
-        <el-tab-pane label="导出" name="export">
+        <el-tab-pane label=".." name="export">
         </el-tab-pane>
     </el-tabs>
 </div>
@@ -83,7 +89,11 @@
 
                 totalUrl: 'appLog/byDay',
                 searchApp: '',
-                searchDate: [new Date(new Date().getTime() - 3600 * 1000 * 24 * 9), new Date(new Date().getTime() - 3600 * 1000 * 24 * 2)],
+                searchDate: [
+                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 9),
+                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 2)
+                ],
+                isFront: 0,
 
                 dataList: [],
                 myChart: {},
@@ -168,7 +178,15 @@
                 this.dataList = [];
                 let start = getYmd(this.searchDate[0]) * 100;
                 let end = getYmd(this.searchDate[1]) * 100 + 23;
-                let url = this.totalUrl + '?app=' + this.searchApp + '&start=' + start + '&end=' + end;
+                let url = this.totalUrl +
+                    '?app=' +
+                    this.searchApp +
+                    '&start=' +
+                    start +
+                    '&end=' +
+                    end +
+                    '&front=' +
+                    this.isFront;
                 return window.axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;

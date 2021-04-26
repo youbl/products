@@ -19,17 +19,17 @@ namespace LogViewerWeb.Controllers
 
         [HttpGet]
         [Route("byHour")]
-        public List<NginxAppLog> GetAppLogByHour(string app, int start, int end)
+        public List<NginxAppLog> GetAppLogByHour(string app, int start, int end, int front)
         {
-            var ret = nginxAppLogService.GetAppGroupDataByHour(app, start, end);
+            var ret = nginxAppLogService.GetAppGroupDataByHour(app, start, end, front);
             return ret;
         }
 
         [HttpGet]
         [Route("byDay")]
-        public List<NginxAppLog> GetAppLogByDay(string app, int start, int end)
+        public List<NginxAppLog> GetAppLogByDay(string app, int start, int end, int front)
         {
-            return nginxAppLogService.GetAppGroupDataByDay(app, start, end);
+            return nginxAppLogService.GetAppGroupDataByDay(app, start, end, front);
         }
     }
 }

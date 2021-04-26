@@ -14,30 +14,22 @@ namespace LogViewerWeb.Services
         /// <summary>
         /// 按小时汇总app数据
         /// </summary>
-        /// <param name="app"></param>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <returns></returns>
-        public List<NginxAppLog> GetAppGroupDataByHour(string app, int start, int end)
+        public List<NginxAppLog> GetAppGroupDataByHour(string app, int start, int end, int front)
         {
             if (string.IsNullOrEmpty(app))
-                return nginxAppLogRepository.GroupByAppAndHour(start, end);
-            return nginxAppLogRepository.GroupByAppAndHour(SplitApp(app), start, end);
+                return nginxAppLogRepository.GroupByAppAndHour(start, end, front);
+            return nginxAppLogRepository.GroupByAppAndHour(SplitApp(app), start, end, front);
         }
 
 
         /// <summary>
         /// 按天汇总app数据
         /// </summary>
-        /// <param name="app"></param>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <returns></returns>
-        public List<NginxAppLog> GetAppGroupDataByDay(string app, int start, int end)
+        public List<NginxAppLog> GetAppGroupDataByDay(string app, int start, int end, int front)
         {
             if (string.IsNullOrEmpty(app))
-                return nginxAppLogRepository.GroupByAppAndDay(start, end);
-            return nginxAppLogRepository.GroupByAppAndDay(SplitApp(app), start, end);
+                return nginxAppLogRepository.GroupByAppAndDay(start, end, front);
+            return nginxAppLogRepository.GroupByAppAndDay(SplitApp(app), start, end, front);
         }
 
         public List<String> GetAppList()

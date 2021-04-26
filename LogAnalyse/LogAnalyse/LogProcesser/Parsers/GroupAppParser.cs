@@ -109,7 +109,8 @@ namespace LogAnalyse.LogProcesser.Parsers
                 }
             }
 
-            totalNum += DoInsert(sql.ToString());
+            if (sql.Length > 0)
+                totalNum += DoInsert(sql.ToString());
             logger.Info("汇总共插入行数：" + totalNum);
         }
 
