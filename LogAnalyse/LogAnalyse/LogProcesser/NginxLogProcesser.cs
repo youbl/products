@@ -60,14 +60,14 @@ namespace LogAnalyse.LogProcesser
 
         private void RunWithYmd(string ymd)
         {
-            logger.Info("Nginx日志处理启动...");
+            logger.Info($"{ymd} Nginx日志处理启动...");
 
             var allProcessedTasks = GetTasks(ymd);
-            logger.Info($"前次已处理任务数：{allProcessedTasks.Count.ToString()}");
+            logger.Info($"{ymd} 前次已处理任务数：{allProcessedTasks.Count.ToString()}");
 
 
             var arrNewFiles = UnzipFiles(allProcessedTasks, ymd);
-            logger.Info($"本次待处理任务数：{arrNewFiles.Count.ToString()}");
+            logger.Info($"{ymd} 本次待处理任务数：{arrNewFiles.Count.ToString()}");
             if (arrNewFiles.Count <= 0)
                 return;
 
@@ -82,19 +82,19 @@ namespace LogAnalyse.LogProcesser
                 FinishTask(taskId, processedRowNum);
             }
 
-            logger.Info($"导入文件任务，准备最后一步……{processedNumAll}");
+            logger.Info($"{ymd} 导入文件任务，准备最后一步……{processedNumAll}");
 
             foreach (var parser in parserList)
             {
                 parser.Finish(ymd);
             }
 
-            logger.Info($"Finish工作完成，准备清理文件:{arrNewFiles.Count}个");
+            logger.Info($"{ymd} Finish工作完成，准备清理文件:{arrNewFiles.Count}个");
 
             foreach (var file in arrNewFiles)
                 DeleteFile(file);
 
-            logger.Info($"本次任务完成，总处理行数：{processedNumAll}");
+            logger.Info($"{ymd} 本次任务完成，总处理行数：{processedNumAll}");
         }
 
         private bool NeedIgnore(string file)
@@ -163,6 +163,12 @@ namespace LogAnalyse.LogProcesser
             return ret;
         }
 
+        /// <summary>
+        /// 汇总一天的数据，GroupAppParser执行约3~4分钟
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="ymd"></param>
+        /// <returns></returns>
         private int ImportFile(string file, String ymd)
         {
             int ret = 0;
