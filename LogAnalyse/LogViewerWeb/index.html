@@ -49,6 +49,7 @@
                     </el-form-item>
                     <el-form-item label="访问来源:">
                         <el-radio-group v-model="isFront" @change="loadStateReport(false)">
+                            <el-radio :label="2">全部</el-radio>
                             <el-radio :label="1">前端</el-radio>
                             <el-radio :label="0">后端</el-radio>
                         </el-radio-group>
@@ -64,6 +65,13 @@
                                         end-placeholder="结束日期"
                                         :picker-options="comparePickerOptions">
                         </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="时间维度:">
+                        <el-radio-group v-model="weekend" @change="loadStateReport(false)">
+                            <el-radio :label="2">全部</el-radio>
+                            <el-radio :label="1">周末</el-radio>
+                            <el-radio :label="0">平日</el-radio>
+                        </el-radio-group>
                     </el-form-item>
 
                     <el-button icon="el-icon-search" type="primary"
@@ -110,7 +118,8 @@
                     new Date(new Date().getTime() - 3600 * 1000 * 24 * 16),
                     new Date(new Date().getTime() - 3600 * 1000 * 24 * 9)
                 ],
-                isFront: 0,
+                isFront: 2,
+                weekend: 2,
 
                 dataList: [],
                 dataCompareList: [],
@@ -251,7 +260,9 @@
                     '&end=' +
                     end +
                     '&front=' +
-                    this.isFront;
+                    this.isFront +
+                    '&weekend=' +
+                    this.weekend;
                 return window.axios.get(url).then(response => {
                     if (!response || !response.data || !response.data.length) {
                         return;
