@@ -435,13 +435,22 @@
     }
 
     function addDays(ymd, days) {
+        let isHour = (ymd.length === 10);
         let year = ymd.substring(0, 4);
         let month = parseInt(ymd.substring(4, 6), 10) - 1;
         let day = ymd.substring(6, 8);
-        let tm = new Date(year, month, day);
+        let hour = 0;
+        if (isHour) {
+            hour = parseInt(ymd.substring(8, 10), 10);
+        }
+        let tm = new Date(year, month, day, hour, 0, 0);
         tm.setDate(tm.getDate() + days);
 
-        return getYmd(tm);
+        let ret = getYmd(tm);
+        if (isHour) {
+            ret = ret * 100 + hour;
+        }
+        return ret;
     }
 </script>
 </body>
