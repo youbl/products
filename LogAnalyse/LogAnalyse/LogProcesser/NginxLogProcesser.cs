@@ -51,7 +51,7 @@ namespace LogAnalyse.LogProcesser
         {
             var today = DateTime.Now.Date;
             var start = today.AddDays(-3); // 处理最近3天
-            while (start < today)
+            while (start <= today)
             {
                 RunWithYmd(start.ToString("yyyyMMdd"));
                 start = start.AddDays(1);

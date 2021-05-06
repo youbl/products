@@ -111,12 +111,12 @@
                 totalUrl: 'appLog/byDay',
                 searchApp: '',
                 searchDate: [
-                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 9),
-                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 2)
+                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 8),
+                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 1)
                 ],
                 compareDate: [
-                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 16),
-                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 9)
+                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 15),
+                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 8)
                 ],
                 isFront: 2,
                 weekend: 2,
@@ -131,24 +131,27 @@
                             text: '最近7天',
                             onClick(picker) {
                                 const end = new Date();
+                                end.setTime(end.getTime() - 3600 * 1000 * 24 * 1);
                                 const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 8);
                                 picker.$emit('pick', [start, end]);
                             }
                         }, {
                             text: '最近30天',
                             onClick(picker) {
                                 const end = new Date();
+                                end.setTime(end.getTime() - 3600 * 1000 * 24 * 1);
                                 const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 31);
                                 picker.$emit('pick', [start, end]);
                             }
                         }, {
                             text: '最近90天',
                             onClick(picker) {
                                 const end = new Date();
+                                end.setTime(end.getTime() - 3600 * 1000 * 24 * 1);
                                 const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 91);
                                 picker.$emit('pick', [start, end]);
                             }
                         }
