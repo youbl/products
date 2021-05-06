@@ -21,16 +21,7 @@
         <el-tab-pane :label="labelName" name="accessTotal">
             <div>
                 <el-form :inline="true" style="text-align: left">
-                    <el-form-item label="服务名:">
-                        <el-select v-model="searchApp" multiple filterable placeholder="请选择服务名">
-                            <el-option v-for="item in appList"
-                                       :key="item"
-                                       :label="item"
-                                       :value="item">
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="时间:">
+                    <el-form-item label="统计时间:">
                         <el-date-picker v-model="searchDate"
                                         type="daterange"
                                         align="right"
@@ -41,20 +32,42 @@
                                         :picker-options="pickerOptions">
                         </el-date-picker>
                     </el-form-item>
+                    <el-form-item label="服务名:">
+                        <el-select v-model="searchApp" multiple filterable placeholder="请选择服务名">
+                            <el-option v-for="item in appList"
+                                       :key="item"
+                                       :label="item"
+                                       :value="item">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
                     <el-form-item label="统计维度:">
-                        <el-radio-group v-model="totalUrl" @change="loadStateReport">
+                        <el-radio-group v-model="totalUrl" @change="loadStateReport(false)">
                             <el-radio :label="'appLog/byDay'">按天</el-radio>
                             <el-radio :label="'appLog/byHour'">按小时</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="访问来源:">
-                        <el-radio-group v-model="isFront" @change="loadStateReport">
+                        <el-radio-group v-model="isFront" @change="loadStateReport(false)">
                             <el-radio :label="1">前端</el-radio>
                             <el-radio :label="0">后端</el-radio>
                         </el-radio-group>
                     </el-form-item>
+                    <br/>
+                    <el-form-item label="环比时间:">
+                        <el-date-picker v-model="compareDate"
+                                        type="daterange"
+                                        align="right"
+                                        unlink-panels
+                                        range-separator="至"
+                                        start-placeholder="开始日期"
+                                        end-placeholder="结束日期"
+                                        :picker-options="comparePickerOptions">
+                        </el-date-picker>
+                    </el-form-item>
+
                     <el-button icon="el-icon-search" type="primary"
-                               @click="loadStateReport">
+                               @click="loadStateReport(false)">
                         查 询
                     </el-button>
                 </el-form>
@@ -93,15 +106,20 @@
                     new Date(new Date().getTime() - 3600 * 1000 * 24 * 9),
                     new Date(new Date().getTime() - 3600 * 1000 * 24 * 2)
                 ],
+                compareDate: [
+                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 16),
+                    new Date(new Date().getTime() - 3600 * 1000 * 24 * 9)
+                ],
                 isFront: 0,
 
                 dataList: [],
+                dataCompareList: [],
                 myChart: {},
 
                 pickerOptions: {
                     shortcuts: [
                         {
-                            text: '最近一周',
+                            text: '最近7天',
                             onClick(picker) {
                                 const end = new Date();
                                 const start = new Date();
@@ -109,7 +127,7 @@
                                 picker.$emit('pick', [start, end]);
                             }
                         }, {
-                            text: '最近一个月',
+                            text: '最近30天',
                             onClick(picker) {
                                 const end = new Date();
                                 const start = new Date();
@@ -117,7 +135,7 @@
                                 picker.$emit('pick', [start, end]);
                             }
                         }, {
-                            text: '最近三个月',
+                            text: '最近90天',
                             onClick(picker) {
                                 const end = new Date();
                                 const start = new Date();
@@ -127,11 +145,43 @@
                         }
                     ]
                 },
+                comparePickerOptions: {
+                    shortcuts: [
+                        {
+                            text: '近7天环比',
+                            onClick(picker) {
+                                const end = new Date(vueApp.searchDate[1].valueOf()); // 不能直接等，会按引用拿到
+                                const start = new Date(vueApp.searchDate[0].valueOf());
+                                start.setDate(start.getDate() - 7);
+                                end.setDate(end.getDate() - 7);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '近14天环比',
+                            onClick(picker) {
+                                const end = new Date(vueApp.searchDate[1].valueOf());
+                                const start = new Date(vueApp.searchDate[0].valueOf());
+                                start.setDate(start.getDate() - 14);
+                                end.setDate(end.getDate() - 14);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '近28天环比',
+                            onClick(picker) {
+                                const end = new Date(vueApp.searchDate[1].valueOf());
+                                const start = new Date(vueApp.searchDate[0].valueOf());
+                                start.setDate(start.getDate() - 28);
+                                end.setDate(end.getDate() - 28);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }
+                    ]
+                },
             }
         },
         mounted: function() {
             this.loadApps()
-                .then(this.loadStateReport);
+                .then(() => { this.loadStateReport(false); });
         },
         computed: {
             // 收集的所有x轴数据，避免某些服务有数据缺漏
@@ -174,10 +224,25 @@
                     },
                     100);
             },
-            loadStateReport: function() {
-                this.dataList = [];
-                let start = getYmd(this.searchDate[0]) * 100;
-                let end = getYmd(this.searchDate[1]) * 100 + 23;
+            loadStateReport: function(isSearchCompare) {
+                let result;
+                let arrDate;
+                if (isSearchCompare) {
+                    arrDate = this.compareDate;
+                    this.dataCompareList = [];
+                    result = 'dataCompareList';
+                } else {
+                    // 环比日期与查询日期的相差天数
+                    let diffDays = Math.floor((this.searchDate[0] - this.compareDate[0]) / 3600 / 24 / 1000);
+                    if (diffDays <= 0) {
+                        return alert('环比时间必须小于统计时间');
+                    }
+                    arrDate = this.searchDate;
+                    this.dataList = [];
+                    result = 'dataList';
+                }
+                let start = getYmd(arrDate[0]) * 100;
+                let end = getYmd(arrDate[1]) * 100 + 23;
                 let url = this.totalUrl +
                     '?app=' +
                     this.searchApp +
@@ -191,9 +256,13 @@
                     if (!response || !response.data || !response.data.length) {
                         return;
                     }
-                    Vue.set(this, 'dataList', this.groupData(response.data));
+                    window.Vue.set(this, result, this.groupData(response.data));
 
-                    this.showEChart();
+                    if (isSearchCompare) {
+                        this.showEChart();
+                    } else {
+                        this.loadStateReport(true); // 搜索对比数据
+                    }
                 }).catch(error => this.ajaxError(error));
             },
             groupData: function(arrData) {
@@ -213,7 +282,7 @@
                 if (!xAxis || !xAxis.length)
                     return;
                 let titleAndVals = {};
-
+                // 遍历数据，收集时间和对应的值，如 20210501: 123456
                 for (let i = 0, j = this.dataList.length; i < j; i++) {
                     let item = this.dataList[i];
                     if (!titleAndVals[item.name]) {
@@ -222,11 +291,24 @@
                     titleAndVals[item.name][item.hour] = item.num;
                 }
 
+                let compareTitleAndVals = {};
+                // 遍历用于对比的数据，收集时间和对应的值，如 20210501: 123456
+                for (let i = 0, j = this.dataCompareList.length; i < j; i++) {
+                    let item = this.dataCompareList[i];
+                    if (!compareTitleAndVals[item.name]) {
+                        compareTitleAndVals[item.name] = {};
+                    }
+                    compareTitleAndVals[item.name][item.hour] = item.num;
+                }
+                // 环比日期与查询日期的相差天数
+                let diffDays = Math.floor((this.searchDate[0] - this.compareDate[0]) / 3600 / 24 / 1000);
+
                 let legend = [];
                 let legendData = [];
                 for (let att in titleAndVals) {
                     if (titleAndVals.hasOwnProperty(att)) {
                         legend.push(att);
+
                         let itemData = [];
                         legendData.push(itemData);
                         for (let i = 0, j = xAxis.length; i < j; i++) {
@@ -235,6 +317,25 @@
                                 itemData.push(titleAndVals[att][day]);
                             } else {
                                 itemData.push(0);
+                            }
+                        }
+
+                        if (compareTitleAndVals.hasOwnProperty(att)) {
+                            let itemData = [];
+                            legendData.push(itemData);
+
+                            for (let i = 0, j = xAxis.length; i < j; i++) {
+                                let day = xAxis[i];
+                                let compareDay = addDays(day, -diffDays).toString();
+                                if (i === 0) {
+                                    legend.push(att + '-环比' + diffDays + '天前');
+                                }
+
+                                if (compareTitleAndVals[att][compareDay]) {
+                                    itemData.push(compareTitleAndVals[att][compareDay]);
+                                } else {
+                                    itemData.push(0);
+                                }
                             }
                         }
                     }
@@ -331,6 +432,16 @@
             date = new Date();
         }
         return date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+    }
+
+    function addDays(ymd, days) {
+        let year = ymd.substring(0, 4);
+        let month = parseInt(ymd.substring(4, 6), 10) - 1;
+        let day = ymd.substring(6, 8);
+        let tm = new Date(year, month, day);
+        tm.setDate(tm.getDate() + days);
+
+        return getYmd(tm);
     }
 </script>
 </body>
