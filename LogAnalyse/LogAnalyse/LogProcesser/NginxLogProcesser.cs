@@ -33,9 +33,9 @@ namespace LogAnalyse.LogProcesser
         private string[] ignoreFiles = new[]
         {
             "error.log",
-            "agent.chidaoni.",
-            "api.chidaoni.",
-            "callback.chidaoni."
+            "agent.",
+            "api.",
+            "callback."
         };
 
         private List<IParser> parserList = new List<IParser>();
