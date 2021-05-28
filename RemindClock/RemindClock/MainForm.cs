@@ -8,8 +8,6 @@ namespace RemindClock
         public MainForm()
         {
             InitializeComponent();
-            // 设置窗体icon
-            this.Icon = Resources.clock;
         }
 
         /// <summary>
@@ -42,6 +40,16 @@ namespace RemindClock
                 // 隐藏窗体
                 this.Visible = false;
             }
+        }
+
+        private void 打开提醒机ToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            notifyIcon1_MouseDoubleClick(sender, null);
+        }
+
+        private void 退出ToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            this.Close();
         }
     }
 }
