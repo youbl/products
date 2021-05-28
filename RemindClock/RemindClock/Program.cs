@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Beinet.Core.Cron;
 
 namespace RemindClock
 {
@@ -14,6 +12,9 @@ namespace RemindClock
         [STAThread]
         static void Main()
         {
+            // 启动计划任务
+            ScheduledWorker.StartAllScheduled();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());
