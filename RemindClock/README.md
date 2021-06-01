@@ -34,15 +34,32 @@ _【编写说明】用例图应该区别于功能清单，主要体现出Actor�
 @startuml
 left to right direction
 actor 用户 as user
-usecase "短信/邮件系统" as sms
+usecase "短信/邮件等系统" as sms
 package System {
+  usecase "登录" as UC_Login
   usecase "个人信息" as UC_Profile
+  usecase "注册" as UC_Register
+  usecase "编辑" as UC_Modify
   usecase "编辑事件" as UC_Edit
+  usecase "提醒方式" as UC_Notify
+  usecase "短信提醒" as UC_Sms
+  usecase "邮件提醒" as UC_Email
+  usecase "钉钉提醒" as UC_Dingding
+  usecase "URL调用" as UC_Url
   usecase 计时器 as UC_Timer
   usecase 触发事件 as UC_Event
 }
+user --> UC_Register
+user --> UC_Login
 user --> UC_Profile
+UC_Profile .> UC_Modify: include
 user --> UC_Edit
+UC_Edit .> UC_Notify: include
+UC_Notify <|-- UC_Sms
+UC_Notify <|-- UC_Email
+UC_Notify <|-- UC_Dingding
+UC_Notify <|-- UC_Url
+UC_Edit .> UC_Timer: extends
 UC_Timer --> UC_Event
 UC_Event --> sms
 @enduml
@@ -50,6 +67,24 @@ UC_Event --> sms
 
 ### 关键流程
 
+```plantuml
+@startuml
+title 计时器通知
+start
+:每秒检查;
+repeat
+  if(符合触发条件 且 配置了触发方式)then(yes)
+  	:启动线程;
+    :触发提醒;
+    note right
+    可以有多个提醒
+    end note
+  else(no)
+  endif
+repeat while(循环下一个记事) is (yes) not (no)
+stop
+@enduml
+```
 
 ### 其他需求
 
@@ -60,7 +95,67 @@ _【编写说明】来自产品负责人和高级设计人员的非功能性需�
 ### 关键架构决策
 
 
-### 领域模型
+### 领域模型或类图
+
+```plantuml
+@startuml
+title 贝可提醒机模型
+class Users<<用户>>{
+    Id<int>: 用户唯一ID
+    Account<string>: 登录账号
+    Name<string>: 姓名
+    Phone<string >: 手机号，接收短信用
+    Email<string>: 邮箱，接收邮件用
+    DingDing<string>: 所在的钉钉群Token
+    CreationTime<time>: 注册时间
+    LastModifyTime<time>: 最后编辑时间
+}
+
+class Notes<<记事>>{
+    Id<int>: 唯一ID
+    UserId<int>: 所属用户
+    Title<string>: 标题
+    Content<string>: 内容
+    CreationTime<time>: 注册时间
+    LastModifyTime<time>: 最后编辑时间
+}
+
+class NoteEvent<<记事提醒信息>>{
+    Id<int>: 唯一ID
+    NoticeId<int>: 所属记事ID
+    EventTime<time>: 提醒时间
+    Cron<string>: 循环方式,Cron表达式,空不循环
+    EventType<string>: 提醒方式
+    CreationTime<time>: 注册时间
+    LastModifyTime<time>: 最后编辑时间
+}
+
+interface Notice<<提醒>> {
+    string call(NoteEvent note);
+}
+
+class SmsNotice<<短信提醒>> {
+    string call(NoteEvent note);
+}
+class EmailNotice<<邮件提醒>> {
+    string call(NoteEvent note);
+}
+class DingdingNotice<<钉钉提醒>> {
+    string call(NoteEvent note);
+}
+class UrlNotice<<URL调用>> {
+    string call(NoteEvent note);
+}
+
+Users o-- Notes
+Notes *-- NoteEvent
+SmsNotice --|> Notice
+EmailNotice --|> Notice
+DingdingNotice --|> Notice
+UrlNotice --|> Notice
+NoteEvent --> Notice
+@enduml
+```
 
 ## 详细设计
 
