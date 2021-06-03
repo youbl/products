@@ -1,10 +1,24 @@
 ﻿using System.Windows.Forms;
-using RemindClock.Properties;
 
 namespace RemindClock
 {
     public partial class MainForm : Form
     {
+        private static MainForm _default;
+
+        public static MainForm Default
+        {
+            get
+            {
+                if (_default == null)
+                {
+                    _default = new MainForm();
+                }
+
+                return _default;
+            }
+        }
+
         public MainForm()
         {
             InitializeComponent();
