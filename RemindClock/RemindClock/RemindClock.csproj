@@ -72,6 +72,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\SchedueService.cs" />
     <Compile Include="Services\ShowAlertForm.cs" />
+    <Compile Include="Utils\AutoStartHelper.cs" />
     <Compile Include="Utils\FormHelper.cs" />
     <EmbeddedResource Include="AlertForm.resx">
       <DependentUpon>AlertForm.cs</DependentUpon>

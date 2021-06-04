@@ -1,4 +1,6 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
+using RemindClock.Utils;
 
 namespace RemindClock
 {
@@ -22,6 +24,12 @@ namespace RemindClock
         public MainForm()
         {
             InitializeComponent();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            CheckAutoStart();
         }
 
         /// <summary>
@@ -64,6 +72,32 @@ namespace RemindClock
         private void 退出ToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
             this.Close();
+        }
+
+        private void 开机启动ToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            var checkedStatus = !开机启动ToolStripMenuItem.Checked;
+            try
+            {
+                AutoStartHelper.AutoStart(this.Text, checkedStatus);
+                开机启动ToolStripMenuItem.Checked = checkedStatus;
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show("请先获取管理员权限:" + exp.Message);
+            }
+        }
+
+        /// <summary>
+        /// 已设置开机启动时，自动最小化
+        /// </summary>
+        private void CheckAutoStart()
+        {
+            if (AutoStartHelper.IsAutoStart(this.Text))
+            {
+                开机启动ToolStripMenuItem.Checked = true;
+                this.WindowState = FormWindowState.Minimized;
+            }
         }
     }
 }
