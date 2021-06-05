@@ -10,6 +10,17 @@ public class StrHelper {
     private static final Random rnd = new Random();    //获取随机数对象
 
     /**
+     * 返回随机数值
+     *
+     * @param len
+     * @return
+     */
+    public static long getRndNum(int len) {
+        String rndStr = getRndStr(len, 1);
+        return Long.parseLong(rndStr);
+    }
+
+    /**
      * 获取随机字符串
      *
      * @param len  字符串长度

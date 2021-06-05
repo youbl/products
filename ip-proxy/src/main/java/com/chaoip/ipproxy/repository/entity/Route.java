@@ -75,4 +75,10 @@ public class Route {
      */
     @LastModifiedDate
     private LocalDateTime modifyTime;
+
+    /**
+     * 随机数，用于取IP时排序，避免结果不随机
+     */
+    @Indexed
+    private Long rndNum;
 }

@@ -4,6 +4,7 @@ import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.repository.RouteRepository;
 import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.util.CityHelper;
+import com.chaoip.ipproxy.util.StrHelper;
 import com.mongodb.client.DistinctIterable;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -37,7 +38,9 @@ public class RouteService {
 
     public int saveMultiRoute(List<RouteDto> dtos) {
         for (RouteDto dto : dtos) {
-            routeRepository.save(dto.mapTo());
+            Route route = dto.mapTo();
+            route.setRndNum(StrHelper.getRndNum(10));
+            routeRepository.save(route);
         }
         return dtos.size();
     }
@@ -74,7 +77,7 @@ public class RouteService {
         if (!StringUtils.isEmpty(dto.getOperators())) {
             condition = condition.and("operators").is(dto.getOperators());
         }
-        Query query = Query.query(condition).limit(dto.getPageSize()).with(Sort.by(Sort.Direction.ASC, "id"));
+        Query query = Query.query(condition).limit(dto.getPageSize()).with(Sort.by(Sort.Direction.ASC, "rndNum"));
         return mongoTemplate.find(query, Route.class);
     }
 
