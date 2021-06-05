@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace RemindClock
 {
-    public partial class AlertForm : Form
+    public sealed partial class AlertForm : Form
     {
         #region 用于实现按下鼠标，拖动窗体的引入代码
 
@@ -32,11 +32,16 @@ namespace RemindClock
 
         #endregion
 
-        public AlertForm(string note)
+        public AlertForm(string title, string content)
         {
             InitializeComponent();
             this.labTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            this.labNote.Text = FormatNote(note);
+            this.labNote.Text = FormatNote(content);
+            if (!string.IsNullOrEmpty(title))
+            {
+                this.Text = title;
+                this.labTitle.Text = title;
+            }
         }
 
         protected override void OnLoad(EventArgs e)
@@ -60,7 +65,13 @@ namespace RemindClock
 
         private void Button1_Click(object sender, EventArgs e)
         {
-            this.Close();
+            var result = MessageBox.Show("请先确认完成，再关闭，以免忘记！\r\n确认要关闭吗？",
+                "关了就没法提醒了！",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button2);
+            if (result == DialogResult.Yes)
+                this.Close();
         }
 
         private void AlertForm_MouseDown(object sender, MouseEventArgs e)

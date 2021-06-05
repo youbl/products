@@ -1,6 +1,6 @@
 ﻿namespace RemindClock
 {
-    partial class AlertForm
+    sealed partial class AlertForm
     {
         /// <summary>
         /// Required designer variable.
@@ -31,7 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AlertForm));
             this.labTime = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
+            this.labTitle = new System.Windows.Forms.Label();
             this.labNote = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -54,20 +54,21 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
-            // label2
+            // labTitle
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 9);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(41, 12);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "提醒：";
+            this.labTitle.AutoSize = true;
+            this.labTitle.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labTitle.Location = new System.Drawing.Point(12, 9);
+            this.labTitle.Name = "labTitle";
+            this.labTitle.Size = new System.Drawing.Size(44, 12);
+            this.labTitle.TabIndex = 2;
+            this.labTitle.Text = "提醒：";
             // 
             // labNote
             // 
             this.labNote.AutoSize = true;
             this.labNote.ForeColor = System.Drawing.Color.Red;
-            this.labNote.Location = new System.Drawing.Point(59, 9);
+            this.labNote.Location = new System.Drawing.Point(12, 31);
             this.labNote.Name = "labNote";
             this.labNote.Size = new System.Drawing.Size(65, 12);
             this.labNote.TabIndex = 3;
@@ -77,9 +78,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.LightCyan;
             this.ClientSize = new System.Drawing.Size(458, 118);
             this.Controls.Add(this.labNote);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.labTitle);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.labTime);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -99,7 +101,7 @@
 
         private System.Windows.Forms.Label labTime;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label labTitle;
         private System.Windows.Forms.Label labNote;
     }
 }
