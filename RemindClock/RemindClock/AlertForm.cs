@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 
 namespace RemindClock
@@ -35,7 +36,7 @@ namespace RemindClock
         {
             InitializeComponent();
             this.labTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            this.labNote.Text = note;
+            this.labNote.Text = FormatNote(note);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -68,6 +69,32 @@ namespace RemindClock
             ReleaseCapture();
             //发送消息 让系统误以为在标题栏上按下鼠标
             SendMessage((IntPtr) this.Handle, VM_NCLBUTTONDOWN, HTCAPTION, 0);
+        }
+
+        /// <summary>
+        /// 字太长了，要加入换行符
+        /// </summary>
+        /// <param name="note"></param>
+        /// <returns></returns>
+        private string FormatNote(string note)
+        {
+            var lineLen = 30;
+            if (string.IsNullOrEmpty(note) || note.Length <= lineLen)
+                return note;
+
+            var sb = new StringBuilder(note.Length);
+            int i = lineLen, j = note.Length;
+            for (; i < j; i += lineLen)
+            {
+                sb.Append(note.Substring(i - lineLen, lineLen)).Append("\r\n");
+            }
+
+            if (i - lineLen < j)
+            {
+                sb.Append(note.Substring(i - lineLen));
+            }
+
+            return sb.ToString();
         }
     }
 }
