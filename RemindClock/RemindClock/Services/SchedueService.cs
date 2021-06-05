@@ -13,11 +13,11 @@ namespace RemindClock.Services
         /// cron格式参考： https://github.com/youbl/DemoCode
         /// 表达式由6个或7个由空格分隔的字符串组成，第7个年可选
         /// </summary>
-        [Scheduled(cron: "0 * * * * *")]
+        [Scheduled(cron: "*/10 * * * * *")]
         public void Begin()
         {
             logger.Info("haha");
-            showAlertService.Show(DateTime.Now.Second);
+            showAlertService.Show(DateTime.Now.Minute * 100 + DateTime.Now.Second);
         }
     }
 }
