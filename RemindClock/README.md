@@ -116,44 +116,43 @@ class Notes<<记事>>{
     UserId<int>: 所属用户
     Title<string>: 标题
     Content<string>: 内容
-    CreationTime<time>: 注册时间
+    CreationTime<time>: 新增时间
     LastModifyTime<time>: 最后编辑时间
 }
 
-class NoteEvent<<记事提醒信息>>{
+class NoteDetail<<记事提醒信息>>{
     Id<int>: 唯一ID
     NoticeId<int>: 所属记事ID
-    EventTime<time>: 提醒时间
-    Cron<string>: 循环方式,Cron表达式,空不循环
-    EventType<string>: 提醒方式
-    CreationTime<time>: 注册时间
+    EventType<string>: 提醒类型, 支持2种：late:相对时间，只提醒一次，如60s; time:绝对时间只提醒一次、cron:Cron表达式
+    EventArg<string>: 循环方式,EventType对应的参数
+    CreationTime<time>: 新增时间
     LastModifyTime<time>: 最后编辑时间
 }
 
 interface Notice<<提醒>> {
-    string call(NoteEvent note);
+    string call(NoteDetail note);
 }
 
 class SmsNotice<<短信提醒>> {
-    string call(NoteEvent note);
+    string call(NoteDetail note);
 }
 class EmailNotice<<邮件提醒>> {
-    string call(NoteEvent note);
+    string call(NoteDetail note);
 }
 class DingdingNotice<<钉钉提醒>> {
-    string call(NoteEvent note);
+    string call(NoteDetail note);
 }
 class UrlNotice<<URL调用>> {
-    string call(NoteEvent note);
+    string call(NoteDetail note);
 }
 
 Users o-- Notes
-Notes *-- NoteEvent
+Notes *-- NoteDetail
 SmsNotice --|> Notice
 EmailNotice --|> Notice
 DingdingNotice --|> Notice
 UrlNotice --|> Notice
-NoteEvent --> Notice
+NoteDetail --> Notice
 @enduml
 ```
 
