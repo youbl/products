@@ -7,6 +7,7 @@ import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,7 +53,7 @@ public class IpGetService {
         List<Long> usedIdList = productOrderService.getRouteIdsByOrderNo(condition.getOrderNo());
         List<Route> ret = routeService.find(condition, usedIdList);
         if (ret == null || ret.isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
 
         // 已提取IP插入明细表，并更新productOrder表的今日已提取IP数

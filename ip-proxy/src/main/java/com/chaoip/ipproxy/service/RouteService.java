@@ -53,7 +53,12 @@ public class RouteService {
      * @return 结果
      */
     public List<Route> find(RouteDto dto, List<Long> usedIdList) {
-        Criteria condition = Criteria.where("id").gt(0); // id大于0，只是为了生成一个条件
+        Criteria condition;
+        if (usedIdList != null && usedIdList.size() > 0) {
+            condition = Criteria.where("id").nin(usedIdList);
+        } else {
+            condition = Criteria.where("id").gt(0);// id大于0，只是为了生成一个条件
+        }
         if (!StringUtils.isEmpty(dto.getProtocal())) {
             condition = condition.and("protocal").is(dto.getProtocal());
         }
@@ -68,9 +73,6 @@ public class RouteService {
         }
         if (!StringUtils.isEmpty(dto.getOperators())) {
             condition = condition.and("operators").is(dto.getOperators());
-        }
-        if (usedIdList != null && usedIdList.size() > 0) {
-            condition = condition.and("id").nin(usedIdList);
         }
         Query query = Query.query(condition).limit(dto.getPageSize()).with(Sort.by(Sort.Direction.ASC, "id"));
         return mongoTemplate.find(query, Route.class);
