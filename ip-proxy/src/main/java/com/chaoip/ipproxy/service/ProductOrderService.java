@@ -12,6 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +40,8 @@ public class ProductOrderService {
     private final UserMoneyService userMoneyService;
     private final ProductOrderDetailRepository productOrderDetailRepository;
     private final DisCountService disCountService;
+    private final RouteService routeService;
+    private final MongoTemplate mongoTemplate;
 
     public ProductOrderService(ProductService productService,
                                ProductOrderRepository productOrderRepository,
@@ -43,7 +49,9 @@ public class ProductOrderService {
                                PayService payService,
                                UserMoneyService userMoneyService,
                                ProductOrderDetailRepository productOrderDetailRepository,
-                               DisCountService disCountService) {
+                               DisCountService disCountService,
+                               RouteService routeService,
+                               MongoTemplate mongoTemplate) {
         this.productService = productService;
         this.productOrderRepository = productOrderRepository;
         this.userService = userService;
@@ -51,6 +59,8 @@ public class ProductOrderService {
         this.userMoneyService = userMoneyService;
         this.productOrderDetailRepository = productOrderDetailRepository;
         this.disCountService = disCountService;
+        this.routeService = routeService;
+        this.mongoTemplate = mongoTemplate;
     }
 
     public ProductOrder close(long id, String account) {
@@ -217,6 +227,22 @@ public class ProductOrderService {
                     .build();
             productOrderDetailRepository.save(detail);
         }
+    }
+
+    /**
+     * 根据订单号，查找所有未过期的RouteId列表
+     *
+     * @param orderNo
+     * @return route表的id列表
+     */
+    public List<Long> getRouteIdsByOrderNo(String orderNo) {
+        Criteria condition = Criteria.where("orderNo").is(orderNo);
+
+        // 过期的id就不比较了
+        long minId = routeService.getMinRouteId();
+        condition.and("routeId").gte(minId);
+        Query query = Query.query(condition);
+        return mongoTemplate.findDistinct(query, "routeId", ProductOrderDetail.class, Long.class);
     }
 
     /**
