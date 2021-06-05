@@ -119,4 +119,19 @@ public class RouteService {
         }
         return ret;
     }
+
+    /**
+     * 返回库里的最小id，因为很多过期了
+     *
+     * @return 最小id
+     */
+    public long getMinRouteId() {
+        // db.routes.find({},{"_id":1}).sort({"_id":1}).limit(1)
+        Query query = new Query();
+        query.with(Sort.by(Sort.Direction.ASC, "id")).limit(1);
+        Route ret = mongoTemplate.findOne(query, Route.class);
+        if (ret == null)
+            return 0;
+        return ret.getId();
+    }
 }
