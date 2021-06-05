@@ -49,11 +49,13 @@ public class IpGetService {
         condition.setPageSize(limitNum);
 
         // 查路由数据
-        List<Route> ret = routeService.find(condition);
+        List<Long> usedIdList = productOrderService.getRouteIdsByOrderNo(condition.getOrderNo());
+        List<Route> ret = routeService.find(condition, usedIdList);
         if (ret == null || ret.isEmpty()) {
             return null;
         }
 
+        // 已提取IP插入明细表，并更新productOrder表的今日已提取IP数
         productOrderService.updateIpGetRecord(order, ret);
         return ret;
     }
