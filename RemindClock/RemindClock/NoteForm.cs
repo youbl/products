@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using PopupTool;
+using RemindClock.Componment;
 using RemindClock.Repository.Model;
 using RemindClock.Services;
 
@@ -24,6 +26,7 @@ namespace RemindClock
 
             this.txtTitle.Text = this.notes.Title;
             this.txtContent.Text = this.notes.Content;
+            ShowDeails();
         }
 
         private void NoteForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -36,6 +39,33 @@ namespace RemindClock
         {
             notesService.Save(this.notes);
             MessageBox.Show("保存成功");
+        }
+
+        private NoteControl noteControl;
+        // 点击提醒文本框，弹浮层选择时间
+        private void TxtNoteTime_MouseClick(object sender, MouseEventArgs e)
+        {
+            noteControl = new NoteControl(this.notes.Details);
+            noteControl.VisibleChanged += NoteControl_SizeChanged;  // 这个不能正常工作
+
+            Popup popup = new Popup(noteControl);
+            popup.Show(txtNoteTime, false);
+        }
+
+        private void NoteControl_SizeChanged(object sender, EventArgs e)
+        {
+            ShowDeails();
+        }
+
+        private void ShowDeails()
+        {
+            var sb = new StringBuilder();
+            foreach (var detail in notes.Details)
+            {
+                sb.Append(detail).Append(";");
+            }
+
+            txtNoteTime.Text = sb.ToString();
         }
     }
 }

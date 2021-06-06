@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace RemindClock.Repository.Model
 {
@@ -20,16 +21,20 @@ namespace RemindClock.Repository.Model
         /// <summary>
         /// 记事提醒明细
         /// </summary>
-        public List<NoteDetail> Details { get; set; }
+        public List<NoteDetail> Details { get; set; } = new List<NoteDetail>();
 
         public class NoteDetail
         {
             /// <summary>
-            /// 提醒类型, 支持2种：late:相对时间，只提醒一次，如60s; time:绝对时间只提醒一次、cron:Cron表达式
+            /// 提醒时间
+            /// </summary>
+            public DateTime EventTime { get; set; }
+
+            /// <summary>
+            /// 提醒类型
+            /// "单次","每分钟","每小时","每天","周一~周五每天","周六~周日每天","每周","每月","每年"
             /// </summary>
             public string EventType { get; set; }
-
-            public string EventArg { get; set; }
         }
     }
 }
