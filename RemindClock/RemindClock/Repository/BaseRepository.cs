@@ -27,6 +27,21 @@ namespace RemindClock.Repository
         }
 
         /// <summary>
+        /// 根据id，返回对象
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public T FindById(int id)
+        {
+            if (id <= 0)
+                return null;
+            var fileName = Path.Combine(this.modelDir, id + fileExt);
+            if (!File.Exists(fileName))
+                return null;
+            return serializer.DeSerializFromFile<T>(fileName);
+        }
+
+        /// <summary>
         /// 返回所有存在的对象
         /// </summary>
         /// <returns></returns>

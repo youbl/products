@@ -74,6 +74,7 @@
     <Compile Include="Repository\Model\Notes.cs" />
     <Compile Include="Repository\BaseRepository.cs" />
     <Compile Include="Repository\NotesRepository.cs" />
+    <Compile Include="Services\NotesService.cs" />
     <Compile Include="Services\SchedueService.cs" />
     <Compile Include="Services\ShowAlertForm.cs" />
     <Compile Include="Utils\AutoStartHelper.cs" />
