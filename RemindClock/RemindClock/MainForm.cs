@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using RemindClock.Repository.Model;
 using RemindClock.Utils;
 
 namespace RemindClock
@@ -7,6 +8,7 @@ namespace RemindClock
     public partial class MainForm : Form
     {
         private static MainForm _default;
+        private bool realClose = false;
 
         public static MainForm Default
         {
@@ -71,6 +73,8 @@ namespace RemindClock
 
         private void 退出ToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
+            this.realClose = true;
+            //this.Dispose(true);
             this.Close();
         }
 
@@ -98,6 +102,24 @@ namespace RemindClock
                 开机启动ToolStripMenuItem.Checked = true;
                 this.WindowState = FormWindowState.Minimized;
             }
+        }
+
+        private void BtnNew_Click(object sender, EventArgs e)
+        {
+            new NoteForm(new Notes()).ShowDialog(this);
+        }
+
+        // 不让关闭，改成最小化
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (this.realClose)
+            {
+                return; // 菜单退出，要真实的退出
+            }
+
+            // 点x，最小化，而不是退出
+            e.Cancel = true;
+            this.WindowState = FormWindowState.Minimized;
         }
     }
 }
