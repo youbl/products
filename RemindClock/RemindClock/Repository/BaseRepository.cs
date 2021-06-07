@@ -50,9 +50,10 @@ namespace RemindClock.Repository
             var ret = new List<T>();
             foreach (var file in Directory.GetFiles(this.modelDir, "*" + fileExt, SearchOption.TopDirectoryOnly))
             {
-                if (int.TryParse(Path.GetFileNameWithoutExtension(file), out _))
+                if (int.TryParse(Path.GetFileNameWithoutExtension(file), out var id))
                 {
                     var item = serializer.DeSerializFromFile<T>(file);
+                    item.Id = id; // 避免复制导致ID有问题的情况
                     ret.Add(item);
                 }
             }

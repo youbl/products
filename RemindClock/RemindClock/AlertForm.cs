@@ -2,7 +2,9 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+using RemindClock.Utils;
 
 namespace RemindClock
 {
@@ -106,6 +108,13 @@ namespace RemindClock
             }
 
             return sb.ToString();
+        }
+
+        public static void Show(string title, string content)
+        {
+            ThreadPool.UnsafeQueueUserWorkItem(
+                state => { FormHelper.Invoke(MainForm.Default, () => { new AlertForm(title, content).Show(); }); },
+                null);
         }
     }
 }
