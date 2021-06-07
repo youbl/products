@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Beinet.Core.Cron;
 using NLog;
 
@@ -17,7 +18,8 @@ namespace RemindClock.Services
         public void Begin()
         {
             logger.Info("haha");
-            showAlertService.Show(DateTime.Now.Minute * 100 + DateTime.Now.Second);
+            ThreadPool.UnsafeQueueUserWorkItem(
+                state => { showAlertService.Show(DateTime.Now.Minute * 100 + DateTime.Now.Second); }, null);
         }
     }
 }

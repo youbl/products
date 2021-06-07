@@ -35,6 +35,39 @@ namespace RemindClock.Repository.Model
             /// "单次","每分钟","每小时","每天","周一~周五每天","周六~周日每天","每周","每月","每年"
             /// </summary>
             public string EventType { get; set; }
+
+            public override string ToString()
+            {
+                if (string.IsNullOrEmpty(EventType))
+                    EventType = "单次";
+
+                switch (EventType)
+                {
+                    case "每分钟":
+                        return EventType + ":" + EventTime.ToString("ss秒");
+                    case "每小时":
+                        return EventType + ":" + EventTime.ToString("mm分ss秒");
+                    case "每天":
+                        return EventType + ":" + EventTime.ToString("HH:mm:ss");
+                    case "周一~周五每天":
+                        return EventType + ":" + EventTime.ToString("HH:mm:ss");
+                    case "周六~周日每天":
+                        return EventType + ":" + EventTime.ToString("HH:mm:ss");
+                    case "每周":
+                        var week = ((int) EventTime.DayOfWeek).ToString();
+                        if (week == "0")
+                            week = "日";
+                        return EventType + ":周" + week + EventTime.ToString("HH:mm:ss");
+                    case "每月":
+                        return EventType + ":" + EventTime.ToString("dd日HH:mm:ss");
+                    case "每年":
+                        return EventType + ":" + EventTime.ToString("MM月dd日HH:mm:ss");
+                    case "单次":
+                        return EventType + ":" + EventTime.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+
+                return EventTime.ToString("yyyy-MM-dd HH:mm:ss");
+            }
         }
     }
 }

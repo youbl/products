@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 using RemindClock.Repository.Model;
 
@@ -81,6 +82,11 @@ namespace RemindClock.Componment
             txtNoteTime.Value = detail.EventTime;
             txtNoteTime.Format = DateTimePickerFormat.Custom;
             txtNoteTime.CustomFormat = "yyyy-MM-dd HH:mm:ss";
+            txtNoteTime.ValueChanged += (sender, args) =>
+            {
+                detail.EventTime = txtNoteTime.Value;
+                this.OnVisibleChanged(null);
+            };
 
             // 
             // labRepeat
@@ -110,6 +116,11 @@ namespace RemindClock.Componment
             lstRepeat.Name = "lstRepeat" + idx;
             lstRepeat.Size = new System.Drawing.Size(121, 20);
             lstRepeat.Text = detail.EventType;
+            lstRepeat.SelectedIndexChanged += (sender, args) =>
+            {
+                detail.EventType = lstRepeat.Text;
+                this.OnVisibleChanged(null);
+            };
             // 
             // lnkMinus
             // 
@@ -118,15 +129,17 @@ namespace RemindClock.Componment
             lnkMinus.Location = new System.Drawing.Point(405, pointY);
             lnkMinus.Name = "lnkMinus" + idx;
             lnkMinus.Text = "-";
+            lnkMinus.Font = new System.Drawing.Font("宋体", 20, System.Drawing.FontStyle.Bold);
             lnkMinus.LinkClicked += LnkMinusOnLinkClicked;
             // 
             // lnkPlus
             // 
             lnkPlus.AutoSize = true;
             lnkPlus.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-            lnkPlus.Location = new System.Drawing.Point(415, pointY);
+            lnkPlus.Location = new System.Drawing.Point(425, pointY);
             lnkPlus.Name = "lnkPlus" + idx;
             lnkPlus.Text = "+";
+            lnkPlus.Font = new System.Drawing.Font("宋体", 20, System.Drawing.FontStyle.Bold);
             lnkPlus.LinkClicked += LnkPlusOnLinkClicked;
         }
 

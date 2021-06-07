@@ -62,7 +62,7 @@ namespace RemindClock
             var sb = new StringBuilder();
             foreach (var detail in notes.Details)
             {
-                sb.Append(detail).Append(";");
+                sb.Append("[").Append(detail).Append("];");
             }
 
             txtNoteTime.Text = sb.ToString();
