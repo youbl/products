@@ -31,4 +31,6 @@ public interface ProductOrderDetailRepository extends BaseRepository<ProductOrde
      * @return 总数
      */
     int countByOrderNoAndCreationTimeBetween(String orderNo, LocalDateTime startTime, LocalDateTime endTime);
+
+    List<ProductOrderDetail> findByOrderNoOrderByIdDesc(String orderNo);
 }

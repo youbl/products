@@ -4,6 +4,7 @@ import com.chaoip.ipproxy.controller.dto.RouteDto;
 import com.chaoip.ipproxy.repository.RouteRepository;
 import com.chaoip.ipproxy.repository.entity.Route;
 import com.chaoip.ipproxy.util.CityHelper;
+import com.chaoip.ipproxy.util.DateHelper;
 import com.chaoip.ipproxy.util.StrHelper;
 import com.mongodb.client.DistinctIterable;
 import org.springframework.data.domain.*;
@@ -66,7 +67,8 @@ public class RouteService {
             condition = condition.and("protocal").is(dto.getProtocal());
         }
         if (dto.getExpireTime() > 0) {
-            condition = condition.and("expireTime").gte(LocalDateTime.now().plusSeconds(dto.getExpireTime()));
+            LocalDateTime compareTime = LocalDateTime.now().plusSeconds(dto.getExpireTime());
+            condition = condition.and("expireTime").gte(DateHelper.toDate(compareTime));
         }
         if (!StringUtils.isEmpty(dto.getProvince())) {
             condition = condition.and("province").is(dto.getProvince());

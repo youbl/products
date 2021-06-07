@@ -229,6 +229,10 @@ public class ProductOrderService {
         }
     }
 
+    public List<ProductOrderDetail> orderHistory(String orderNo) {
+        return productOrderDetailRepository.findByOrderNoOrderByIdDesc(orderNo);
+    }
+
     /**
      * 根据订单号，查找所有未过期的RouteId列表
      *

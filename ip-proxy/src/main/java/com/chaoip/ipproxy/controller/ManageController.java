@@ -224,4 +224,9 @@ public class ManageController {
     public void delayOrders(int id, int days) {
         productOrderService.delayOrders(id, days);
     }
+
+    @GetMapping("order/history")
+    public List<ProductOrderDetail> getHistory(@RequestParam String orderNo) {
+        return productOrderService.orderHistory(orderNo);
+    }
 }
