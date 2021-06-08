@@ -62,6 +62,11 @@ namespace RemindClock.Services
             return notesRepository.Save(model);
         }
 
+        public bool Del(Notes model)
+        {
+            return notesRepository.Del(model);
+        }
+
         public bool IsNoteTime(int noteId, int indexId, Notes.NoteDetail detail)
         {
             foreach (var noteCheck in noteCheckList)

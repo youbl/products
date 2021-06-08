@@ -106,7 +106,7 @@
             this.txtNoteTime.Name = "txtNoteTime";
             this.txtNoteTime.Size = new System.Drawing.Size(635, 21);
             this.txtNoteTime.TabIndex = 2;
-            this.txtNoteTime.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TxtNoteTime_MouseClick);
+            this.txtNoteTime.Click += new System.EventHandler(this.TxtNoteTime_MouseClick);
             // 
             // NoteForm
             // 

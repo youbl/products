@@ -81,6 +81,18 @@ namespace RemindClock.Repository
             return model;
         }
 
+        public bool Del(T model)
+        {
+            var file = Path.Combine(this.modelDir, model.Id.ToString() + fileExt);
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+                return true;
+            }
+
+            return false;
+        }
+
         private void SerializeToFile(T obj)
         {
             var file = Path.Combine(this.modelDir, obj.Id.ToString() + fileExt);

@@ -47,7 +47,7 @@ namespace RemindClock
         private NoteControl noteControl;
 
         // 点击提醒文本框，弹浮层选择时间
-        private void TxtNoteTime_MouseClick(object sender, MouseEventArgs e)
+        private void TxtNoteTime_MouseClick(object sender, EventArgs e)
         {
             noteControl = new NoteControl(this.notes.Details);
             noteControl.VisibleChanged += NoteControl_SizeChanged; // 这个不能正常工作

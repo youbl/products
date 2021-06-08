@@ -12,6 +12,12 @@ namespace RemindClock
     {
         private static MainForm _default;
 
+        private const int COL_ID = 0; // ID在第几列（ListView）
+        private const int COL_TITLE = 1;
+        private const int COL_NOTE = 2;
+        private const int COL_DEL = 3;
+        private const int COL_COUNT = 4; // ListView的总列数
+
         // 是关闭窗体还是最小化
         private bool realClose = false;
         private NotesService notesService = new NotesService();
@@ -131,6 +137,10 @@ namespace RemindClock
             this.WindowState = FormWindowState.Minimized;
         }
 
+        /// <summary>
+        /// 重新加载提醒。
+        /// 注：不用管计划任务，它都是实时拉取数据的
+        /// </summary>
         private void LoadNotes()
         {
             lvData.Items.Clear();
@@ -138,11 +148,11 @@ namespace RemindClock
             notesList = notesService.FindAll().ToDictionary(item => item.Id, item => item);
             foreach (var note in notesList.Values)
             {
-                var dataArr = new string[4];
-                dataArr[0] = note.Id.ToString();
-                dataArr[1] = note.Title;
-                dataArr[2] = note.GetStrDetail();
-                dataArr[3] = "删除";
+                var dataArr = new string[COL_COUNT];
+                dataArr[COL_ID] = note.Id.ToString();
+                dataArr[COL_TITLE] = note.Title;
+                dataArr[COL_NOTE] = note.GetStrDetail();
+                dataArr[COL_DEL] = "删除";
                 var row = new ListViewItem(dataArr, 0);
                 lvData.Items.Add(row);
             }
@@ -155,12 +165,8 @@ namespace RemindClock
         /// <param name="e"></param>
         private void lvData_DoubleClick(object sender, EventArgs e)
         {
-            if (lvData.SelectedItems.Count <= 0)
-                return;
-            var selectedRow = lvData.SelectedItems[0];
-            if (selectedRow.SubItems.Count <= 0 || !int.TryParse(selectedRow.SubItems[0].Text, out var id))
-                return;
-            if (notesList.TryGetValue(id, out var notes))
+            var notes = GetSelectedNote();
+            if (notes != null)
             {
                 ShowEditForm(notes);
             }
@@ -170,6 +176,53 @@ namespace RemindClock
         {
             new NoteForm(notes).ShowDialog(this);
             LoadNotes();
+        }
+
+        private Notes GetSelectedNote()
+        {
+            if (lvData.SelectedItems.Count <= 0)
+                return null;
+            var selectedRow = lvData.SelectedItems[0];
+            if (selectedRow.SubItems.Count <= 0 || !int.TryParse(selectedRow.SubItems[0].Text, out var id))
+                return null;
+            if (notesList.TryGetValue(id, out var notes))
+                return notes;
+            return null;
+        }
+
+        /// <summary>
+        /// 鼠标单击事件，判断删除
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void lvData_MouseClick(object sender, MouseEventArgs e)
+        {
+            var notes = GetSelectedNote();
+            if (notes == null)
+                return;
+
+            var item = lvData.SelectedItems[0];
+            int intCol = item.SubItems.IndexOf(item.GetSubItemAt(e.X, e.Y)); //列索引
+            if (intCol == COL_DEL)
+            {
+                DelNote(notes);
+            }
+        }
+
+        private void DelNote(Notes notes)
+        {
+            var msg = "真的要删除提醒:" + notes.Title + "?";
+            var result = MessageBox.Show(msg, "删除确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button2);
+            if (DialogResult.Yes != result)
+            {
+                return;
+            }
+
+            if (notesService.Del(notes))
+            {
+                LoadNotes();
+            }
         }
     }
 }
