@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using RemindClock.Repository.Model;
@@ -15,8 +16,9 @@ namespace RemindClock
         private const int COL_ID = 0; // ID在第几列（ListView）
         private const int COL_TITLE = 1;
         private const int COL_NOTE = 2;
-        private const int COL_DEL = 3;
-        private const int COL_COUNT = 4; // ListView的总列数
+        private const int COL_EDIT = 3;
+        private const int COL_DEL = 4;
+        private const int COL_COUNT = 5; // ListView的总列数
 
         // 是关闭窗体还是最小化
         private bool realClose = false;
@@ -47,6 +49,11 @@ namespace RemindClock
             CheckAutoStart();
 
             LoadNotes();
+
+            // 下面3行，用于设置ListView的行高
+            var il = new ImageList();
+            il.ImageSize = new Size(1, 25);
+            lvData.SmallImageList = il;
         }
 
         /// <summary>
@@ -143,18 +150,28 @@ namespace RemindClock
         /// </summary>
         private void LoadNotes()
         {
+            var colorArr = new Color[]
+            {
+                Color.FromArgb(42, 0xa0, 0xe7, 0xae),
+                Color.FromArgb(42, 0xdb, 0xd5, 0xf7), //DBD5F7
+            };
             lvData.Items.Clear();
 
+            var idx = 0;
             notesList = notesService.FindAll().ToDictionary(item => item.Id, item => item);
-            foreach (var note in notesList.Values)
+            foreach (var note in notesList.Values.OrderByDescending(item => item.Id))
             {
                 var dataArr = new string[COL_COUNT];
                 dataArr[COL_ID] = note.Id.ToString();
                 dataArr[COL_TITLE] = note.Title;
                 dataArr[COL_NOTE] = note.GetStrDetail();
+                dataArr[COL_EDIT] = "编辑";
                 dataArr[COL_DEL] = "删除";
                 var row = new ListViewItem(dataArr, 0);
                 lvData.Items.Add(row);
+
+                lvData.Items[idx].BackColor = colorArr[idx % colorArr.Length];
+                idx++;
             }
         }
 
@@ -203,9 +220,14 @@ namespace RemindClock
 
             var item = lvData.SelectedItems[0];
             int intCol = item.SubItems.IndexOf(item.GetSubItemAt(e.X, e.Y)); //列索引
-            if (intCol == COL_DEL)
+            switch (intCol)
             {
-                DelNote(notes);
+                case COL_EDIT:
+                    ShowEditForm(notes);
+                    break;
+                case COL_DEL:
+                    DelNote(notes);
+                    break;
             }
         }
 

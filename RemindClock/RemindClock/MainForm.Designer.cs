@@ -41,7 +41,8 @@
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.col4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -123,7 +124,8 @@
             this.columnHeader1,
             this.columnHeader2,
             this.columnHeader3,
-            this.columnHeader4});
+            this.col4,
+            this.columnHeader5});
             this.lvData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lvData.FullRowSelect = true;
             this.lvData.HideSelection = false;
@@ -151,10 +153,15 @@
             this.columnHeader3.Text = "提醒";
             this.columnHeader3.Width = 250;
             // 
-            // columnHeader4
+            // col4
             // 
-            this.columnHeader4.Text = "操作";
-            this.columnHeader4.Width = 100;
+            this.col4.Text = "";
+            this.col4.Width = 45;
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "";
+            this.columnHeader5.Width = 45;
             // 
             // MainForm
             // 
@@ -189,7 +196,8 @@
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader col4;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
     }
 }
 
