@@ -18,9 +18,19 @@ namespace RemindClock
             this.notes = notes ?? throw new ArgumentException("提醒不能为空");
             InitializeComponent();
 
+            SetTextByNote();
+            ShowDeails();
+        }
+
+        private void SetTextByNote()
+        {
             this.txtTitle.Text = this.notes.Title;
             this.txtContent.Text = this.notes.Content;
-            ShowDeails();
+            if (!string.IsNullOrEmpty(this.notes.DingDingToken))
+            {
+                this.chkDingDing.Checked = true;
+                this.txtDingDingToken.Text = this.notes.DingDingToken;
+            }
         }
 
         private void NoteForm_FormClosing(object sender, FormClosingEventArgs e)
