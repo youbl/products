@@ -31,6 +31,7 @@ namespace RemindClock.Services
             noteCheckList.Add(new NotePerYear());
             noteCheckList.Add(new NotePerWeekEnd());
             noteCheckList.Add(new NotePerWeekNormal());
+            noteCheckList.Add(new NoteSingleTime());
         }
 
         /// <summary>
