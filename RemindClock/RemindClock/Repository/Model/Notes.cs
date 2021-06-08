@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace RemindClock.Repository.Model
 {
@@ -22,6 +23,17 @@ namespace RemindClock.Repository.Model
         /// 记事提醒明细
         /// </summary>
         public List<NoteDetail> Details { get; set; } = new List<NoteDetail>();
+
+        public string GetStrDetail()
+        {
+            var ret = new StringBuilder();
+            foreach (var detail in Details)
+            {
+                ret.Append(detail).Append(";");
+            }
+
+            return ret.ToString();
+        }
 
         public class NoteDetail
         {

@@ -37,16 +37,26 @@ namespace RemindClock
 
         private void BtnSave_Click(object sender, EventArgs e)
         {
+            this.notes.Title = txtTitle.Text.Trim();
+            if (this.notes.Title.Length <= 0)
+            {
+                MessageBox.Show("标题必填");
+                return;
+            }
+
+            this.notes.Title = txtContent.Text.Trim();
+
             notesService.Save(this.notes);
             MessageBox.Show("保存成功");
         }
 
         private NoteControl noteControl;
+
         // 点击提醒文本框，弹浮层选择时间
         private void TxtNoteTime_MouseClick(object sender, MouseEventArgs e)
         {
             noteControl = new NoteControl(this.notes.Details);
-            noteControl.VisibleChanged += NoteControl_SizeChanged;  // 这个不能正常工作
+            noteControl.VisibleChanged += NoteControl_SizeChanged; // 这个不能正常工作
 
             Popup popup = new Popup(noteControl);
             popup.Show(txtNoteTime, false);

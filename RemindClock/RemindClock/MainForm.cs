@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using RemindClock.Repository.Model;
+using RemindClock.Services;
 using RemindClock.Utils;
 
 namespace RemindClock
@@ -8,7 +11,11 @@ namespace RemindClock
     public partial class MainForm : Form
     {
         private static MainForm _default;
+
+        // 是关闭窗体还是最小化
         private bool realClose = false;
+        private NotesService notesService = new NotesService();
+        private Dictionary<int, Notes> notesList;
 
         public static MainForm Default
         {
@@ -32,6 +39,8 @@ namespace RemindClock
         {
             base.OnLoad(e);
             CheckAutoStart();
+
+            LoadNotes();
         }
 
         /// <summary>
@@ -106,7 +115,7 @@ namespace RemindClock
 
         private void BtnNew_Click(object sender, EventArgs e)
         {
-            new NoteForm(new Notes()).ShowDialog(this);
+            ShowEditForm(new Notes());
         }
 
         // 不让关闭，改成最小化
@@ -120,6 +129,47 @@ namespace RemindClock
             // 点x，最小化，而不是退出
             e.Cancel = true;
             this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void LoadNotes()
+        {
+            lvData.Items.Clear();
+
+            notesList = notesService.FindAll().ToDictionary(item => item.Id, item => item);
+            foreach (var note in notesList.Values)
+            {
+                var dataArr = new string[4];
+                dataArr[0] = note.Id.ToString();
+                dataArr[1] = note.Title;
+                dataArr[2] = note.GetStrDetail();
+                dataArr[3] = "删除";
+                var row = new ListViewItem(dataArr, 0);
+                lvData.Items.Add(row);
+            }
+        }
+
+        /// <summary>
+        /// 双击弹出编辑框
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void lvData_DoubleClick(object sender, EventArgs e)
+        {
+            if (lvData.SelectedItems.Count <= 0)
+                return;
+            var selectedRow = lvData.SelectedItems[0];
+            if (selectedRow.SubItems.Count <= 0 || !int.TryParse(selectedRow.SubItems[0].Text, out var id))
+                return;
+            if (notesList.TryGetValue(id, out var notes))
+            {
+                ShowEditForm(notes);
+            }
+        }
+
+        private void ShowEditForm(Notes notes)
+        {
+            new NoteForm(notes).ShowDialog(this);
+            LoadNotes();
         }
     }
 }
