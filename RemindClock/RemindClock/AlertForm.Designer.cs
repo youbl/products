@@ -39,9 +39,10 @@
             // labTime
             // 
             this.labTime.AutoSize = true;
-            this.labTime.Location = new System.Drawing.Point(12, 99);
+            this.labTime.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labTime.Location = new System.Drawing.Point(1, 99);
             this.labTime.Name = "labTime";
-            this.labTime.Size = new System.Drawing.Size(167, 12);
+            this.labTime.Size = new System.Drawing.Size(188, 12);
             this.labTime.TabIndex = 0;
             this.labTime.Text = "2021年06月05日 20点42分40秒";
             // 
@@ -79,7 +80,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.ForeColor = System.Drawing.Color.Red;
-            this.label1.Location = new System.Drawing.Point(200, 99);
+            this.label1.Location = new System.Drawing.Point(197, 99);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(185, 12);
             this.label1.TabIndex = 4;

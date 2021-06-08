@@ -38,6 +38,7 @@
             this.txtNoteTime = new System.Windows.Forms.TextBox();
             this.chkDingDing = new System.Windows.Forms.CheckBox();
             this.txtDingDingToken = new System.Windows.Forms.TextBox();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -85,7 +86,7 @@
             this.btnSave.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnSave.Location = new System.Drawing.Point(701, 8);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(87, 74);
+            this.btnSave.Size = new System.Drawing.Size(87, 58);
             this.btnSave.TabIndex = 6;
             this.btnSave.Text = "保  存";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -131,11 +132,26 @@
             this.txtDingDingToken.TabIndex = 4;
             this.txtDingDingToken.Visible = false;
             // 
+            // btnCancel
+            // 
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnCancel.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnCancel.Location = new System.Drawing.Point(701, 72);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(87, 29);
+            this.btnCancel.TabIndex = 7;
+            this.btnCancel.Text = "取  消";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
             // NoteForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.txtDingDingToken);
             this.Controls.Add(this.chkDingDing);
             this.Controls.Add(this.txtContent);
@@ -166,5 +182,6 @@
         private System.Windows.Forms.TextBox txtNoteTime;
         private System.Windows.Forms.CheckBox chkDingDing;
         private System.Windows.Forms.TextBox txtDingDingToken;
+        private System.Windows.Forms.Button btnCancel;
     }
 }

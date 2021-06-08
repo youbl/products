@@ -99,5 +99,43 @@ namespace RemindClock
         {
             txtDingDingToken.Visible = chkDingDing.Checked;
         }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        //        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        //        {
+        //            int WM_KEYDOWN = 256;
+        //            int WM_SYSKEYDOWN = 260;
+        //            if (msg.Msg == WM_KEYDOWN | msg.Msg == WM_SYSKEYDOWN)
+        //
+        //            {
+        //                switch (keyData)
+        //
+        //                {
+        //                    case Keys.Escape:
+        //
+        //                        this.Close(); //esc关闭窗体
+        //
+        //                        break;
+        //                }
+        //            }
+        //
+        //            return false;
+        //        }
+
+
+        //        protected override void OnKeyPress(KeyPressEventArgs e)
+        //        {
+        //            if (e.KeyChar == (char) Keys.Escape)
+        //            {
+        //                this.Close();
+        //                return;
+        //            }
+        //
+        //            base.OnKeyPress(e);
+        //        }
     }
 }
