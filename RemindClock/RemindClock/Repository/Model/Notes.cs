@@ -20,6 +20,12 @@ namespace RemindClock.Repository.Model
         public string Content { get; set; }
 
         /// <summary>
+        ///  钉钉通知时，群机器人的Token.
+        /// 为空不通知
+        /// </summary>
+        public string DingDingToken { get; set; }
+
+        /// <summary>
         /// 记事提醒明细
         /// </summary>
         public List<NoteDetail> Details { get; set; } = new List<NoteDetail>();

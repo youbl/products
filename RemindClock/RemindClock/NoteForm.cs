@@ -39,6 +39,19 @@ namespace RemindClock
             }
 
             this.notes.Content = txtContent.Text.Trim();
+            if (chkDingDing.Checked)
+            {
+                this.notes.DingDingToken = txtDingDingToken.Text.Trim();
+                if (this.notes.DingDingToken.Length <= 0)
+                {
+                    MessageBox.Show("钉钉Token必填");
+                    return;
+                }
+            }
+            else
+            {
+                this.notes.DingDingToken = "";
+            }
 
             notesService.Save(this.notes);
             MessageBox.Show("保存成功");
@@ -70,6 +83,11 @@ namespace RemindClock
             }
 
             txtNoteTime.Text = sb.ToString();
+        }
+
+        private void chkDingDing_CheckedChanged(object sender, EventArgs e)
+        {
+            txtDingDingToken.Visible = chkDingDing.Checked;
         }
     }
 }

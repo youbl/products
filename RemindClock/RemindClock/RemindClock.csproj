@@ -39,6 +39,12 @@
     <Reference Include="Beinet.Core">
       <HintPath>..\lib\Beinet.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Beinet.Feign">
+      <HintPath>..\lib\Beinet.Feign.dll</HintPath>
+    </Reference>
+    <Reference Include="LinFu.DynamicProxy">
+      <HintPath>..\lib\LinFu.DynamicProxy.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -71,6 +77,8 @@
     <Compile Include="Componment\NoteControl.Designer.cs">
       <DependentUpon>NoteControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="FeignService\DingDingFeign.cs" />
+    <Compile Include="FeignService\Dto\DingDingDto.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -89,6 +97,9 @@
     <Compile Include="Repository\Model\Notes.cs" />
     <Compile Include="Repository\BaseRepository.cs" />
     <Compile Include="Repository\NotesRepository.cs" />
+    <Compile Include="Services\NoteOperation\NoteAlertByDingDing.cs" />
+    <Compile Include="Services\NoteOperation\NoteAlertByForm.cs" />
+    <Compile Include="Services\NoteOperation\INoteAlert.cs" />
     <Compile Include="Services\NotesService.cs" />
     <Compile Include="Services\NoteType\INoteTime.cs" />
     <Compile Include="Services\NoteType\NotePerWeekNormal.cs" />

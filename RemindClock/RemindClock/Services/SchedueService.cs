@@ -1,12 +1,27 @@
-﻿using Beinet.Core.Cron;
-using NLog;
+﻿using System.Collections.Generic;
+using Beinet.Core.Cron;
+using RemindClock.Repository.Model;
+using RemindClock.Services.NoteOperation;
 
 namespace RemindClock.Services
 {
     class SchedueService
     {
-        private static ILogger logger = LogManager.GetCurrentClassLogger();
+        /// <summary>
+        /// 所有通知器，比如钉钉通知、短信通知、窗体通知等
+        /// </summary>
+        List<INoteAlert> AllAlerts = new List<INoteAlert>();
+
         private NotesService notesService = new NotesService();
+
+        //private bool isRunning = false;
+
+
+        public SchedueService()
+        {
+            AllAlerts.Add(new NoteAlertByForm());
+            AllAlerts.Add(new NoteAlertByDingDing());
+        }
 
         /// <summary>
         /// cron格式参考： https://github.com/youbl/DemoCode
@@ -15,6 +30,10 @@ namespace RemindClock.Services
         [Scheduled(cron: "* * * * * *")]
         public void Begin()
         {
+//            if (isRunning)
+//                return;
+//            isRunning = true;
+
             var allNotes = notesService.FindAll();
             foreach (var note in allNotes)
             {
@@ -23,11 +42,21 @@ namespace RemindClock.Services
                 {
                     if (notesService.IsNoteTime(note.Id, detailId, noteDetail))
                     {
-                        AlertForm.Show(note.Title, note.Content);
+                        StartNote(note);
                     }
 
                     detailId++;
                 }
+            }
+
+//            isRunning = false;
+        }
+
+        private void StartNote(Notes note)
+        {
+            foreach (var noteAlert in AllAlerts)
+            {
+                noteAlert.Alert(note);
             }
         }
     }

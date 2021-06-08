@@ -36,6 +36,8 @@
             this.btnSave = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.txtNoteTime = new System.Windows.Forms.TextBox();
+            this.chkDingDing = new System.Windows.Forms.CheckBox();
+            this.txtDingDingToken = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label1
@@ -43,17 +45,17 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(13, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(41, 12);
+            this.label1.Size = new System.Drawing.Size(65, 12);
             this.label1.TabIndex = 0;
-            this.label1.Text = "标题：";
+            this.label1.Text = "记事标题：";
             // 
             // txtTitle
             // 
             this.txtTitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtTitle.Location = new System.Drawing.Point(60, 10);
+            this.txtTitle.Location = new System.Drawing.Point(69, 10);
             this.txtTitle.Name = "txtTitle";
-            this.txtTitle.Size = new System.Drawing.Size(635, 21);
+            this.txtTitle.Size = new System.Drawing.Size(626, 21);
             this.txtTitle.TabIndex = 1;
             // 
             // txtContent
@@ -61,21 +63,21 @@
             this.txtContent.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtContent.Location = new System.Drawing.Point(60, 69);
+            this.txtContent.Location = new System.Drawing.Point(69, 107);
             this.txtContent.Multiline = true;
             this.txtContent.Name = "txtContent";
             this.txtContent.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtContent.Size = new System.Drawing.Size(728, 369);
-            this.txtContent.TabIndex = 3;
+            this.txtContent.Size = new System.Drawing.Size(719, 331);
+            this.txtContent.TabIndex = 5;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(13, 69);
+            this.label2.Location = new System.Drawing.Point(12, 107);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(41, 12);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "内容：";
+            this.label2.Size = new System.Drawing.Size(65, 12);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "记事内容：";
             // 
             // btnSave
             // 
@@ -83,8 +85,8 @@
             this.btnSave.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnSave.Location = new System.Drawing.Point(701, 8);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(87, 51);
-            this.btnSave.TabIndex = 4;
+            this.btnSave.Size = new System.Drawing.Size(87, 74);
+            this.btnSave.TabIndex = 6;
             this.btnSave.Text = "保  存";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
@@ -94,30 +96,53 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(13, 41);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.Size = new System.Drawing.Size(65, 12);
             this.label3.TabIndex = 0;
-            this.label3.Text = "提醒：";
+            this.label3.Text = "提醒时间：";
             // 
             // txtNoteTime
             // 
             this.txtNoteTime.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtNoteTime.Location = new System.Drawing.Point(60, 38);
+            this.txtNoteTime.Location = new System.Drawing.Point(69, 38);
             this.txtNoteTime.Name = "txtNoteTime";
-            this.txtNoteTime.Size = new System.Drawing.Size(635, 21);
+            this.txtNoteTime.Size = new System.Drawing.Size(626, 21);
             this.txtNoteTime.TabIndex = 2;
             this.txtNoteTime.Click += new System.EventHandler(this.TxtNoteTime_MouseClick);
+            // 
+            // chkDingDing
+            // 
+            this.chkDingDing.AutoSize = true;
+            this.chkDingDing.Location = new System.Drawing.Point(69, 66);
+            this.chkDingDing.Name = "chkDingDing";
+            this.chkDingDing.Size = new System.Drawing.Size(72, 16);
+            this.chkDingDing.TabIndex = 3;
+            this.chkDingDing.Text = "钉钉提醒";
+            this.chkDingDing.UseVisualStyleBackColor = true;
+            this.chkDingDing.CheckedChanged += new System.EventHandler(this.chkDingDing_CheckedChanged);
+            // 
+            // txtDingDingToken
+            // 
+            this.txtDingDingToken.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtDingDingToken.Location = new System.Drawing.Point(147, 64);
+            this.txtDingDingToken.Name = "txtDingDingToken";
+            this.txtDingDingToken.Size = new System.Drawing.Size(548, 21);
+            this.txtDingDingToken.TabIndex = 4;
+            this.txtDingDingToken.Visible = false;
             // 
             // NoteForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.btnSave);
+            this.Controls.Add(this.txtDingDingToken);
+            this.Controls.Add(this.chkDingDing);
             this.Controls.Add(this.txtContent);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.txtNoteTime);
             this.Controls.Add(this.txtTitle);
+            this.Controls.Add(this.btnSave);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -139,5 +164,7 @@
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtNoteTime;
+        private System.Windows.Forms.CheckBox chkDingDing;
+        private System.Windows.Forms.TextBox txtDingDingToken;
     }
 }

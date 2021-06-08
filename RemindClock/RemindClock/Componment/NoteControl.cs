@@ -126,20 +126,20 @@ namespace RemindClock.Componment
             // 
             lnkMinus.AutoSize = true;
             lnkMinus.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-            lnkMinus.Location = new System.Drawing.Point(405, pointY);
+            lnkMinus.Location = new System.Drawing.Point(410, pointY);
             lnkMinus.Name = "lnkMinus" + idx;
-            lnkMinus.Text = "-";
-            lnkMinus.Font = new System.Drawing.Font("宋体", 20, System.Drawing.FontStyle.Bold);
+            lnkMinus.Text = "删除";
+            //lnkMinus.Font = new System.Drawing.Font("宋体", 20, System.Drawing.FontStyle.Bold);
             lnkMinus.LinkClicked += LnkMinusOnLinkClicked;
             // 
             // lnkPlus
             // 
             lnkPlus.AutoSize = true;
             lnkPlus.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-            lnkPlus.Location = new System.Drawing.Point(425, pointY);
+            lnkPlus.Location = new System.Drawing.Point(440, pointY);
             lnkPlus.Name = "lnkPlus" + idx;
-            lnkPlus.Text = "+";
-            lnkPlus.Font = new System.Drawing.Font("宋体", 20, System.Drawing.FontStyle.Bold);
+            lnkPlus.Text = "添加";
+            //lnkPlus.Font = new System.Drawing.Font("宋体", 20, System.Drawing.FontStyle.Bold);
             lnkPlus.LinkClicked += LnkPlusOnLinkClicked;
         }
 
