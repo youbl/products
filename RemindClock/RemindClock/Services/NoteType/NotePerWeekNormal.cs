@@ -14,11 +14,11 @@ namespace RemindClock.Services.NoteType
 
         public bool IsTime(DateTime eventTime, DateTime lastNoteTime)
         {
+            var now = DateTime.Now;
             // 今天已经提醒过，忽略
-            if (lastNoteTime.Day == eventTime.Day)
+            if (lastNoteTime.Day == now.Day)
                 return false;
 
-            var now = DateTime.Now;
             return now.DayOfWeek != DayOfWeek.Saturday
                    && now.DayOfWeek != DayOfWeek.Sunday
                    && now.Hour == eventTime.Hour
