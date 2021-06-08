@@ -8,5 +8,8 @@ namespace RemindClockWeb.Repository
     {
         [Query("select * from #{#entityName} where userId=?1 order by id", NativeQuery = true)]
         List<Notes> GetByUser(int userId);
+
+        [Query("delete from #{#entityName} where userId=?1", NativeQuery = true)]
+        int DeleteByUser(int userId);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Http;
 using RemindClockWeb.Repository.Model;
 using RemindClockWeb.Services;
@@ -9,32 +10,32 @@ namespace RemindClockWeb.Controllers
     {
         private readonly NotesService notesService = new NotesService();
 
-        // GET api/<controller>
+        /// <summary>
+        /// 根据用户账号返回所有提醒数据
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         [Route("notes"), HttpGet]
-        public List<Notes> GetNotes()
+        public List<Notes> GetNotes([FromUri] string account, [FromUri] string token)
         {
-            return null;//ew string[] {"value1", "value2"};
+            if (string.IsNullOrEmpty(account) || string.IsNullOrEmpty(token))
+            {
+                throw new ArgumentException("account和token不能为空");
+            }
+
+            return notesService.GetNotesByAccount(account, token);
         }
 
-        // GET api/<controller>/5
-        public string Get(int id)
+        [Route("notes"), HttpPost]
+        public void SaveNotes([FromUri] string account, [FromUri] string token, [FromBody] List<Notes> notes)
         {
-            return "value";
-        }
+            if (string.IsNullOrEmpty(account) || string.IsNullOrEmpty(token) || notes == null)
+            {
+                throw new ArgumentException("account和token、notes均不能为空");
+            }
 
-        // POST api/<controller>
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<controller>/5
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<controller>/5
-        public void Delete(int id)
-        {
+            notesService.SaveNotesByAccount(account, token, notes);
         }
     }
 }
