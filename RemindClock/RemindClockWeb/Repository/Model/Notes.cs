@@ -55,5 +55,8 @@ namespace RemindClockWeb.Repository.Model
         /// </summary>
         [Column(Insertable = false, Updatable = false)]
         public DateTime LastModifyTime { get; set; }
+
+        [Transient]
+        public List<NoteDetail> Details { get; set; }
     }
 }

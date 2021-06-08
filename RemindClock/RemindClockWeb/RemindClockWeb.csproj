@@ -109,6 +109,7 @@
     <Compile Include="Repository\NotesDetailRepository.cs" />
     <Compile Include="Repository\NotesRepository.cs" />
     <Compile Include="Repository\UsersRepository.cs" />
+    <Compile Include="Services\NotesService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

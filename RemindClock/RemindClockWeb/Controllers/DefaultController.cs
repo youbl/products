@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Web.Http;
+using RemindClockWeb.Repository.Model;
+using RemindClockWeb.Services;
 
 namespace RemindClockWeb.Controllers
 {
     public class DefaultController : ApiController
     {
+        private readonly NotesService notesService = new NotesService();
+
         // GET api/<controller>
-        [Route("aa/bb")]
-        public IEnumerable<string> Get()
+        [Route("notes"), HttpGet]
+        public List<Notes> GetNotes()
         {
-            return new string[] { "value1", "value2" };
+            return null;//ew string[] {"value1", "value2"};
         }
 
         // GET api/<controller>/5
@@ -23,12 +23,12 @@ namespace RemindClockWeb.Controllers
         }
 
         // POST api/<controller>
-        public void Post([FromBody]string value)
+        public void Post([FromBody] string value)
         {
         }
 
         // PUT api/<controller>/5
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody] string value)
         {
         }
 
