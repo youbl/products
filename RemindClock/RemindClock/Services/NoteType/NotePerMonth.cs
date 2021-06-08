@@ -7,24 +7,22 @@ namespace RemindClock.Services.NoteType
     /// </summary>
     class NotePerMonth : INoteTime
     {
-        public DateTime EventTime { get; set; }
-
         public bool Handle(string eventType)
         {
             return eventType != null && eventType == "每月";
         }
 
-        public bool IsTime(DateTime lastNoteTime)
+        public bool IsTime(DateTime eventTime, DateTime lastNoteTime)
         {
             // 本月已经提醒过，忽略
-            if (lastNoteTime.Month == EventTime.Month)
+            if (lastNoteTime.Month == eventTime.Month)
                 return false;
 
             var now = DateTime.Now;
-            return now.Day == EventTime.Day
-                   && now.Hour == EventTime.Hour
-                   && now.Minute == EventTime.Minute
-                   && now.Second >= EventTime.Second;
+            return now.Day == eventTime.Day
+                   && now.Hour == eventTime.Hour
+                   && now.Minute == eventTime.Minute
+                   && now.Second >= eventTime.Second;
         }
     }
 }

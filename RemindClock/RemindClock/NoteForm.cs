@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using PopupTool;
 using RemindClock.Componment;
@@ -44,7 +38,7 @@ namespace RemindClock
                 return;
             }
 
-            this.notes.Title = txtContent.Text.Trim();
+            this.notes.Content = txtContent.Text.Trim();
 
             notesService.Save(this.notes);
             MessageBox.Show("保存成功");

@@ -66,8 +66,11 @@ namespace RemindClock.Services
         {
             foreach (var noteCheck in noteCheckList)
             {
+                if (!noteCheck.Handle(detail.EventType))
+                    continue;
+
                 var lastNoteTime = GetLastNoteTime(noteId, indexId);
-                if (noteCheck.Handle(detail.EventType) && noteCheck.IsTime(lastNoteTime))
+                if (noteCheck.IsTime(detail.EventTime, lastNoteTime))
                 {
                     // 判断通过，要设置本次提醒时间
                     SetLastNoteTime(noteId, indexId);
