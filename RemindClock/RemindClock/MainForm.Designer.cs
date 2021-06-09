@@ -36,6 +36,9 @@
             this.开机启动ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnOverwriteLocal = new System.Windows.Forms.Button();
+            this.btnOverwriteServer = new System.Windows.Forms.Button();
+            this.btnReload = new System.Windows.Forms.Button();
             this.btnNew = new System.Windows.Forms.Button();
             this.lvData = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -43,7 +46,6 @@
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.col4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.btnReload = new System.Windows.Forms.Button();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -99,17 +101,49 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnOverwriteLocal);
+            this.splitContainer1.Panel1.Controls.Add(this.btnOverwriteServer);
             this.splitContainer1.Panel1.Controls.Add(this.btnReload);
             this.splitContainer1.Panel1.Controls.Add(this.btnNew);
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.lvData);
-            this.splitContainer1.Size = new System.Drawing.Size(800, 450);
+            this.splitContainer1.Size = new System.Drawing.Size(841, 450);
             this.splitContainer1.SplitterDistance = 46;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 1;
             this.splitContainer1.TabStop = false;
+            // 
+            // btnOverwriteLocal
+            // 
+            this.btnOverwriteLocal.Location = new System.Drawing.Point(480, 12);
+            this.btnOverwriteLocal.Name = "btnOverwriteLocal";
+            this.btnOverwriteLocal.Size = new System.Drawing.Size(117, 23);
+            this.btnOverwriteLocal.TabIndex = 3;
+            this.btnOverwriteLocal.Text = "强制覆盖远端";
+            this.btnOverwriteLocal.UseVisualStyleBackColor = true;
+            this.btnOverwriteLocal.Click += new System.EventHandler(this.BtnOverwriteLocal_Click);
+            // 
+            // btnOverwriteServer
+            // 
+            this.btnOverwriteServer.Location = new System.Drawing.Point(614, 12);
+            this.btnOverwriteServer.Name = "btnOverwriteServer";
+            this.btnOverwriteServer.Size = new System.Drawing.Size(116, 23);
+            this.btnOverwriteServer.TabIndex = 3;
+            this.btnOverwriteServer.Text = "强制覆盖本地";
+            this.btnOverwriteServer.UseVisualStyleBackColor = true;
+            this.btnOverwriteServer.Click += new System.EventHandler(this.BtnOverwriteServer_Click);
+            // 
+            // btnReload
+            // 
+            this.btnReload.Location = new System.Drawing.Point(736, 12);
+            this.btnReload.Name = "btnReload";
+            this.btnReload.Size = new System.Drawing.Size(93, 23);
+            this.btnReload.TabIndex = 2;
+            this.btnReload.Text = "刷新";
+            this.btnReload.UseVisualStyleBackColor = true;
+            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
             // 
             // btnNew
             // 
@@ -134,7 +168,7 @@
             this.lvData.HideSelection = false;
             this.lvData.Location = new System.Drawing.Point(0, 0);
             this.lvData.Name = "lvData";
-            this.lvData.Size = new System.Drawing.Size(800, 403);
+            this.lvData.Size = new System.Drawing.Size(841, 403);
             this.lvData.TabIndex = 0;
             this.lvData.UseCompatibleStateImageBehavior = false;
             this.lvData.View = System.Windows.Forms.View.Details;
@@ -149,12 +183,12 @@
             // columnHeader2
             // 
             this.columnHeader2.Text = "标题";
-            this.columnHeader2.Width = 400;
+            this.columnHeader2.Width = 300;
             // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "提醒";
-            this.columnHeader3.Width = 250;
+            this.columnHeader3.Width = 400;
             // 
             // col4
             // 
@@ -166,21 +200,11 @@
             this.columnHeader5.Text = "";
             this.columnHeader5.Width = 45;
             // 
-            // btnReload
-            // 
-            this.btnReload.Location = new System.Drawing.Point(128, 12);
-            this.btnReload.Name = "btnReload";
-            this.btnReload.Size = new System.Drawing.Size(93, 23);
-            this.btnReload.TabIndex = 2;
-            this.btnReload.Text = "刷新";
-            this.btnReload.UseVisualStyleBackColor = true;
-            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(841, 450);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
@@ -212,6 +236,8 @@
         private System.Windows.Forms.ColumnHeader col4;
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.Button btnReload;
+        private System.Windows.Forms.Button btnOverwriteLocal;
+        private System.Windows.Forms.Button btnOverwriteServer;
     }
 }
 

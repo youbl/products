@@ -132,6 +132,14 @@ namespace RemindClock.Services
             }
         }
 
+        public void SetVersion(int clientVersion, int serverVersion)
+        {
+            var ver = versionRepository.FindFirst();
+            ver.ClientVersion = clientVersion;
+            ver.ServerVersion = serverVersion;
+            versionRepository.Save(ver);
+        }
+
 
         #region 计划任务扫描方法
 

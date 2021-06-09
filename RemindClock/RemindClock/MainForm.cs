@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using Beinet.Feign;
+using RemindClock.FeignService;
 using RemindClock.Repository.Model;
 using RemindClock.Services;
+using RemindClock.Services.SyncType;
 using RemindClock.Utils;
 
 namespace RemindClock
@@ -22,7 +25,10 @@ namespace RemindClock
 
         // 是关闭窗体还是最小化
         private bool realClose = false;
+
         private NotesService notesService = new NotesService();
+        private SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
+
         private Dictionary<int, Notes> notesList;
 
         public static MainForm Default
@@ -233,7 +239,7 @@ namespace RemindClock
 
         private void DelNote(Notes notes)
         {
-            var msg = "真的要删除提醒:" + notes.Title + "?";
+            var msg = "真的要删除:" + notes.Title + "?";
             var result = MessageBox.Show(msg, "删除确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
                 MessageBoxDefaultButton.Button2);
             if (DialogResult.Yes != result)
@@ -250,6 +256,36 @@ namespace RemindClock
         private void btnReload_Click(object sender, EventArgs e)
         {
             LoadNotes();
+        }
+
+
+        private void BtnOverwriteLocal_Click(object sender, EventArgs e)
+        {
+            var msg = "本地数据将被清空，以远端为准，确认要执行吗?";
+            var result = MessageBox.Show(msg, "覆盖确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button2);
+            if (DialogResult.Yes != result)
+            {
+                return;
+            }
+
+            // 本地强制设置为初始版本，这样job就会自动从线上同步
+            notesService.SetVersion(0, 0);
+        }
+
+        private void BtnOverwriteServer_Click(object sender, EventArgs e)
+        {
+            var msg = "远端数据将被清空，以本地为准，确认要执行吗?";
+            var result = MessageBox.Show(msg, "覆盖确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button2);
+            if (DialogResult.Yes != result)
+            {
+                return;
+            }
+
+            // 本地强制设置为服务器版本+1，这样job就会自动同步到线上
+            var serverVerNow = syncFeign.GetServerVersion(SyncService.SyncUser, SyncService.SyncToken);
+            notesService.SetVersion(serverVerNow + 1, serverVerNow);
         }
     }
 }
