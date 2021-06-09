@@ -37,7 +37,7 @@ namespace RemindClock
         public AlertForm(string title, string content)
         {
             InitializeComponent();
-            this.labTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            this.labTime.Text = GetTimeTxt();
             this.labNote.Text = FormatNote(content);
             if (!string.IsNullOrEmpty(title))
             {
@@ -108,6 +108,12 @@ namespace RemindClock
             }
 
             return sb.ToString();
+        }
+
+        private string GetTimeTxt()
+        {
+            var now = DateTime.Now;
+            return now.ToString("yyyy-MM-dd HH:mm:ss") + " " + now.DayOfWeek;
         }
 
         public static void Show(string title, string content)

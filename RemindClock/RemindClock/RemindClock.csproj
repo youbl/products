@@ -112,6 +112,7 @@
     <Compile Include="Services\NoteType\NotePerDay.cs" />
     <Compile Include="Services\NoteType\NotePerMinute.cs" />
     <Compile Include="Services\SchedueService.cs" />
+    <Compile Include="Services\SyncService.cs" />
     <Compile Include="Utils\AutoStartHelper.cs" />
     <Compile Include="Utils\FormHelper.cs" />
     <EmbeddedResource Include="AlertForm.resx">
