@@ -73,15 +73,66 @@ title 计时器通知
 start
 :每秒检查;
 repeat
-  if(符合触发条件 且 配置了触发方式)then(yes)
+  if(符合触发条件)then(yes)
   	:启动线程;
     :触发提醒;
     note right
-    可以有多个提醒
+    可以有多种提醒方式，循环触发
+    窗体、钉钉、短信等
     end note
   else(no)
   endif
 repeat while(循环下一个记事) is (yes) not (no)
+stop
+@enduml
+```
+
+```plantuml
+@startuml
+title 客户端同步流程
+start
+
+:读取远程服务端版本号:verServerNow;
+note right
+首次部署返回0
+end note
+:读取本地版本号:verClient;
+note right
+首次无数据时，返回0
+end note
+:读取前次同步的服务端版本号:verServerLast;
+note right
+上次与服务端交互时，得到的服务端版本号.
+未同步过时，返回0
+end note
+
+if(verClient < verServerLast)then(yes)
+    :不可能，本地版本只会大于等于本地前次同步信息,有bug;
+    stop
+endif
+if(verServerNow < verServerLast)then(yes)
+    :不可能，服务端被重新初始化了或有bug;
+    stop
+endif
+
+if(verServerNow == verServerLast)then(yes)
+    if(verClient == verServerLast)then(yes)
+        :服务端与客户端都没有变更，无需同步;
+    else (no)
+        :POST本地数据给服务端;
+        :完成 客户端=>服务端的数据同步;
+    endif
+else(no)
+    if(verClient == verServerLast)then(yes)
+        :GET服务端数据;
+        :完成 服务端=>客户端的数据同步;
+    else (no)
+        :本地和服务端同时有变化;
+        :提示数据冲突，人工同步;
+    endif
+endif
+
+
 stop
 @enduml
 ```
@@ -99,14 +150,12 @@ _【编写说明】来自产品负责人和高级设计人员的非功能性需�
 
 ```plantuml
 @startuml
-title 贝可提醒机模型
+title 贝可提醒机服务端模型
 class Users<<用户>>{
     Id<int>: 用户唯一ID
     Account<string>: 登录账号
-    Name<string>: 姓名
-    Phone<string >: 手机号，接收短信用
-    Email<string>: 邮箱，接收邮件用
-    DingDing<string>: 所在的钉钉群Token
+    Token<string>: 数据同步用
+    Version<int>: 服务端数据版本号
     CreationTime<time>: 注册时间
     LastModifyTime<time>: 最后编辑时间
 }
@@ -114,17 +163,20 @@ class Users<<用户>>{
 class Notes<<记事>>{
     Id<int>: 唯一ID
     UserId<int>: 所属用户
+    ClientId<int>: 客户端ID
     Title<string>: 标题
     Content<string>: 内容
+    DingDingToken<string>: 钉钉群Token，不为空时要发钉钉通知
     CreationTime<time>: 新增时间
     LastModifyTime<time>: 最后编辑时间
+    Details<List<NoteDetail>>: 触发时间配置
 }
 
-class NoteDetail<<记事提醒信息>>{
+class NoteDetail<<记事触发明细配置信息>>{
     Id<int>: 唯一ID
     NoticeId<int>: 所属记事ID
-    EventType<string>: 提醒类型, 支持2种：late:相对时间，只提醒一次，如60s; time:绝对时间只提醒一次、cron:Cron表达式
-    EventArg<string>: 循环方式,EventType对应的参数
+    EventType<string>: 提醒类型, "单次","每分钟","每小时","每天","周一~周五每天","周六~周日每天","每周","每月","每年"
+    EventTime<time>: 提醒时间，根据EventType处理
     CreationTime<time>: 新增时间
     LastModifyTime<time>: 最后编辑时间
 }
