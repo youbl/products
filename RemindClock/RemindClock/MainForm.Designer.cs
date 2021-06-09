@@ -121,7 +121,7 @@
             this.btnOverwriteLocal.Name = "btnOverwriteLocal";
             this.btnOverwriteLocal.Size = new System.Drawing.Size(117, 23);
             this.btnOverwriteLocal.TabIndex = 3;
-            this.btnOverwriteLocal.Text = "强制覆盖远端";
+            this.btnOverwriteLocal.Text = "强制覆盖本地";
             this.btnOverwriteLocal.UseVisualStyleBackColor = true;
             this.btnOverwriteLocal.Click += new System.EventHandler(this.BtnOverwriteLocal_Click);
             // 
@@ -131,7 +131,7 @@
             this.btnOverwriteServer.Name = "btnOverwriteServer";
             this.btnOverwriteServer.Size = new System.Drawing.Size(116, 23);
             this.btnOverwriteServer.TabIndex = 3;
-            this.btnOverwriteServer.Text = "强制覆盖本地";
+            this.btnOverwriteServer.Text = "强制覆盖远端";
             this.btnOverwriteServer.UseVisualStyleBackColor = true;
             this.btnOverwriteServer.Click += new System.EventHandler(this.BtnOverwriteServer_Click);
             // 
