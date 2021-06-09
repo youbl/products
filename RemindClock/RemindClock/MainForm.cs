@@ -148,7 +148,7 @@ namespace RemindClock
         /// 重新加载提醒。
         /// 注：不用管计划任务，它都是实时拉取数据的
         /// </summary>
-        private void LoadNotes()
+        public void LoadNotes()
         {
             var colorArr = new Color[]
             {
@@ -245,6 +245,11 @@ namespace RemindClock
             {
                 LoadNotes();
             }
+        }
+
+        private void btnReload_Click(object sender, EventArgs e)
+        {
+            LoadNotes();
         }
     }
 }

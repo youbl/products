@@ -2,6 +2,7 @@
 using RemindClock.FeignService;
 using RemindClock.Repository;
 using RemindClock.Repository.Model;
+using RemindClock.Utils;
 
 namespace RemindClock.Services.SyncType
 {
@@ -37,6 +38,7 @@ namespace RemindClock.Services.SyncType
             // 保存服务端拉到的提醒
             foreach (var note in serverNotes)
             {
+                // 直接使用服务端的id，不再使用客户端ID了
                 notesService.Save(note);
             }
 
@@ -44,6 +46,9 @@ namespace RemindClock.Services.SyncType
             version.ServerVersion = serverVersion;
             version.ClientVersion = serverVersion;
             versionRepository.Save(version);
+
+            // 刷新主界面
+            FormHelper.Invoke(MainForm.Default, () => MainForm.Default.LoadNotes());
         }
     }
 }

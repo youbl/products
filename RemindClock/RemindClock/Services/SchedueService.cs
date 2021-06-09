@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using Beinet.Core.Cron;
-using NLog;
-using RemindClock.Repository.Model;
-using RemindClock.Services.NoteOperation;
+﻿using Beinet.Core.Cron;
 
 namespace RemindClock.Services
 {
@@ -30,7 +24,10 @@ namespace RemindClock.Services
 //            isRunning = false;
         }
 
-        [Scheduled(cron: "*/10 * * * * *")]
+        /// <summary>
+        /// 与服务端数据同步的方法，每分钟执行1次
+        /// </summary>
+        [Scheduled(cron: "10 * * * * *")]
         public void SyncNotes()
         {
             //if (isRunning)
