@@ -46,12 +46,13 @@ namespace RemindClockWeb.Services
                 note.ClientId = note.Id;
                 note.Id = 0;
                 note.UserId = user.Id;
-                notesRepository.Save(note);
+                // note的id不会变化，还是0
+                var savedRec = notesRepository.Save(note);
 
                 foreach (var detail in note.Details)
                 {
                     detail.Id = 0;
-                    detail.NoteId = note.Id;
+                    detail.NoteId = savedRec.Id;
                     detailRepository.Save(detail);
                 }
             }

@@ -14,6 +14,7 @@ namespace RemindClockWeb.Repository
         /// <param name="userId">用户id</param>
         /// <param name="oldVersion">更新前的版本号</param>
         /// <returns>更新行数</returns>
+        [Modifing]
         [Query("update #{#entityName} set version=version+1 where id=?1 and version=?2", NativeQuery = true)]
         int IncrVersion(int userId, int oldVersion);
     }
