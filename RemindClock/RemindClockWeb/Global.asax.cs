@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Http;
-using System.Web.Routing;
+using RemindClockWeb.Controllers;
 
 namespace RemindClockWeb
 {
@@ -15,6 +11,9 @@ namespace RemindClockWeb
 
             // 禁止xml格式支持
             GlobalConfiguration.Configuration.Formatters.XmlFormatter.SupportedMediaTypes.Clear();
+
+            // 全局异常处理
+            GlobalConfiguration.Configuration.Filters.Add(new WebApiExceptionFilterAttribute());
         }
     }
 }
