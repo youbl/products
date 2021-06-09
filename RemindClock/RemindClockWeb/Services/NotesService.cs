@@ -32,7 +32,7 @@ namespace RemindClockWeb.Services
         /// <param name="account">账号</param>
         /// <param name="token">token</param>
         /// <param name="notes">要保存的提醒数据</param>
-        public void SaveNotesByAccount(string account, string token, List<Notes> notes)
+        public int SaveNotesByAccount(string account, string token, List<Notes> notes)
         {
             var user = GetUser(account, token);
 
@@ -54,6 +54,24 @@ namespace RemindClockWeb.Services
                     detailRepository.Save(detail);
                 }
             }
+
+            if (IncrVersion(user.Id, user.Version))
+            {
+                return user.Version + 1;
+            }
+
+            throw new Exception("版本号加1出错:" + user.Id + ":" + account + " 当前版本:" + user.Version);
+        }
+
+        /// <summary>
+        /// 查找指定用户的数据版本号
+        /// </summary>
+        /// <param name="account">账号</param>
+        /// <param name="token">token</param>
+        /// <returns>版本</returns>
+        public int GetVersion(string account, string token)
+        {
+            return GetUser(account, token).Version;
         }
 
         private List<Notes> GetNotesByUser(int userId)
@@ -81,6 +99,11 @@ namespace RemindClockWeb.Services
             }
 
             return user;
+        }
+
+        private bool IncrVersion(int userId, int oldVersion)
+        {
+            return usersRepository.IncrVersion(userId, oldVersion) > 0;
         }
     }
 }

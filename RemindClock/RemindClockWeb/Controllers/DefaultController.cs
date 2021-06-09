@@ -27,15 +27,39 @@ namespace RemindClockWeb.Controllers
             return notesService.GetNotesByAccount(account, token);
         }
 
+        /// <summary>
+        /// 把客户端的数据同步到服务端保存，并返回服务端版本号
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="token"></param>
+        /// <param name="notes"></param>
+        /// <returns></returns>
         [Route("notes"), HttpPost]
-        public void SaveNotes([FromUri] string account, [FromUri] string token, [FromBody] List<Notes> notes)
+        public int SaveNotes([FromUri] string account, [FromUri] string token, [FromBody] List<Notes> notes)
         {
             if (string.IsNullOrEmpty(account) || string.IsNullOrEmpty(token) || notes == null)
             {
                 throw new ArgumentException("account和token、notes均不能为空");
             }
 
-            notesService.SaveNotesByAccount(account, token, notes);
+            return notesService.SaveNotesByAccount(account, token, notes);
+        }
+
+        /// <summary>
+        /// 读取服务端版本号，以便客户端判断同步策略
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [Route("version"), HttpGet]
+        public int GetVersion([FromUri] string account, [FromUri] string token)
+        {
+            if (string.IsNullOrEmpty(account) || string.IsNullOrEmpty(token))
+            {
+                throw new ArgumentException("account和token均不能为空");
+            }
+
+            return notesService.GetVersion(account, token);
         }
     }
 }

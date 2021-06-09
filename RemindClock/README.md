@@ -208,6 +208,45 @@ NoteDetail --> Notice
 @enduml
 ```
 
+- 数据库设计
+
+```sql
+CREATE TABLE `users` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `Account` varchar(20) NOT NULL DEFAULT '' COMMENT '账号',
+  `Token` varchar(20) NOT NULL DEFAULT '' COMMENT 'token',
+  `version` int(11) NOT NULL DEFAULT '0' COMMENT '版本号',
+  `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '记录新增时间',
+  `LastModificationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNQI_Account` (`Account`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
+CREATE TABLE `notes` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `UserId` int(11) NOT NULL DEFAULT '0' COMMENT '用户id',
+  `ClientId` int(11) NOT NULL DEFAULT '0' COMMENT '客户端id',
+  `title` varchar(200) NOT NULL DEFAULT '' COMMENT '标题',
+  `content` varchar(500) NOT NULL DEFAULT '' COMMENT '内容',
+  `dingDingToken` varchar(50) NOT NULL DEFAULT '' COMMENT '钉钉通群机器人的Token.为空不通知',
+  `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '记录新增时间',
+  `LastModificationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user` (`UserId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='记事表';
+
+CREATE TABLE `notedetail` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `NoteId` int(11) NOT NULL DEFAULT '0' COMMENT '提醒id',
+  `EventTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '事件时间',
+  `EventType` varchar(20) NOT NULL DEFAULT '' COMMENT '提醒类型',
+  `CreationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '记录新增时间',
+  `LastModificationTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_NoteId` (`NoteId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='记事提醒明细表';
+```
+
 ## 详细设计
 
 ### 接口

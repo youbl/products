@@ -17,7 +17,7 @@ namespace RemindClockWeb.Repository.Model
         [Id]
         [GeneratedValue(Strategy = GenerationType.IDENTITY)]
         public int Id { get; set; }
-        
+
         /// <summary>
         ///  账号
         /// </summary>
@@ -27,6 +27,11 @@ namespace RemindClockWeb.Repository.Model
         ///  客户端API调用的Token
         /// </summary>
         public string Token { get; set; }
+
+        /// <summary>
+        /// 版本号，用于客户端比对和同步使用
+        /// </summary>
+        public int Version { get; set; }
 
         /// <summary>
         ///  入库时间
