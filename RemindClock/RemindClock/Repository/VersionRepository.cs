@@ -8,9 +8,13 @@ namespace RemindClock.Repository
     /// </summary>
     public class VersionRepository : BaseRepository<Version>
     {
+        /// <summary>
+        /// 返回第一个版本号数据
+        /// </summary>
+        /// <returns></returns>
         public Version FindFirst()
         {
-            return FindAll().FirstOrDefault();
+            return FindAll().FirstOrDefault() ?? new Version();
         }
 
         /// <summary>
@@ -18,7 +22,7 @@ namespace RemindClock.Repository
         /// </summary>
         public int PlusVersion()
         {
-            var version = FindFirst() ?? new Version();
+            var version = FindFirst();
             version.ClientVersion++;
             Save(version);
             return version.ClientVersion;

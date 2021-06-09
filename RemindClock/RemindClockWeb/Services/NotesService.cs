@@ -32,6 +32,7 @@ namespace RemindClockWeb.Services
         /// <param name="account">账号</param>
         /// <param name="token">token</param>
         /// <param name="notes">要保存的提醒数据</param>
+        /// <returns>服务端版本号</returns>
         public int SaveNotesByAccount(string account, string token, List<Notes> notes)
         {
             var user = GetUser(account, token);

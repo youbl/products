@@ -10,15 +10,15 @@ using Version = RemindClock.Repository.Model.Version;
 
 namespace RemindClock.Services
 {
-    class SyncService
+    public class SyncService
     {
+        public static readonly string SyncUser = ConfigurationManager.AppSettings["SyncUser"] ?? "";
+        public static readonly string SyncToken = ConfigurationManager.AppSettings["SyncToken"] ?? "";
+
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
 
         private static readonly bool SyncDisabled =
             (ConfigurationManager.AppSettings["SyncEnable"] ?? "true").ToLower() != "true";
-
-        private static readonly string SyncUser = ConfigurationManager.AppSettings["SyncUser"] ?? "";
-        private static readonly string SyncToken = ConfigurationManager.AppSettings["SyncToken"] ?? "";
 
         private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
         private readonly VersionRepository versionRepository = new VersionRepository();
@@ -52,7 +52,7 @@ namespace RemindClock.Services
             var serverVerNow = syncFeign.GetServerVersion(SyncUser, SyncToken);
 
             // 读取本地版本号 和 上次同步的服务端版本号
-            var verObj = versionRepository.FindFirst() ?? new Version();
+            var verObj = versionRepository.FindFirst();
 
             VersionCheck(verObj, serverVerNow);
 
