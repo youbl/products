@@ -1,5 +1,6 @@
-﻿using System.Linq;
-using RemindClock.Repository.Model;
+﻿using System;
+using System.Linq;
+using Version = RemindClock.Repository.Model.Version;
 
 namespace RemindClock.Repository
 {
@@ -14,7 +15,20 @@ namespace RemindClock.Repository
         /// <returns></returns>
         public Version FindFirst()
         {
-            return FindAll().FirstOrDefault() ?? new Version();
+            var arr = FindAll();
+            if (arr.Count > 1)
+            {
+                throw new Exception("不能有2个以上的版本信息");
+            }
+
+            var ret = arr.FirstOrDefault();
+            if (ret != null)
+            {
+                return ret;
+            }
+
+            ret = new Version();
+            return Save(ret);
         }
 
         /// <summary>

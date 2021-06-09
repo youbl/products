@@ -1,4 +1,5 @@
-﻿using Beinet.Feign;
+﻿using Beinet.Core.Serializer;
+using Beinet.Feign;
 using NLog;
 using RemindClock.FeignService;
 using RemindClock.Repository;
@@ -13,6 +14,7 @@ namespace RemindClock.Services.SyncType
     public class SyncServerToClient : ISyncType
     {
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+        private static readonly JsonSerializer serializer = new JsonSerializer();
 
         private readonly NotesService notesService = new NotesService();
         private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
@@ -24,18 +26,18 @@ namespace RemindClock.Services.SyncType
             if (version.ServerVersion < serverVersion
                 && version.ClientVersion == version.ServerVersion)
             {
-                DoSync(serverVersion);
+                DoSync(version, serverVersion);
                 return true;
             }
 
             return false;
         }
 
-        private void DoSync(int serverVersion)
+        private void DoSync(Version version, int serverVersion)
         {
-            var version = versionRepository.FindFirst();
             logger.Info("SyncServerToClient begin: " + version.ServerVersion + ":" + version.ClientVersion);
             var serverNotes = syncFeign.GetNotes(SyncService.SyncUser, SyncService.SyncToken);
+            logger.Info("服务端下发数据:\n" + serializer.SerializToStr(serverNotes));
 
             // 备份本地
             notesService.BackupAll();

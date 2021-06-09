@@ -23,16 +23,15 @@ namespace RemindClock.Services.SyncType
             if (version.ServerVersion == serverVersion
                 && version.ClientVersion > serverVersion)
             {
-                DoSync();
+                DoSync(version);
                 return true;
             }
 
             return false;
         }
 
-        private void DoSync()
+        private void DoSync(Version version)
         {
-            var version = versionRepository.FindFirst();
             logger.Info("SyncClientToServer begin: " + version.ServerVersion + ":" + version.ClientVersion);
             var allNotes = notesService.FindAll();
             var serverVersion = syncFeign.SaveNotes(SyncService.SyncUser, SyncService.SyncToken, allNotes);
