@@ -18,6 +18,7 @@ namespace RemindClock.Services
         List<INoteAlert> AllAlerts = new List<INoteAlert>();
 
         private NotesService notesService = new NotesService();
+        private SyncService syncService = new SyncService();
 
         //private bool isRunning = false;
 
@@ -34,7 +35,7 @@ namespace RemindClock.Services
         /// 表达式由6个或7个由空格分隔的字符串组成，第7个年可选
         /// </summary>
         [Scheduled(cron: "* * * * * *")]
-        public void Begin()
+        public void ScanAllNotes()
         {
 //            if (isRunning)
 //                return;
@@ -58,6 +59,12 @@ namespace RemindClock.Services
 //            isRunning = false;
         }
 
+        [Scheduled(cron: "*/10 * * * * *")]
+        public void SyncNotes()
+        {
+            syncService.BeginSync();
+        }
+
         private void StartNote(Notes note)
         {
             foreach (var noteAlert in AllAlerts)
@@ -65,7 +72,7 @@ namespace RemindClock.Services
                 // 改用线程进行通知避免阻塞和异常
                 ThreadPool.UnsafeQueueUserWorkItem(state =>
                 {
-                    var tmpNote = (Notes) note;
+                    var tmpNote = (Notes)state;
                     try
                     {
                         noteAlert.Alert(tmpNote);

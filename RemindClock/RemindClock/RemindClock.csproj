@@ -77,6 +77,7 @@
     <Compile Include="Componment\NoteControl.Designer.cs">
       <DependentUpon>NoteControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="FeignService\SyncFeign.cs" />
     <Compile Include="FeignService\DingDingFeign.cs" />
     <Compile Include="FeignService\Dto\DingDingDto.cs" />
     <Compile Include="MainForm.cs">
@@ -96,6 +97,8 @@
     <Compile Include="Repository\Model\BaseModel.cs" />
     <Compile Include="Repository\Model\Notes.cs" />
     <Compile Include="Repository\BaseRepository.cs" />
+    <Compile Include="Repository\Model\Version.cs" />
+    <Compile Include="Repository\VersionRepository.cs" />
     <Compile Include="Repository\NotesRepository.cs" />
     <Compile Include="Services\NoteOperation\NoteAlertByDingDing.cs" />
     <Compile Include="Services\NoteOperation\NoteAlertByForm.cs" />
