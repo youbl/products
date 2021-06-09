@@ -13,11 +13,6 @@ namespace RemindClock.Services.SyncType
         /// <param name="version"></param>
         /// <param name="serverVersion"></param>
         /// <returns></returns>
-        bool Match(Version version, int serverVersion);
-
-        /// <summary>
-        /// 执行同步
-        /// </summary>
-        void Sync();
+        bool Sync(Version version, int serverVersion);
     }
 }

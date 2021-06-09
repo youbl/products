@@ -58,9 +58,9 @@ namespace RemindClock.Services
 
             foreach (var syncType in syncTypeList)
             {
-                if (syncType.Match(verObj, serverVerNow))
+                // 有一个同步方案匹配，就退出
+                if (syncType.Sync(verObj, serverVerNow))
                 {
-                    syncType.Sync();
                     return;
                 }
             }

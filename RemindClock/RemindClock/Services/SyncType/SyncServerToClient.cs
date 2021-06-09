@@ -1,4 +1,7 @@
-﻿using RemindClock.Repository.Model;
+﻿using Beinet.Feign;
+using RemindClock.FeignService;
+using RemindClock.Repository;
+using RemindClock.Repository.Model;
 
 namespace RemindClock.Services.SyncType
 {
@@ -8,16 +11,39 @@ namespace RemindClock.Services.SyncType
     public class SyncServerToClient : ISyncType
     {
         private readonly NotesService notesService = new NotesService();
+        private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
+        private readonly VersionRepository versionRepository = new VersionRepository();
 
-        public bool Match(Version version, int serverVersion)
+        public bool Sync(Version version, int serverVersion)
         {
             // 上次同步版本 < 服务端版本 && 本地版本 == 上次同步版本，走服务端同步
-            return (version.ServerVersion < serverVersion
-                    && version.ClientVersion == version.ServerVersion);
+            if (version.ServerVersion < serverVersion
+                && version.ClientVersion == version.ServerVersion)
+            {
+                DoSync(serverVersion);
+                return true;
+            }
+
+            return false;
         }
 
-        public void Sync()
+        private void DoSync(int serverVersion)
         {
+            var serverNotes = syncFeign.GetNotes(SyncService.SyncUser, SyncService.SyncToken);
+
+            // 备份本地
+            notesService.BackupAll();
+
+            // 保存服务端拉到的提醒
+            foreach (var note in serverNotes)
+            {
+                notesService.Save(note);
+            }
+
+            var version = versionRepository.FindFirst();
+            version.ServerVersion = serverVersion;
+            version.ClientVersion = serverVersion;
+            versionRepository.Save(version);
         }
     }
 }

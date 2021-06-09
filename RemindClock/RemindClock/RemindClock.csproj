@@ -121,6 +121,7 @@
     <Compile Include="Services\SyncType\SyncClientToServer.cs" />
     <Compile Include="Services\SyncType\ISyncType.cs" />
     <Compile Include="Utils\AutoStartHelper.cs" />
+    <Compile Include="Utils\FileHelper.cs" />
     <Compile Include="Utils\FormHelper.cs" />
     <EmbeddedResource Include="AlertForm.resx">
       <DependentUpon>AlertForm.cs</DependentUpon>

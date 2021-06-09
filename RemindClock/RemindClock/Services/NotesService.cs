@@ -104,6 +104,11 @@ namespace RemindClock.Services
             return false;
         }
 
+        public void BackupAll()
+        {
+            notesRepository.BackupAll();
+        }
+
         private DateTime GetLastNoteTime(int noteId, int indexId)
         {
             var key = noteId * 10000 + indexId;

@@ -9,15 +9,21 @@ namespace RemindClock.Services.SyncType
     /// </summary>
     public class SyncMerge : ISyncType
     {
-        public bool Match(Version version, int serverVersion)
+        public bool Sync(Version version, int serverVersion)
         {
             // 上次同步版本 < 服务端版本 && 本地版本 > 上次同步版本
             // 表示2边同时变更了，有冲突
-            return (version.ServerVersion < serverVersion
-                    && version.ClientVersion > version.ServerVersion);
+            if (version.ServerVersion < serverVersion
+                && version.ClientVersion > version.ServerVersion)
+            {
+                DoSync();
+                return true;
+            }
+
+            return false;
         }
 
-        public void Sync()
+        private void DoSync()
         {
             throw new Exception("冲突，请人工合并");
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Beinet.Core.Serializer;
 using RemindClock.Repository.Model;
+using RemindClock.Utils;
 
 namespace RemindClock.Repository
 {
@@ -15,15 +16,16 @@ namespace RemindClock.Repository
 
         private static readonly string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
         private const string fileExt = ".data";
-        private string modelDir;
+
+        /// <summary>
+        /// 当前模型保存的目录
+        /// </summary>
+        protected string ModelDir { get; private set; }
 
         protected BaseRepository()
         {
-            this.modelDir = Path.Combine(baseDir, typeof(T).Name);
-            if (!Directory.Exists(this.modelDir))
-            {
-                Directory.CreateDirectory(this.modelDir);
-            }
+            this.ModelDir = Path.Combine(baseDir, typeof(T).Name);
+            FileHelper.CreateDir(this.ModelDir);
         }
 
         /// <summary>
@@ -35,7 +37,7 @@ namespace RemindClock.Repository
         {
             if (id <= 0)
                 return null;
-            var fileName = Path.Combine(this.modelDir, id + fileExt);
+            var fileName = Path.Combine(this.ModelDir, id + fileExt);
             if (!File.Exists(fileName))
                 return null;
             return serializer.DeSerializFromFile<T>(fileName);
@@ -48,7 +50,7 @@ namespace RemindClock.Repository
         public List<T> FindAll()
         {
             var ret = new List<T>();
-            foreach (var file in Directory.GetFiles(this.modelDir, "*" + fileExt, SearchOption.TopDirectoryOnly))
+            foreach (var file in Directory.GetFiles(this.ModelDir, "*" + fileExt, SearchOption.TopDirectoryOnly))
             {
                 if (int.TryParse(Path.GetFileNameWithoutExtension(file), out var id))
                 {
@@ -83,7 +85,7 @@ namespace RemindClock.Repository
 
         public bool Del(T model)
         {
-            var file = Path.Combine(this.modelDir, model.Id.ToString() + fileExt);
+            var file = Path.Combine(this.ModelDir, model.Id.ToString() + fileExt);
             if (File.Exists(file))
             {
                 File.Delete(file);
@@ -95,14 +97,14 @@ namespace RemindClock.Repository
 
         private void SerializeToFile(T obj)
         {
-            var file = Path.Combine(this.modelDir, obj.Id.ToString() + fileExt);
+            var file = Path.Combine(this.ModelDir, obj.Id.ToString() + fileExt);
             serializer.SerializToFile(file, obj);
         }
 
         private int FindMaxId()
         {
             int maxId = 0;
-            foreach (var file in Directory.GetFiles(this.modelDir, "*" + fileExt, SearchOption.TopDirectoryOnly))
+            foreach (var file in Directory.GetFiles(this.ModelDir, "*" + fileExt, SearchOption.TopDirectoryOnly))
             {
                 if (int.TryParse(Path.GetFileNameWithoutExtension(file), out var id) && id > maxId)
                 {

@@ -14,14 +14,20 @@ namespace RemindClock.Services.SyncType
         private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
         private readonly VersionRepository versionRepository = new VersionRepository();
 
-        public bool Match(Version version, int serverVersion)
+        public bool Sync(Version version, int serverVersion)
         {
             // 服务端版本等于上次同步版本，且本地版本大于服务端版本，走客户端同步
-            return (version.ServerVersion == serverVersion
-                    && version.ClientVersion > serverVersion);
+            if (version.ServerVersion == serverVersion
+                && version.ClientVersion > serverVersion)
+            {
+                DoSync();
+                return true;
+            }
+
+            return false;
         }
 
-        public void Sync()
+        private void DoSync()
         {
             var allNotes = notesService.FindAll();
             var serverVersion = syncFeign.SaveNotes(SyncService.SyncUser, SyncService.SyncToken, allNotes);
