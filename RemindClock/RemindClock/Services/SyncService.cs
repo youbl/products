@@ -33,7 +33,7 @@ namespace RemindClock.Services
 
         public void BeginSync()
         {
-            if (SyncDisabled)
+            if (SyncDisabled || SyncUser.Length <= 0 || SyncToken.Length <= 0)
                 return;
 
             try

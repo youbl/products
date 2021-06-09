@@ -13,6 +13,7 @@ namespace RemindClock.Services
     {
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
         private readonly NotesRepository notesRepository = new NotesRepository();
+        private readonly VersionRepository versionRepository = new VersionRepository();
 
         /// <summary>
         /// 判断是否需要提醒的检查器列表
@@ -72,12 +73,16 @@ namespace RemindClock.Services
         /// <returns></returns>
         public Notes Save(Notes model)
         {
-            return notesRepository.Save(model);
+            var ret = notesRepository.Save(model);
+            versionRepository.PlusVersion();
+            return ret;
         }
 
         public bool Del(Notes model)
         {
-            return notesRepository.Del(model);
+            var ret = notesRepository.Del(model);
+            versionRepository.PlusVersion();
+            return ret;
         }
 
         public bool IsNoteTime(int noteId, int indexId, Notes.NoteDetail detail)
@@ -111,6 +116,7 @@ namespace RemindClock.Services
             return DateTime.MinValue;
         }
 
+        // 修改内存里的最近提醒时间，避免重复提醒
         private void SetLastNoteTime(int noteId, int indexId)
         {
             var key = noteId * 10000 + indexId;
