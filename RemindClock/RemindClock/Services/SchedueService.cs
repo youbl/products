@@ -10,24 +10,10 @@ namespace RemindClock.Services
 {
     class SchedueService
     {
-        private static ILogger logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// 所有通知器，比如钉钉通知、短信通知、窗体通知等
-        /// </summary>
-        List<INoteAlert> AllAlerts = new List<INoteAlert>();
-
         private NotesService notesService = new NotesService();
         private SyncService syncService = new SyncService();
 
-        //private bool isRunning = false;
-
-
-        public SchedueService()
-        {
-            AllAlerts.Add(new NoteAlertByForm());
-            AllAlerts.Add(new NoteAlertByDingDing());
-        }
+        private bool isRunning = false;
 
         /// <summary>
         /// 主调方法，每秒轮询所有任务
@@ -40,49 +26,17 @@ namespace RemindClock.Services
 //            if (isRunning)
 //                return;
 //            isRunning = true;
-
-            var allNotes = notesService.FindAll();
-            foreach (var note in allNotes)
-            {
-                var detailId = 0;
-                foreach (var noteDetail in note.Details)
-                {
-                    if (notesService.IsNoteTime(note.Id, detailId, noteDetail))
-                    {
-                        StartNote(note);
-                    }
-
-                    detailId++;
-                }
-            }
-
+            notesService.ScanAllNote();
 //            isRunning = false;
         }
 
         [Scheduled(cron: "*/10 * * * * *")]
         public void SyncNotes()
         {
+            //if (isRunning)
+            //    return;
+            //isRunning = true;
             syncService.BeginSync();
-        }
-
-        private void StartNote(Notes note)
-        {
-            foreach (var noteAlert in AllAlerts)
-            {
-                // 改用线程进行通知避免阻塞和异常
-                ThreadPool.UnsafeQueueUserWorkItem(state =>
-                {
-                    var tmpNote = (Notes)state;
-                    try
-                    {
-                        noteAlert.Alert(tmpNote);
-                    }
-                    catch (Exception exp)
-                    {
-                        logger.Error(exp, note.Title + ":" + noteAlert.GetType().Name);
-                    }
-                }, note);
-            }
         }
     }
 }

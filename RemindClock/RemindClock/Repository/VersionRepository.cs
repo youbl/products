@@ -1,4 +1,5 @@
-﻿using RemindClock.Repository.Model;
+﻿using System.Linq;
+using RemindClock.Repository.Model;
 
 namespace RemindClock.Repository
 {
@@ -7,5 +8,9 @@ namespace RemindClock.Repository
     /// </summary>
     public class VersionRepository : BaseRepository<Version>
     {
+        public Version FindFirst()
+        {
+            return FindAll().FirstOrDefault();
+        }
     }
 }
