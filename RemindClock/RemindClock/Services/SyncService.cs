@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using Beinet.Feign;
 using NLog;
 using RemindClock.FeignService;
 using RemindClock.Repository;
+using RemindClock.Services.SyncType;
 using Version = RemindClock.Repository.Model.Version;
 
 namespace RemindClock.Services
@@ -19,9 +20,16 @@ namespace RemindClock.Services
         private static readonly string SyncUser = ConfigurationManager.AppSettings["SyncUser"] ?? "";
         private static readonly string SyncToken = ConfigurationManager.AppSettings["SyncToken"] ?? "";
 
-        private NotesService notesService = new NotesService();
-        private SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
-        private VersionRepository versionRepository = new VersionRepository();
+        private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
+        private readonly VersionRepository versionRepository = new VersionRepository();
+        private readonly List<ISyncType> syncTypeList = new List<ISyncType>();
+
+        public SyncService()
+        {
+            syncTypeList.Add(new SyncServerToClient());
+            syncTypeList.Add(new SyncClientToServer());
+            syncTypeList.Add(new SyncMerge());
+        }
 
         public void BeginSync()
         {
@@ -47,6 +55,15 @@ namespace RemindClock.Services
             var verObj = versionRepository.FindFirst() ?? new Version();
 
             VersionCheck(verObj, serverVerNow);
+
+            foreach (var syncType in syncTypeList)
+            {
+                if (syncType.Match(verObj, serverVerNow))
+                {
+                    syncType.Sync();
+                    return;
+                }
+            }
         }
 
         private void VersionCheck(Version verObj, int serverVerNow)

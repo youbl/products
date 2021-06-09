@@ -116,6 +116,10 @@
     <Compile Include="Services\NoteType\NotePerMinute.cs" />
     <Compile Include="Services\SchedueService.cs" />
     <Compile Include="Services\SyncService.cs" />
+    <Compile Include="Services\SyncType\SyncMerge.cs" />
+    <Compile Include="Services\SyncType\SyncServerToClient.cs" />
+    <Compile Include="Services\SyncType\SyncClientToServer.cs" />
+    <Compile Include="Services\SyncType\ISyncType.cs" />
     <Compile Include="Utils\AutoStartHelper.cs" />
     <Compile Include="Utils\FormHelper.cs" />
     <EmbeddedResource Include="AlertForm.resx">
