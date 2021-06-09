@@ -46,6 +46,9 @@ namespace RemindClockWeb.Services
                 note.ClientId = note.Id;
                 note.Id = 0;
                 note.UserId = user.Id;
+                note.Title = CutStr(note.Title, 200); // 汉字也按1计算
+                note.Content = CutStr(note.Content, 500);
+
                 // note的id不会变化，还是0
                 var savedRec = notesRepository.Save(note);
 
@@ -106,6 +109,13 @@ namespace RemindClockWeb.Services
         private bool IncrVersion(int userId, int oldVersion)
         {
             return usersRepository.IncrVersion(userId, oldVersion) > 0;
+        }
+
+        private string CutStr(string str, int len)
+        {
+            if (str.Length > len)
+                return str.Substring(0, len);
+            return str;
         }
     }
 }
