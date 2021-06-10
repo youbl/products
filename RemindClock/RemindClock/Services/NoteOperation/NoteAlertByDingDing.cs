@@ -26,7 +26,7 @@ namespace RemindClock.Services.NoteOperation
             DingDingDto.Text text = new DingDingDto.Text();
             text.content = sb.ToString();
             DingDingDto.At at = new DingDingDto.At();
-            at.atMobiles.Add("15980726586");
+            //at.atMobiles.Add("手机号"); 在钉钉群里的人的手机号
 
             DingDingDto dto = new DingDingDto();
             dto.text = text;

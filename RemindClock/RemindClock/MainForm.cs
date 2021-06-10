@@ -47,6 +47,9 @@ namespace RemindClock
         public MainForm()
         {
             InitializeComponent();
+
+            this.Icon = RemindClock.Properties.Resources.clock;
+            this.notifyIcon1.Icon = RemindClock.Properties.Resources.clock;
         }
 
         protected override void OnLoad(EventArgs e)
