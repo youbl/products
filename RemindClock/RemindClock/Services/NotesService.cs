@@ -6,6 +6,7 @@ using RemindClock.Repository;
 using RemindClock.Repository.Model;
 using RemindClock.Services.NoteOperation;
 using RemindClock.Services.NoteType;
+using Version = RemindClock.Repository.Model.Version;
 
 namespace RemindClock.Services
 {
@@ -132,9 +133,14 @@ namespace RemindClock.Services
             }
         }
 
+        public Version GetVersion()
+        {
+            return versionRepository.FindFirst();
+        }
+
         public void SetVersion(int clientVersion, int serverVersion)
         {
-            var ver = versionRepository.FindFirst();
+            var ver = GetVersion();
             ver.ClientVersion = clientVersion;
             ver.ServerVersion = serverVersion;
             versionRepository.Save(ver);

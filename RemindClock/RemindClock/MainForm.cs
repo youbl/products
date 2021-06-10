@@ -179,6 +179,16 @@ namespace RemindClock
                 lvData.Items[idx].BackColor = colorArr[idx % colorArr.Length];
                 idx++;
             }
+
+            var version = notesService.GetVersion();
+            if (version.ServerVersion <= 0)
+            {
+                labSync.Text = "未同步";
+            }
+            else
+            {
+                labSync.Text = version.LastModifyTime.ToString("yyyy-MM-dd HH:mm:ss");
+            }
         }
 
         /// <summary>
@@ -286,6 +296,11 @@ namespace RemindClock
             // 本地强制设置为服务器版本+1，这样job就会自动同步到线上
             var serverVerNow = syncFeign.GetServerVersion(SyncService.SyncUser, SyncService.SyncToken);
             notesService.SetVersion(serverVerNow + 1, serverVerNow);
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

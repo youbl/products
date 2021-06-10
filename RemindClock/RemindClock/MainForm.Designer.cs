@@ -37,9 +37,12 @@
             this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnOverwriteLocal = new System.Windows.Forms.Button();
+            this.labSync = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.btnOverwriteServer = new System.Windows.Forms.Button();
             this.btnReload = new System.Windows.Forms.Button();
             this.btnNew = new System.Windows.Forms.Button();
+            this.btnClose = new System.Windows.Forms.Button();
             this.lvData = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -102,6 +105,8 @@
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.btnOverwriteLocal);
+            this.splitContainer1.Panel1.Controls.Add(this.labSync);
+            this.splitContainer1.Panel1.Controls.Add(this.label1);
             this.splitContainer1.Panel1.Controls.Add(this.btnOverwriteServer);
             this.splitContainer1.Panel1.Controls.Add(this.btnReload);
             this.splitContainer1.Panel1.Controls.Add(this.btnNew);
@@ -109,6 +114,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.lvData);
+            this.splitContainer1.Panel2.Controls.Add(this.btnClose);
             this.splitContainer1.Size = new System.Drawing.Size(841, 450);
             this.splitContainer1.SplitterDistance = 46;
             this.splitContainer1.SplitterWidth = 1;
@@ -117,7 +123,7 @@
             // 
             // btnOverwriteLocal
             // 
-            this.btnOverwriteLocal.Location = new System.Drawing.Point(480, 12);
+            this.btnOverwriteLocal.Location = new System.Drawing.Point(579, 12);
             this.btnOverwriteLocal.Name = "btnOverwriteLocal";
             this.btnOverwriteLocal.Size = new System.Drawing.Size(117, 23);
             this.btnOverwriteLocal.TabIndex = 3;
@@ -125,19 +131,37 @@
             this.btnOverwriteLocal.UseVisualStyleBackColor = true;
             this.btnOverwriteLocal.Click += new System.EventHandler(this.BtnOverwriteLocal_Click);
             // 
+            // labSync
+            // 
+            this.labSync.AutoSize = true;
+            this.labSync.Location = new System.Drawing.Point(457, 17);
+            this.labSync.Name = "labSync";
+            this.labSync.Size = new System.Drawing.Size(119, 12);
+            this.labSync.TabIndex = 6;
+            this.labSync.Text = "2021-06-10 09:10:11";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(400, 17);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(59, 12);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "前次同步:";
+            // 
             // btnOverwriteServer
             // 
-            this.btnOverwriteServer.Location = new System.Drawing.Point(614, 12);
+            this.btnOverwriteServer.Location = new System.Drawing.Point(713, 12);
             this.btnOverwriteServer.Name = "btnOverwriteServer";
             this.btnOverwriteServer.Size = new System.Drawing.Size(116, 23);
-            this.btnOverwriteServer.TabIndex = 3;
+            this.btnOverwriteServer.TabIndex = 4;
             this.btnOverwriteServer.Text = "强制覆盖远端";
             this.btnOverwriteServer.UseVisualStyleBackColor = true;
             this.btnOverwriteServer.Click += new System.EventHandler(this.BtnOverwriteServer_Click);
             // 
             // btnReload
             // 
-            this.btnReload.Location = new System.Drawing.Point(736, 12);
+            this.btnReload.Location = new System.Drawing.Point(111, 12);
             this.btnReload.Name = "btnReload";
             this.btnReload.Size = new System.Drawing.Size(93, 23);
             this.btnReload.TabIndex = 2;
@@ -150,10 +174,22 @@
             this.btnNew.Location = new System.Drawing.Point(12, 12);
             this.btnNew.Name = "btnNew";
             this.btnNew.Size = new System.Drawing.Size(93, 23);
-            this.btnNew.TabIndex = 2;
+            this.btnNew.TabIndex = 1;
             this.btnNew.Text = "新增提醒...";
             this.btnNew.UseVisualStyleBackColor = true;
             this.btnNew.Click += new System.EventHandler(this.BtnNew_Click);
+            // 
+            // btnClose
+            // 
+            this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnClose.Location = new System.Drawing.Point(727, 43);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 0;
+            this.btnClose.TabStop = false;
+            this.btnClose.Text = "隐藏的关闭按钮";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // lvData
             // 
@@ -204,6 +240,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(841, 450);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -213,6 +250,7 @@
             this.SizeChanged += new System.EventHandler(this.MainForm_SizeChanged);
             this.contextMenuStrip1.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
@@ -238,6 +276,9 @@
         private System.Windows.Forms.Button btnReload;
         private System.Windows.Forms.Button btnOverwriteLocal;
         private System.Windows.Forms.Button btnOverwriteServer;
+        private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.Label labSync;
+        private System.Windows.Forms.Label label1;
     }
 }
 
