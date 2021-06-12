@@ -1,10 +1,11 @@
-﻿using Beinet.Core.Serializer;
+﻿using System;
+using Beinet.Core.Serializer;
 using Beinet.Feign;
 using NLog;
 using RemindClock.FeignService;
 using RemindClock.Repository;
-using RemindClock.Repository.Model;
 using RemindClock.Utils;
+using Version = RemindClock.Repository.Model.Version;
 
 namespace RemindClock.Services.SyncType
 {
@@ -51,6 +52,7 @@ namespace RemindClock.Services.SyncType
 
             version.ServerVersion = serverVersion;
             version.ClientVersion = serverVersion;
+            version.LastSyncTime = DateTime.Now;
             versionRepository.Save(version);
             logger.Info("SyncServerToClient end: " + version.ServerVersion + ":" + version.ClientVersion);
 

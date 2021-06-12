@@ -1,4 +1,6 @@
-﻿namespace RemindClock.Repository.Model
+﻿using System;
+
+namespace RemindClock.Repository.Model
 {
     /// <summary>
     /// 版本类，用于同步策略判断
@@ -14,5 +16,10 @@
         /// 最近一次同步的服务端版本号
         /// </summary>
         public int ServerVersion { get; set; }
+
+        /// <summary>
+        /// 最近同步时间
+        /// </summary>
+        public DateTime LastSyncTime { get; set; }
     }
 }

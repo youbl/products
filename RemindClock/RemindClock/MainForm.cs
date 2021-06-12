@@ -193,7 +193,7 @@ namespace RemindClock
             }
             else
             {
-                labSync.Text = version.LastModifyTime.ToString("yyyy-MM-dd HH:mm:ss");
+                labSync.Text = version.LastSyncTime.ToString("yyyy-MM-dd HH:mm:ss");
             }
         }
 

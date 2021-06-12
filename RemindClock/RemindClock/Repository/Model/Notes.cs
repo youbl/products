@@ -72,10 +72,8 @@ namespace RemindClock.Repository.Model
                     case "周六~周日每天":
                         return EventType + ":" + EventTime.ToString("HH:mm:ss");
                     case "每周":
-                        var week = ((int) EventTime.DayOfWeek).ToString();
-                        if (week == "0")
-                            week = "日";
-                        return EventType + ":周" + week + EventTime.ToString("HH:mm:ss");
+                        var week = GetChineseWeek(EventTime.DayOfWeek);
+                        return EventType + week + EventTime.ToString("HH:mm:ss");
                     case "每月":
                         return EventType + ":" + EventTime.ToString("dd日HH:mm:ss");
                     case "每年":
@@ -85,6 +83,29 @@ namespace RemindClock.Repository.Model
                 }
 
                 return EventTime.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+
+            private string GetChineseWeek(DayOfWeek day)
+            {
+                switch (day)
+                {
+                    case DayOfWeek.Monday:
+                        return "一";
+                    case DayOfWeek.Tuesday:
+                        return "二";
+                    case DayOfWeek.Wednesday:
+                        return "三";
+                    case DayOfWeek.Thursday:
+                        return "四";
+                    case DayOfWeek.Friday:
+                        return "五";
+                    case DayOfWeek.Saturday:
+                        return "六";
+                    case DayOfWeek.Sunday:
+                        return "日";
+                }
+
+                return "X";
             }
         }
     }
