@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AlertForm));
             this.labTime = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.labTitle = new System.Windows.Forms.Label();
@@ -113,7 +112,6 @@
             this.Controls.Add(this.labTitle);
             this.Controls.Add(this.labTime);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AlertForm";

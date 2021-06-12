@@ -37,6 +37,8 @@ namespace RemindClock
         public AlertForm(string title, string content)
         {
             InitializeComponent();
+            this.Icon = RemindClock.Properties.Resources.clock;
+
             this.labTime.Text = GetTimeTxt();
             this.labNote.Text = FormatNote(content);
             if (!string.IsNullOrEmpty(title))

@@ -17,6 +17,7 @@ namespace RemindClock
         {
             this.notes = notes ?? throw new ArgumentException("提醒不能为空");
             InitializeComponent();
+            this.Icon = RemindClock.Properties.Resources.clock;
 
             SetTextByNote();
             ShowDeails();
