@@ -14,6 +14,7 @@ namespace RemindClock
 {
     public partial class MainForm : Form
     {
+        public const string APPNAME = "贝可提醒机";
         private static MainForm _default;
 
         private const int COL_ID = 0; // ID在第几列（ListView）
@@ -50,6 +51,8 @@ namespace RemindClock
 
             this.Icon = RemindClock.Properties.Resources.clock;
             this.notifyIcon1.Icon = RemindClock.Properties.Resources.clock;
+            this.Text = APPNAME;
+            this.notifyIcon1.Text = APPNAME;
         }
 
         protected override void OnLoad(EventArgs e)

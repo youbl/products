@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Beinet.Core.Util;
 using Beinet.Feign;
 using RemindClock.FeignService;
 using RemindClock.FeignService.Dto;
@@ -18,10 +19,14 @@ namespace RemindClock.Services.NoteOperation
 
             var sb = new StringBuilder();
             sb.Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                .Append("-贝可提醒:\n")
+                .Append(" ")
+                .Append(MainForm.APPNAME)
+                .Append(":\n")
                 .Append(note.Title)
                 .Append("\n")
-                .Append(note.Content);
+                .Append(note.Content)
+                .Append("\n客户端:")
+                .Append(IpHelper.GetServerIpList());
 
             DingDingDto.Text text = new DingDingDto.Text();
             text.content = sb.ToString();
