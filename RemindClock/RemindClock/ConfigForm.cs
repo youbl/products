@@ -50,6 +50,7 @@ namespace RemindClock
             }
 
             notesService.SaveVersion(version);
+            this.Close();
         }
     }
 }
