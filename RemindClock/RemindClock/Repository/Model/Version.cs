@@ -21,5 +21,25 @@ namespace RemindClock.Repository.Model
         /// 最近同步时间
         /// </summary>
         public DateTime LastSyncTime { get; set; }
+
+        /// <summary>
+        /// 是否启用同步
+        /// </summary>
+        public bool SyncEnable { get; set; }
+
+        /// <summary>
+        /// 同步服务器地址
+        /// </summary>
+        public string SyncUrl { get; set; }
+
+        /// <summary>
+        /// 同步账号
+        /// </summary>
+        public string SyncUser { get; set; }
+
+        /// <summary>
+        /// 同步密钥
+        /// </summary>
+        public string SyncToken { get; set; }
     }
 }

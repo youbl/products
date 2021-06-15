@@ -146,6 +146,11 @@ namespace RemindClock.Services
             versionRepository.Save(ver);
         }
 
+        public void SaveVersion(Version version)
+        {
+            versionRepository.Save(version);
+        }
+
 
         #region 计划任务扫描方法
 

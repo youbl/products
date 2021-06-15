@@ -35,7 +35,7 @@ namespace RemindClock.Services.SyncType
         {
             logger.Info("SyncClientToServer begin: " + version.ServerVersion + ":" + version.ClientVersion);
             var allNotes = notesService.FindAll();
-            var serverVersion = syncFeign.SaveNotes(SyncService.SyncUser, SyncService.SyncToken, allNotes);
+            var serverVersion = syncFeign.SaveNotes(version.SyncUser, version.SyncToken, allNotes);
 
             version.ServerVersion = serverVersion;
             version.ClientVersion = serverVersion;

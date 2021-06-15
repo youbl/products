@@ -37,7 +37,7 @@ namespace RemindClock.Services.SyncType
         private void DoSync(Version version, int serverVersion)
         {
             logger.Info("SyncServerToClient begin: " + version.ServerVersion + ":" + version.ClientVersion);
-            var serverNotes = syncFeign.GetNotes(SyncService.SyncUser, SyncService.SyncToken);
+            var serverNotes = syncFeign.GetNotes(version.SyncUser, version.SyncToken);
             logger.Info("服务端下发数据:\n" + serializer.SerializToStr(serverNotes));
 
             // 备份本地

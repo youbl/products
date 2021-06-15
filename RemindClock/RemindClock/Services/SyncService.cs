@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using Beinet.Feign;
 using NLog;
 using RemindClock.FeignService;
@@ -12,13 +11,7 @@ namespace RemindClock.Services
 {
     public class SyncService
     {
-        public static readonly string SyncUser = ConfigurationManager.AppSettings["SyncUser"] ?? "";
-        public static readonly string SyncToken = ConfigurationManager.AppSettings["SyncToken"] ?? "";
-
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
-
-        private static readonly bool SyncDisabled =
-            (ConfigurationManager.AppSettings["SyncEnable"] ?? "true").ToLower() != "true";
 
         private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
         private readonly VersionRepository versionRepository = new VersionRepository();
@@ -33,12 +26,16 @@ namespace RemindClock.Services
 
         public void BeginSync()
         {
-            if (SyncDisabled || SyncUser.Length <= 0 || SyncToken.Length <= 0)
+            // 读取本地版本号 和 上次同步的服务端版本号
+            var verObj = versionRepository.FindFirst();
+
+            if (!verObj.SyncEnable || string.IsNullOrEmpty(verObj.SyncUrl) || string.IsNullOrEmpty(verObj.SyncUser) ||
+                string.IsNullOrEmpty(verObj.SyncToken))
                 return;
 
             try
             {
-                StartSync();
+                StartSync(verObj);
             }
             catch (Exception exp)
             {
@@ -46,13 +43,10 @@ namespace RemindClock.Services
             }
         }
 
-        private void StartSync()
+        private void StartSync(Version verObj)
         {
             // 读取服务端版本号
-            var serverVerNow = syncFeign.GetServerVersion(SyncUser, SyncToken);
-
-            // 读取本地版本号 和 上次同步的服务端版本号
-            var verObj = versionRepository.FindFirst();
+            var serverVerNow = syncFeign.GetServerVersion(verObj.SyncUser, verObj.SyncToken);
 
             VersionCheck(verObj, serverVerNow);
 

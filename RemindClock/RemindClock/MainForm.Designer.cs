@@ -37,17 +37,18 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnOverwriteLocal = new System.Windows.Forms.Button();
             this.labSync = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
+            this.labSyncTitle = new System.Windows.Forms.Label();
             this.btnOverwriteServer = new System.Windows.Forms.Button();
             this.btnReload = new System.Windows.Forms.Button();
             this.btnNew = new System.Windows.Forms.Button();
-            this.btnClose = new System.Windows.Forms.Button();
             this.lvData = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.col4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.btnClose = new System.Windows.Forms.Button();
+            this.btnSyncConfig = new System.Windows.Forms.Button();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -72,21 +73,21 @@
             // 打开提醒机ToolStripMenuItem
             // 
             this.打开提醒机ToolStripMenuItem.Name = "打开提醒机ToolStripMenuItem";
-            this.打开提醒机ToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.打开提醒机ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.打开提醒机ToolStripMenuItem.Text = "打开提醒机";
             this.打开提醒机ToolStripMenuItem.Click += new System.EventHandler(this.打开提醒机ToolStripMenuItem_Click);
             // 
             // 开机启动ToolStripMenuItem
             // 
             this.开机启动ToolStripMenuItem.Name = "开机启动ToolStripMenuItem";
-            this.开机启动ToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.开机启动ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.开机启动ToolStripMenuItem.Text = "开机启动";
             this.开机启动ToolStripMenuItem.Click += new System.EventHandler(this.开机启动ToolStripMenuItem_Click);
             // 
             // 退出ToolStripMenuItem
             // 
             this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
-            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.退出ToolStripMenuItem.Text = "退出";
             this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
             // 
@@ -101,9 +102,10 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnSyncConfig);
             this.splitContainer1.Panel1.Controls.Add(this.btnOverwriteLocal);
             this.splitContainer1.Panel1.Controls.Add(this.labSync);
-            this.splitContainer1.Panel1.Controls.Add(this.label1);
+            this.splitContainer1.Panel1.Controls.Add(this.labSyncTitle);
             this.splitContainer1.Panel1.Controls.Add(this.btnOverwriteServer);
             this.splitContainer1.Panel1.Controls.Add(this.btnReload);
             this.splitContainer1.Panel1.Controls.Add(this.btnNew);
@@ -113,17 +115,17 @@
             this.splitContainer1.Panel2.Controls.Add(this.lvData);
             this.splitContainer1.Panel2.Controls.Add(this.btnClose);
             this.splitContainer1.Size = new System.Drawing.Size(841, 450);
-            this.splitContainer1.SplitterDistance = 46;
+            this.splitContainer1.SplitterDistance = 52;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 1;
             this.splitContainer1.TabStop = false;
             // 
             // btnOverwriteLocal
             // 
-            this.btnOverwriteLocal.Location = new System.Drawing.Point(579, 12);
+            this.btnOverwriteLocal.Location = new System.Drawing.Point(722, 29);
             this.btnOverwriteLocal.Name = "btnOverwriteLocal";
-            this.btnOverwriteLocal.Size = new System.Drawing.Size(117, 23);
-            this.btnOverwriteLocal.TabIndex = 3;
+            this.btnOverwriteLocal.Size = new System.Drawing.Size(116, 23);
+            this.btnOverwriteLocal.TabIndex = 5;
             this.btnOverwriteLocal.Text = "强制覆盖本地";
             this.btnOverwriteLocal.UseVisualStyleBackColor = true;
             this.btnOverwriteLocal.Click += new System.EventHandler(this.BtnOverwriteLocal_Click);
@@ -131,24 +133,24 @@
             // labSync
             // 
             this.labSync.AutoSize = true;
-            this.labSync.Location = new System.Drawing.Point(457, 17);
+            this.labSync.Location = new System.Drawing.Point(591, 30);
             this.labSync.Name = "labSync";
             this.labSync.Size = new System.Drawing.Size(119, 12);
-            this.labSync.TabIndex = 6;
+            this.labSync.TabIndex = 0;
             this.labSync.Text = "2021-06-10 09:10:11";
             // 
-            // label1
+            // labSyncTitle
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(400, 17);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(59, 12);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "前次同步:";
+            this.labSyncTitle.AutoSize = true;
+            this.labSyncTitle.Location = new System.Drawing.Point(537, 30);
+            this.labSyncTitle.Name = "labSyncTitle";
+            this.labSyncTitle.Size = new System.Drawing.Size(59, 12);
+            this.labSyncTitle.TabIndex = 0;
+            this.labSyncTitle.Text = "前次同步:";
             // 
             // btnOverwriteServer
             // 
-            this.btnOverwriteServer.Location = new System.Drawing.Point(713, 12);
+            this.btnOverwriteServer.Location = new System.Drawing.Point(722, 2);
             this.btnOverwriteServer.Name = "btnOverwriteServer";
             this.btnOverwriteServer.Size = new System.Drawing.Size(116, 23);
             this.btnOverwriteServer.TabIndex = 4;
@@ -176,18 +178,6 @@
             this.btnNew.UseVisualStyleBackColor = true;
             this.btnNew.Click += new System.EventHandler(this.BtnNew_Click);
             // 
-            // btnClose
-            // 
-            this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnClose.Location = new System.Drawing.Point(727, 43);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(75, 23);
-            this.btnClose.TabIndex = 0;
-            this.btnClose.TabStop = false;
-            this.btnClose.Text = "隐藏的关闭按钮";
-            this.btnClose.UseVisualStyleBackColor = true;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
-            // 
             // lvData
             // 
             this.lvData.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
@@ -201,8 +191,9 @@
             this.lvData.HideSelection = false;
             this.lvData.Location = new System.Drawing.Point(0, 0);
             this.lvData.Name = "lvData";
-            this.lvData.Size = new System.Drawing.Size(841, 403);
+            this.lvData.Size = new System.Drawing.Size(841, 397);
             this.lvData.TabIndex = 0;
+            this.lvData.TabStop = false;
             this.lvData.UseCompatibleStateImageBehavior = false;
             this.lvData.View = System.Windows.Forms.View.Details;
             this.lvData.DoubleClick += new System.EventHandler(this.lvData_DoubleClick);
@@ -232,6 +223,28 @@
             // 
             this.columnHeader5.Text = "";
             this.columnHeader5.Width = 45;
+            // 
+            // btnClose
+            // 
+            this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnClose.Location = new System.Drawing.Point(727, 43);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 0;
+            this.btnClose.TabStop = false;
+            this.btnClose.Text = "隐藏的关闭按钮";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
+            // btnSyncConfig
+            // 
+            this.btnSyncConfig.Location = new System.Drawing.Point(600, 2);
+            this.btnSyncConfig.Name = "btnSyncConfig";
+            this.btnSyncConfig.Size = new System.Drawing.Size(116, 23);
+            this.btnSyncConfig.TabIndex = 3;
+            this.btnSyncConfig.Text = "同步设置...";
+            this.btnSyncConfig.UseVisualStyleBackColor = true;
+            this.btnSyncConfig.Click += new System.EventHandler(this.BtnSyncConfig_Click);
             // 
             // MainForm
             // 
@@ -273,7 +286,8 @@
         private System.Windows.Forms.Button btnOverwriteServer;
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Label labSync;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labSyncTitle;
+        private System.Windows.Forms.Button btnSyncConfig;
     }
 }
 

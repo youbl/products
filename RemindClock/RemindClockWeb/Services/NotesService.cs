@@ -40,7 +40,7 @@ namespace RemindClockWeb.Services
             // 注意，必须先删除Detail，否则会造成删除失败
             detailRepository.DeleteByUser(user.Id);
             notesRepository.DeleteByUser(user.Id);
-            foreach (var note in notes)
+            foreach (var note in notes.OrderBy(item => item.Id))
             {
                 // 上传的Id是客户端标识，不能用
                 note.ClientId = note.Id;

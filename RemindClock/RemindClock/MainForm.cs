@@ -8,6 +8,7 @@ using RemindClock.FeignService;
 using RemindClock.Repository.Model;
 using RemindClock.Services;
 using RemindClock.Utils;
+using Version = RemindClock.Repository.Model.Version;
 
 namespace RemindClock
 {
@@ -30,6 +31,7 @@ namespace RemindClock
         private SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
 
         private Dictionary<int, Notes> notesList;
+        private Version version;
 
         public static MainForm Default
         {
@@ -194,13 +196,16 @@ namespace RemindClock
                 idx++;
             }
 
-            var version = notesService.GetVersion();
+            version = notesService.GetVersion();
             if (version.ServerVersion <= 0)
             {
-                labSync.Text = "未同步";
+                labSyncTitle.Visible = false;
+                labSync.Visible = false;
             }
             else
             {
+                labSyncTitle.Visible = true;
+                labSync.Visible = true;
                 labSync.Text = version.LastSyncTime.ToString("yyyy-MM-dd HH:mm:ss");
             }
         }
@@ -285,6 +290,12 @@ namespace RemindClock
 
         private void BtnOverwriteLocal_Click(object sender, EventArgs e)
         {
+            if (!version.SyncEnable)
+            {
+                MessageBox.Show("未启用同步设置");
+                return;
+            }
+
             var msg = "本地数据将被清空，以远端为准，确认要执行吗?";
             var result = MessageBox.Show(msg, "覆盖确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
                 MessageBoxDefaultButton.Button2);
@@ -299,6 +310,12 @@ namespace RemindClock
 
         private void BtnOverwriteServer_Click(object sender, EventArgs e)
         {
+            if (!version.SyncEnable)
+            {
+                MessageBox.Show("未启用同步设置");
+                return;
+            }
+
             var msg = "远端数据将被清空，以本地为准，确认要执行吗?";
             var result = MessageBox.Show(msg, "覆盖确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
                 MessageBoxDefaultButton.Button2);
@@ -308,13 +325,18 @@ namespace RemindClock
             }
 
             // 本地强制设置为服务器版本+1，这样job就会自动同步到线上
-            var serverVerNow = syncFeign.GetServerVersion(SyncService.SyncUser, SyncService.SyncToken);
+            var serverVerNow = syncFeign.GetServerVersion(version.SyncUser, version.SyncToken);
             notesService.SetVersion(serverVerNow + 1, serverVerNow);
         }
 
         private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void BtnSyncConfig_Click(object sender, EventArgs e)
+        {
+            new ConfigForm().ShowDialog();
         }
     }
 }
