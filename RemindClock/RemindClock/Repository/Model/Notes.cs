@@ -26,6 +26,11 @@ namespace RemindClock.Repository.Model
         public string DingDingToken { get; set; }
 
         /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool Enable { get; set; } = true;
+
+        /// <summary>
         /// 记事提醒明细
         /// </summary>
         public List<NoteDetail> Details { get; set; } = new List<NoteDetail>();

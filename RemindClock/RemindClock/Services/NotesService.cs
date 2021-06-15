@@ -151,7 +151,7 @@ namespace RemindClock.Services
 
         public void ScanAllNote()
         {
-            var allNotes = FindAll();
+            var allNotes = notesRepository.FindAllEnabled();
             foreach (var note in allNotes)
             {
                 var detailId = 0;

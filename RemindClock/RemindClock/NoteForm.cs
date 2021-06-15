@@ -32,6 +32,8 @@ namespace RemindClock
                 this.chkDingDing.Checked = true;
                 this.txtDingDingToken.Text = this.notes.DingDingToken;
             }
+
+            chkEnabled.Checked = this.notes.Enable;
         }
 
         private void NoteForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -63,6 +65,8 @@ namespace RemindClock
             {
                 this.notes.DingDingToken = "";
             }
+
+            this.notes.Enable = chkEnabled.Checked;
 
             notesService.Save(this.notes);
             MessageBox.Show("保存成功");

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using RemindClock.Repository.Model;
 using RemindClock.Utils;
 
@@ -18,6 +20,12 @@ namespace RemindClock.Repository
             var bakName = ModelDir + DateTime.Now.ToString("yyyyMMddHHmmss");
             Directory.Move(ModelDir, bakName);
             FileHelper.CreateDir(ModelDir);
+        }
+
+        public List<Notes> FindAllEnabled()
+        {
+            var allNotes = FindAll();
+            return allNotes.Where(item => item.Enable).ToList();
         }
     }
 }

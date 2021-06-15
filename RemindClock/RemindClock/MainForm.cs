@@ -7,7 +7,6 @@ using Beinet.Feign;
 using RemindClock.FeignService;
 using RemindClock.Repository.Model;
 using RemindClock.Services;
-using RemindClock.Services.SyncType;
 using RemindClock.Utils;
 
 namespace RemindClock
@@ -167,6 +166,7 @@ namespace RemindClock
                 Color.FromArgb(42, 0xa0, 0xe7, 0xae),
                 Color.FromArgb(42, 0xdb, 0xd5, 0xf7), //DBD5F7
             };
+            var colorDisabled = Color.Gray;
             lvData.Items.Clear();
 
             var idx = 0;
@@ -182,7 +182,15 @@ namespace RemindClock
                 var row = new ListViewItem(dataArr, 0);
                 lvData.Items.Add(row);
 
-                lvData.Items[idx].BackColor = colorArr[idx % colorArr.Length];
+                if (note.Enable)
+                {
+                    lvData.Items[idx].BackColor = colorArr[idx % colorArr.Length];
+                }
+                else
+                {
+                    lvData.Items[idx].BackColor = colorDisabled;
+                }
+
                 idx++;
             }
 
