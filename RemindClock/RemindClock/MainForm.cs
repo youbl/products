@@ -28,7 +28,7 @@ namespace RemindClock
         private bool realClose = false;
 
         private NotesService notesService = new NotesService();
-        private readonly SyncFeignService syncFeign = new SyncFeignService();
+        private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
 
         private Dictionary<int, Notes> notesList;
         private Version version;
@@ -325,7 +325,7 @@ namespace RemindClock
             }
 
             // 本地强制设置为服务器版本+1，这样job就会自动同步到线上
-            var serverVerNow = syncFeign.GetServerVersion(version);
+            var serverVerNow = syncFeign.GetServerVersion(version.SyncUser, version.SyncToken);
             notesService.SetVersion(serverVerNow + 1, serverVerNow);
         }
 

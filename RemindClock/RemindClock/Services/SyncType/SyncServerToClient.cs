@@ -18,7 +18,7 @@ namespace RemindClock.Services.SyncType
         private static readonly JsonSerializer serializer = new JsonSerializer();
 
         private readonly NotesService notesService = new NotesService();
-        private readonly SyncFeignService syncFeign = new SyncFeignService();
+        private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
         private readonly VersionRepository versionRepository = new VersionRepository();
 
         public bool Sync(Version version, int serverVersion)
@@ -37,7 +37,7 @@ namespace RemindClock.Services.SyncType
         private void DoSync(Version version, int serverVersion)
         {
             logger.Info("SyncServerToClient begin: " + version.ServerVersion + ":" + version.ClientVersion);
-            var serverNotes = syncFeign.GetNotes(version);
+            var serverNotes = syncFeign.GetNotes(version.SyncUser, version.SyncToken);
             logger.Info("服务端下发数据:\n" + serializer.SerializToStr(serverNotes));
 
             // 备份本地

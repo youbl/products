@@ -13,7 +13,7 @@ namespace RemindClock.Services
     {
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
 
-        private readonly SyncFeignService syncFeign = new SyncFeignService();
+        private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
         private readonly VersionRepository versionRepository = new VersionRepository();
         private readonly List<ISyncType> syncTypeList = new List<ISyncType>();
 
@@ -46,7 +46,7 @@ namespace RemindClock.Services
         private void StartSync(Version verObj)
         {
             // 读取服务端版本号
-            var serverVerNow = syncFeign.GetServerVersion(verObj);
+            var serverVerNow = syncFeign.GetServerVersion(verObj.SyncUser, verObj.SyncToken);
 
             VersionCheck(verObj, serverVerNow);
 

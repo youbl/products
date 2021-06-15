@@ -15,7 +15,7 @@ namespace RemindClock.Services.SyncType
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
 
         private readonly NotesService notesService = new NotesService();
-        private readonly SyncFeignService syncFeign = new SyncFeignService();
+        private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
         private readonly VersionRepository versionRepository = new VersionRepository();
 
         public bool Sync(Version version, int serverVersion)
@@ -35,7 +35,7 @@ namespace RemindClock.Services.SyncType
         {
             logger.Info("SyncClientToServer begin: " + version.ServerVersion + ":" + version.ClientVersion);
             var allNotes = notesService.FindAll();
-            var serverVersion = syncFeign.SaveNotes(version, allNotes);
+            var serverVersion = syncFeign.SaveNotes(version.SyncUser, version.SyncToken, allNotes);
 
             version.ServerVersion = serverVersion;
             version.ClientVersion = serverVersion;

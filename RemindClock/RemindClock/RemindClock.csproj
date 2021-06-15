@@ -83,7 +83,6 @@
     <Compile Include="ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FeignService\SyncFeignService.cs" />
     <Compile Include="FeignService\SyncFeign.cs" />
     <Compile Include="FeignService\DingDingFeign.cs" />
     <Compile Include="FeignService\Dto\DingDingDto.cs" />
