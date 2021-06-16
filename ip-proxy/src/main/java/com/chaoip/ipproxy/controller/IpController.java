@@ -68,11 +68,21 @@ public class IpController {
 
         List<Route> ret = ipGetService.getIpByOrder(condition);
         if (condition.getOutputType().equalsIgnoreCase("json")) {
+            initJsonData(ret);
             return ret;
         }
 
         outputTextIps(ret, response);
         return null;
+    }
+
+    private void initJsonData(List<Route> ret) {
+        for (Route item : ret) {
+            item.setId(0);
+            item.setCreationTime(null);
+            item.setModifyTime(null);
+            item.setRndNum(null);
+        }
     }
 
     private void outputTextIps(List<Route> ret, HttpServletResponse response) throws IOException {

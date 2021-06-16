@@ -293,7 +293,7 @@ public final class CityHelper {
         citys.put("0436", new String[]{"吉林省白城市", "吉林"});
         citys.put("0437", new String[]{"吉林省辽源市", "吉林"});
         citys.put("0438", new String[]{"吉林省松原市", "吉林"});
-        citys.put("0439", new String[]{"吉林省浑江市", "吉林"});
+        citys.put("0439", new String[]{"吉林省白山市", "吉林"});
         citys.put("0440", new String[]{"吉林省珲春市", "吉林"});
 
         citys.put("0770", new String[]{"广西省防城港", "广西"});

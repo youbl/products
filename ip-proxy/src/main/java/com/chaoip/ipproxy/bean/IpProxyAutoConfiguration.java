@@ -1,5 +1,6 @@
 package com.chaoip.ipproxy.bean;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.databind.*;
@@ -45,7 +46,8 @@ public class IpProxyAutoConfiguration {
                 .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)  // 禁用写时间戳
                 .featuresToEnable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES) // 反序列化时，忽略大小写
                 .featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)// 忽略未知属性
-                .build();
+                .build()
+                .setSerializationInclusion(JsonInclude.Include.NON_EMPTY); // 为null或"" 时都不序列化
     }
 
     /**
