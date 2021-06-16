@@ -37,6 +37,7 @@
             this.labSyncToken = new System.Windows.Forms.Label();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // chkEnableSync
@@ -62,14 +63,14 @@
             // 
             this.txtSyncUrl.Location = new System.Drawing.Point(74, 33);
             this.txtSyncUrl.Name = "txtSyncUrl";
-            this.txtSyncUrl.Size = new System.Drawing.Size(643, 21);
+            this.txtSyncUrl.Size = new System.Drawing.Size(408, 21);
             this.txtSyncUrl.TabIndex = 2;
             // 
             // txtSyncUser
             // 
             this.txtSyncUser.Location = new System.Drawing.Point(74, 60);
             this.txtSyncUser.Name = "txtSyncUser";
-            this.txtSyncUser.Size = new System.Drawing.Size(643, 21);
+            this.txtSyncUser.Size = new System.Drawing.Size(408, 21);
             this.txtSyncUser.TabIndex = 4;
             // 
             // labSyncUser
@@ -85,7 +86,7 @@
             // 
             this.txtSyncToken.Location = new System.Drawing.Point(74, 87);
             this.txtSyncToken.Name = "txtSyncToken";
-            this.txtSyncToken.Size = new System.Drawing.Size(643, 21);
+            this.txtSyncToken.Size = new System.Drawing.Size(408, 21);
             this.txtSyncToken.TabIndex = 6;
             // 
             // labSyncToken
@@ -118,12 +119,23 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.ForeColor = System.Drawing.Color.Red;
+            this.label1.Location = new System.Drawing.Point(91, 14);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(305, 12);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "启用后，可以在任意电脑编辑数据，同步到所有其它电脑";
+            // 
             // ConfigForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(726, 159);
+            this.ClientSize = new System.Drawing.Size(498, 159);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.txtSyncToken);
@@ -153,5 +165,6 @@
         private System.Windows.Forms.Label labSyncToken;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.Label label1;
     }
 }
