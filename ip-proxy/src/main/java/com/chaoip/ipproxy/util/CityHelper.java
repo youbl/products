@@ -83,6 +83,7 @@ public final class CityHelper {
         citys.put("0518", new String[]{"江苏省连云港", "江苏"});
         citys.put("0519", new String[]{"江苏省常州市", "江苏"});
         citys.put("0523", new String[]{"江苏省泰州市", "江苏"});
+        citys.put("0527", new String[]{"江苏省宿迁市", "江苏"});
 
         citys.put("0470", new String[]{"内蒙古海拉尔", "内蒙古"});
         citys.put("0471", new String[]{"内蒙古呼和浩特", "内蒙古"});
