@@ -46,6 +46,8 @@ namespace RemindClock.Services
 
             AllAlerts.Add(new NoteAlertByForm());
             AllAlerts.Add(new NoteAlertByDingDing());
+            AllAlerts.Add(new NoteAlertByPhone());
+            AllAlerts.Add(new NoteAlertByUrl());
         }
 
         /// <summary>

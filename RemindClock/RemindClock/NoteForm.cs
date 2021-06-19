@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using PopupTool;
 using RemindClock.Componment;
@@ -33,6 +34,18 @@ namespace RemindClock
                 this.txtDingDingToken.Text = this.notes.DingDingToken;
             }
 
+            if (!string.IsNullOrEmpty(this.notes.Phone))
+            {
+                this.chkPhone.Checked = true;
+                this.txtPhone.Text = this.notes.Phone;
+            }
+
+            if (!string.IsNullOrEmpty(this.notes.NoticeUrl))
+            {
+                this.chkUrl.Checked = true;
+                this.txtUrl.Text = this.notes.NoticeUrl;
+            }
+
             chkEnabled.Checked = this.notes.Enable;
         }
 
@@ -44,11 +57,24 @@ namespace RemindClock
 
         private void BtnSave_Click(object sender, EventArgs e)
         {
+            if (!CheckAndSetAtt())
+            {
+                return;
+            }
+
+            this.notes.Enable = chkEnabled.Checked;
+
+            notesService.Save(this.notes);
+            MessageBox.Show("保存成功");
+        }
+
+        private bool CheckAndSetAtt()
+        {
             this.notes.Title = txtTitle.Text.Trim();
             if (this.notes.Title.Length <= 0)
             {
                 MessageBox.Show("标题必填");
-                return;
+                return false;
             }
 
             this.notes.Content = txtContent.Text.Trim();
@@ -58,7 +84,7 @@ namespace RemindClock
                 if (this.notes.DingDingToken.Length <= 0)
                 {
                     MessageBox.Show("钉钉Token必填");
-                    return;
+                    return false;
                 }
             }
             else
@@ -66,10 +92,41 @@ namespace RemindClock
                 this.notes.DingDingToken = "";
             }
 
-            this.notes.Enable = chkEnabled.Checked;
+            if (chkUrl.Checked)
+            {
+                this.notes.NoticeUrl = txtUrl.Text.Trim();
+                if (this.notes.NoticeUrl.Length <= 0)
+                {
+                    MessageBox.Show("回调通知URL必填");
+                    return false;
+                }
+            }
+            else
+            {
+                this.notes.NoticeUrl = "";
+            }
 
-            notesService.Save(this.notes);
-            MessageBox.Show("保存成功");
+            if (chkPhone.Checked)
+            {
+                this.notes.Phone = txtPhone.Text.Trim();
+                if (this.notes.Phone.Length <= 0)
+                {
+                    MessageBox.Show("手机号必填");
+                    return false;
+                }
+
+                if (!Regex.IsMatch(this.notes.Phone, @"^1\d{10}$"))
+                {
+                    MessageBox.Show("11位手机号格式有误");
+                    return false;
+                }
+            }
+            else
+            {
+                this.notes.Phone = "";
+            }
+
+            return true;
         }
 
         private NoteControl noteControl;
@@ -108,6 +165,16 @@ namespace RemindClock
         private void btnCancel_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void ChkUrl_CheckedChanged(object sender, EventArgs e)
+        {
+            txtUrl.Visible = chkUrl.Checked;
+        }
+
+        private void ChkPhone_CheckedChanged(object sender, EventArgs e)
+        {
+            txtPhone.Visible = chkPhone.Checked;
         }
 
         //        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

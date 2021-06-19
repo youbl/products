@@ -45,6 +45,19 @@ namespace RemindClockWeb.Repository.Model
         public string DingDingToken { get; set; }
 
         /// <summary>
+        ///  手机号，用于短信通知.
+        /// 为空不通知
+        /// </summary>
+        public string Phone { get; set; }
+
+        /// <summary>
+        /// 需要通知的url地址.比如时间到了，触发第三方系统事件.
+        /// 通知时会带上title={Title}
+        /// 为空不通知
+        /// </summary>
+        public string NoticeUrl { get; set; }
+
+        /// <summary>
         ///  入库时间
         /// </summary>
         [Column(Insertable = false, Updatable = false)]

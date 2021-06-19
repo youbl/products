@@ -2,6 +2,7 @@
 using System.Text;
 using Beinet.Core.Util;
 using Beinet.Feign;
+using NLog;
 using RemindClock.FeignService;
 using RemindClock.FeignService.Dto;
 using RemindClock.Repository.Model;
@@ -10,6 +11,8 @@ namespace RemindClock.Services.NoteOperation
 {
     public class NoteAlertByDingDing : INoteAlert
     {
+        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
         public void Alert(Notes note)
         {
             if (string.IsNullOrEmpty(note.DingDingToken))
@@ -37,6 +40,7 @@ namespace RemindClock.Services.NoteOperation
             dto.text = text;
             dto.at = at;
             var ret = ProxyLoader.GetProxy<DingDingFeign>().send(note.DingDingToken, dto);
+            logger.Info("钉钉返回结果:" + ret);
         }
     }
 }

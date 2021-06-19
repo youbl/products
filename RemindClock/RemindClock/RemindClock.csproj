@@ -61,6 +61,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -106,6 +107,8 @@
     <Compile Include="Repository\Model\Version.cs" />
     <Compile Include="Repository\VersionRepository.cs" />
     <Compile Include="Repository\NotesRepository.cs" />
+    <Compile Include="Services\NoteOperation\NoteAlertByUrl.cs" />
+    <Compile Include="Services\NoteOperation\NoteAlertByPhone.cs" />
     <Compile Include="Services\NoteOperation\NoteAlertByDingDing.cs" />
     <Compile Include="Services\NoteOperation\NoteAlertByForm.cs" />
     <Compile Include="Services\NoteOperation\INoteAlert.cs" />
