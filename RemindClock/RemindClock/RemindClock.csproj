@@ -132,6 +132,7 @@
     <Compile Include="Utils\AutoStartHelper.cs" />
     <Compile Include="Utils\FileHelper.cs" />
     <Compile Include="Utils\FormHelper.cs" />
+    <Compile Include="Utils\Sms\AliSmsHelper.cs" />
     <EmbeddedResource Include="AlertForm.resx">
       <DependentUpon>AlertForm.cs</DependentUpon>
     </EmbeddedResource>
