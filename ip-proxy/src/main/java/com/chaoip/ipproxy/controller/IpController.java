@@ -111,7 +111,14 @@ public class IpController {
             for (Map.Entry<String, String[]> item : CityHelper.getCitys().entrySet()) {
                 //.stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
                 String[] val = item.getValue();
-                String line = val[1] + "\t" + val[0] + "\t";
+                String province = val[1];
+                String city = val[0];
+                if (!city.equals(province)) {
+                    city = city.replace(province, "");
+                    if (city.startsWith("省"))
+                        city = city.substring(1);
+                }
+                String line = province + "\t" + city + "\t";
 //                for (String cc : item.getValue()) {
 //                    line += cc + "\t";
 //                }
