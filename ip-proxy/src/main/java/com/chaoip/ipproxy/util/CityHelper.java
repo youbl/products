@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class CityHelper {
-    private static Map<String, String[]> citys = new HashMap<>();
+    private static final Map<String, String[]> citys = new HashMap<>();
 
     static {
         citys.put("010", new String[]{"北京市", "北京市"});

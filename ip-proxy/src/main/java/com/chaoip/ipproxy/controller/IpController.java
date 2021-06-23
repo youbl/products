@@ -7,16 +7,18 @@ import com.chaoip.ipproxy.security.AuthDetails;
 import com.chaoip.ipproxy.security.BeinetUserService;
 import com.chaoip.ipproxy.service.IpGetService;
 import com.chaoip.ipproxy.service.RouteService;
+import com.chaoip.ipproxy.util.CityHelper;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * IpController
@@ -99,5 +101,31 @@ public class IpController {
     @GetMapping("citys")
     public Map<String, String[]> getCitys() {
         return routeService.getAllUsingCity();
+    }
+
+    @GetMapping("citys/all")
+    public Map<String, String[]> getAllCitys(@RequestParam(required = false) String output,
+                                             HttpServletResponse response) throws IOException {
+        if (!StringUtils.isEmpty(output)) {
+            List<String> arrCityLine = new ArrayList<>();
+            for (Map.Entry<String, String[]> item : CityHelper.getCitys().entrySet()) {
+                //.stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
+                String[] val = item.getValue();
+                String line = val[1] + "\t" + val[0] + "\t";
+//                for (String cc : item.getValue()) {
+//                    line += cc + "\t";
+//                }
+                arrCityLine.add(line + item.getKey());
+            }
+            StringBuilder sb = new StringBuilder();
+            for (String item : arrCityLine.stream().sorted().collect(Collectors.toList())) {
+                sb.append(item).append("\n");
+            }
+            response.setContentType("text/plain; charset=UTF-8");
+            response.getOutputStream().write(sb.toString().getBytes());
+            response.flushBuffer();
+            return null;
+        }
+        return CityHelper.getCitys();
     }
 }
