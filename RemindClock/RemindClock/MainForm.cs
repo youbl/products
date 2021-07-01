@@ -27,7 +27,7 @@ namespace RemindClock
         // 是关闭窗体还是最小化
         private bool realClose = false;
 
-        private NotesService notesService = new NotesService();
+        private NotesService notesService = NotesService.Default;
         private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
 
         private Dictionary<int, Notes> notesList;

@@ -14,7 +14,7 @@ namespace RemindClock.Services.SyncType
     {
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
 
-        private readonly NotesService notesService = new NotesService();
+        private readonly NotesService notesService = NotesService.Default;
         private readonly SyncFeign syncFeign = ProxyLoader.GetProxy<SyncFeign>();
         private readonly VersionRepository versionRepository = new VersionRepository();
 

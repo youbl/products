@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AliyunSDK.Services;
 
 namespace RemindClock.Utils.Sms
 {
@@ -12,24 +8,27 @@ namespace RemindClock.Utils.Sms
     /// </summary>
     public class AliSmsHelper
     {
-        /// <summary>
-        /// 阿里云短信api接口
-        /// </summary>
-        public string ApiUrl { get; set; } = "https://dysmsapi.aliyuncs.com/?Action=SendSms";
+        private AliSmsConfig config;
 
-        public string AK { get; set; } = "aaa";
-        public string SK { get; set; } = "bbb";
+        public AliSmsHelper(AliSmsConfig config)
+        {
+            this.config = config;
+        }
 
-        /// <summary>
-        /// 短信签名，必须在阿里云先审核通过
-        /// </summary>
-        public string SignName { get; set; }
+        public void Send(string phone, string title)
+        {
+            if (string.IsNullOrEmpty(title)
+                || string.IsNullOrEmpty(config.AK)
+                || string.IsNullOrEmpty(config.SK))
+            {
+                return;
+            }
 
-        /// <summary>
-        /// 短信模板，也必须在阿里云先审核通过
-        /// </summary>
-        public string TemplateCode { get; set; }
+            title = title.Replace('"', '\'');
 
-        public string TemplateParamJson { get; set; } = "{\"code\":\"{code}\"}";
+            var paraJson = config.TemplateParamJson.Replace("{title}", title);
+            var operation = new SmsOperation(config.AK, config.SK);
+            operation.Send(phone, config.SignName, config.TemplateCode, paraJson);
+        }
     }
 }

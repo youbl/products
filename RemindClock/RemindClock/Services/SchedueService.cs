@@ -4,7 +4,7 @@ namespace RemindClock.Services
 {
     class SchedueService
     {
-        private NotesService notesService = new NotesService();
+        private NotesService notesService = NotesService.Default;
         private SyncService syncService = new SyncService();
 
         private bool isRunning = false;

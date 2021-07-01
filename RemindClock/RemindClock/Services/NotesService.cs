@@ -13,6 +13,17 @@ namespace RemindClock.Services
     class NotesService
     {
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
+        private static NotesService _default = new NotesService();
+
+        /// <summary>
+        /// 单例实现
+        /// </summary>
+        public static NotesService Default
+        {
+            get { return _default; }
+        }
+
         private readonly NotesRepository notesRepository = new NotesRepository();
         private readonly VersionRepository versionRepository = new VersionRepository();
 
@@ -31,7 +42,7 @@ namespace RemindClock.Services
         /// </summary>
         private static Dictionary<int, DateTime> lastNoteTimes = new Dictionary<int, DateTime>();
 
-        public NotesService()
+        private NotesService()
         {
             noteCheckList = new List<INoteTime>();
             noteCheckList.Add(new NotePerMinute());

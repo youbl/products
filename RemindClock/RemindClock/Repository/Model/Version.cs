@@ -1,4 +1,5 @@
 ﻿using System;
+using RemindClock.Utils.Sms;
 
 namespace RemindClock.Repository.Model
 {
@@ -41,5 +42,10 @@ namespace RemindClock.Repository.Model
         /// 同步密钥
         /// </summary>
         public string SyncToken { get; set; }
+
+        /// <summary>
+        /// 阿里云的短信配置
+        /// </summary>
+        public AliSmsConfig SmsConfig { get; set; }
     }
 }

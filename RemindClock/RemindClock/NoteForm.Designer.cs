@@ -209,9 +209,9 @@
             this.label4.ForeColor = System.Drawing.Color.Red;
             this.label4.Location = new System.Drawing.Point(399, 137);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(101, 12);
+            this.label4.Size = new System.Drawing.Size(125, 12);
             this.label4.TabIndex = 0;
-            this.label4.Text = "短信提醒尚未实现";
+            this.label4.Text = "短信提醒仅支持阿里云";
             // 
             // NoteForm
             // 

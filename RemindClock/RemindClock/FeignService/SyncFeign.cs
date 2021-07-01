@@ -45,16 +45,9 @@ namespace RemindClock.FeignService
 
     public class SyncInterceptor : IRequestInterceptor
     {
-        private NotesService notesService;
-
         private NotesService getNotesService()
         {
-            if (notesService == null)
-            {
-                notesService = new NotesService();
-            }
-
-            return notesService;
+            return NotesService.Default;
         }
 
         public string OnCreate(string originUrl)

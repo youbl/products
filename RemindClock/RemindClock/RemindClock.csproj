@@ -124,6 +124,8 @@
     <Compile Include="Services\NoteType\NotePerDay.cs" />
     <Compile Include="Services\NoteType\NotePerMinute.cs" />
     <Compile Include="Services\SchedueService.cs" />
+    <Compile Include="Services\SmsChannel\AliSmsSend.cs" />
+    <Compile Include="Services\SmsChannel\SmsSend.cs" />
     <Compile Include="Services\SyncService.cs" />
     <Compile Include="Services\SyncType\SyncMerge.cs" />
     <Compile Include="Services\SyncType\SyncServerToClient.cs" />
@@ -132,7 +134,9 @@
     <Compile Include="Utils\AutoStartHelper.cs" />
     <Compile Include="Utils\FileHelper.cs" />
     <Compile Include="Utils\FormHelper.cs" />
+    <Compile Include="Utils\Sms\AliSmsConfig.cs" />
     <Compile Include="Utils\Sms\AliSmsHelper.cs" />
+    <Compile Include="Utils\StrHelper.cs" />
     <EmbeddedResource Include="AlertForm.resx">
       <DependentUpon>AlertForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -178,6 +182,11 @@
   <ItemGroup>
     <Content Include="clock.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\AliyunSDK\AliyunSDK.csproj">
+      <Project>{790DDACD-A176-4772-90E5-13ECA4C95D9D}</Project>
+      <Name>AliyunSDK</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

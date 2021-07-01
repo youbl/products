@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Web;
 using AliyunSDK.Model;
 
 namespace AliyunSDK.Services
@@ -19,7 +17,7 @@ namespace AliyunSDK.Services
         {
         }
 
-        public object Send(string signName, string templateCode, string phone, string code)
+        public object Send(string phone, string signName, string templateCode, string paramJson)
         {
             var url = END_POINT;
             var version = "2017-05-25";
@@ -29,7 +27,7 @@ namespace AliyunSDK.Services
             param["PhoneNumbers"] = phone;
             param["SignName"] = signName;
             param["TemplateCode"] = templateCode;
-            param["TemplateParam"] = "{\"code\":\"" + code + "\"}";
+            param["TemplateParam"] = paramJson; // "{\"title\":\"" + code + "\"}";
             return AccessAli<DomainTopList>(url, version, param);
         }
     }

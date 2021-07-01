@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using PopupTool;
 using RemindClock.Componment;
 using RemindClock.Repository.Model;
 using RemindClock.Services;
+using RemindClock.Utils;
 
 namespace RemindClock
 {
     public partial class NoteForm : Form
     {
         private readonly Notes notes;
-        private readonly NotesService notesService = new NotesService();
+        private readonly NotesService notesService = NotesService.Default;
 
         public NoteForm(Notes notes)
         {
@@ -115,7 +115,7 @@ namespace RemindClock
                     return false;
                 }
 
-                if (!Regex.IsMatch(this.notes.Phone, @"^1\d{10}$"))
+                if (!StrHelper.IsMobile(this.notes.Phone))
                 {
                     MessageBox.Show("11位手机号格式有误");
                     return false;

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Windows.Forms;
 using RemindClock.Services;
+using RemindClock.Utils.Sms;
 using Version = RemindClock.Repository.Model.Version;
 
 namespace RemindClock
 {
     public partial class ConfigForm : Form
     {
-        private NotesService notesService = new NotesService();
+        private NotesService notesService = NotesService.Default;
         private Version version;
 
         public ConfigForm()
@@ -26,6 +27,22 @@ namespace RemindClock
             this.txtSyncUrl.Text = version.SyncUrl;
             this.txtSyncUser.Text = version.SyncUser;
             this.txtSyncToken.Text = version.SyncToken;
+
+            if (version.SmsConfig == null)
+            {
+                version.SmsConfig = new AliSmsConfig();
+            }
+
+            if (!string.IsNullOrEmpty(version.SmsConfig.ApiUrl))
+            {
+                txtAliSmsUrl.Text = version.SmsConfig.ApiUrl;
+            }
+
+            txtAliAk.Text = version.SmsConfig.AK;
+            txtAliSk.Text = version.SmsConfig.SK;
+            txtAliSign.Text = version.SmsConfig.SignName;
+            txtAliTemplateCode.Text = version.SmsConfig.TemplateCode;
+            txtAliTempParam.Text = version.SmsConfig.TemplateParamJson;
         }
 
         private void BtnCancel_Click(object sender, EventArgs e)
@@ -48,6 +65,18 @@ namespace RemindClock
                     return;
                 }
             }
+
+            if (version.SmsConfig == null)
+            {
+                version.SmsConfig = new AliSmsConfig();
+            }
+
+            version.SmsConfig.ApiUrl = txtAliSmsUrl.Text.Trim();
+            version.SmsConfig.AK = txtAliAk.Text.Trim();
+            version.SmsConfig.SK = txtAliSk.Text.Trim();
+            version.SmsConfig.SignName = txtAliSign.Text.Trim();
+            version.SmsConfig.TemplateCode = txtAliTemplateCode.Text.Trim();
+            version.SmsConfig.TemplateParamJson = txtAliTempParam.Text.Trim();
 
             notesService.SaveVersion(version);
             this.Close();
