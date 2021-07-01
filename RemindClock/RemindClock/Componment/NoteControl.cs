@@ -131,16 +131,20 @@ namespace RemindClock.Componment
             lnkMinus.Text = "删除";
             //lnkMinus.Font = new System.Drawing.Font("宋体", 20, System.Drawing.FontStyle.Bold);
             lnkMinus.LinkClicked += LnkMinusOnLinkClicked;
-            // 
-            // lnkPlus
-            // 
-            lnkPlus.AutoSize = true;
-            lnkPlus.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-            lnkPlus.Location = new System.Drawing.Point(440, pointY);
-            lnkPlus.Name = "lnkPlus" + idx;
-            lnkPlus.Text = "添加";
-            //lnkPlus.Font = new System.Drawing.Font("宋体", 20, System.Drawing.FontStyle.Bold);
-            lnkPlus.LinkClicked += LnkPlusOnLinkClicked;
+
+            if (idx <= 0)
+            {
+                // 
+                // lnkPlus
+                // 
+                lnkPlus.AutoSize = true;
+                lnkPlus.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
+                lnkPlus.Location = new System.Drawing.Point(440, pointY);
+                lnkPlus.Name = "lnkPlus" + idx;
+                lnkPlus.Text = "添加";
+                //lnkPlus.Font = new System.Drawing.Font("宋体", 20, System.Drawing.FontStyle.Bold);
+                lnkPlus.LinkClicked += LnkPlusOnLinkClicked;
+            }
         }
 
         void RebindDetails()
