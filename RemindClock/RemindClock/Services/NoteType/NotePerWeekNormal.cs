@@ -16,7 +16,8 @@ namespace RemindClock.Services.NoteType
         {
             var now = DateTime.Now;
             // 今天已经提醒过，忽略
-            if (lastNoteTime.Year == now.Year && lastNoteTime.Month == now.Month && lastNoteTime.Day == now.Day)
+            if (lastNoteTime.Year == now.Year && lastNoteTime.Month == now.Month && lastNoteTime.Day == now.Day &&
+                lastNoteTime.Hour == now.Hour && lastNoteTime.Minute == now.Minute)
                 return false;
 
             return now.DayOfWeek != DayOfWeek.Saturday

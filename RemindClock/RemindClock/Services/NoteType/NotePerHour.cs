@@ -16,8 +16,8 @@ namespace RemindClock.Services.NoteType
         {
             var now = DateTime.Now;
 
-            // 这小时已经提醒过，忽略
-            if (lastNoteTime.Hour == now.Hour)
+            // 这小时的这一分钟已经提醒过，忽略
+            if (lastNoteTime.Hour == now.Hour && lastNoteTime.Minute == now.Minute)
                 return false;
 
             return now.Minute == eventTime.Minute && now.Second >= eventTime.Second;
