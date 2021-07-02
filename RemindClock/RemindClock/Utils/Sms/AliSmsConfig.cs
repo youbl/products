@@ -27,5 +27,28 @@
         /// 短信模板对应的变量json，如 "{\"title\":\"{title}\"}"
         /// </summary>
         public string TemplateParamJson { get; set; }
+
+        /// <summary>
+        /// 配置无效还是有效
+        /// </summary>
+        public bool IsInvalid
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(AK)
+                    || string.IsNullOrEmpty(SK)
+                    || string.IsNullOrEmpty(ApiUrl)
+                    || string.IsNullOrEmpty(SignName)
+                    || string.IsNullOrEmpty(TemplateCode)
+                    || string.IsNullOrEmpty(TemplateParamJson))
+                {
+                    return true;
+                }
+
+                return !ValidParaFormat;
+            }
+        }
+
+        public bool ValidParaFormat => TemplateParamJson != null && TemplateParamJson.Contains("{title}");
     }
 }

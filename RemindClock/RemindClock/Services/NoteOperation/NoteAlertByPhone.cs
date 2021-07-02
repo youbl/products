@@ -25,12 +25,7 @@ namespace RemindClock.Services.NoteOperation
         SmsSend GetSender()
         {
             var version = NotesService.Default.GetVersion();
-            if (version.SmsConfig == null
-                || string.IsNullOrEmpty(version.SmsConfig.AK)
-                || string.IsNullOrEmpty(version.SmsConfig.SK)
-                || string.IsNullOrEmpty(version.SmsConfig.ApiUrl)
-                || string.IsNullOrEmpty(version.SmsConfig.SignName)
-                || string.IsNullOrEmpty(version.SmsConfig.TemplateCode))
+            if (version.SmsConfig == null || version.SmsConfig.IsInvalid)
             {
                 return null;
             }

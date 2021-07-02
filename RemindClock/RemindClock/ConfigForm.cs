@@ -20,7 +20,7 @@ namespace RemindClock
         {
             base.OnLoad(e);
 
-            this.Icon = RemindClock.Properties.Resources.clock;
+            this.Icon = Properties.Resources.clock;
 
             version = notesService.GetVersion();
             this.chkEnableSync.Checked = version.SyncEnable;
@@ -61,7 +61,7 @@ namespace RemindClock
             {
                 if (version.SyncUrl.Length <= 0 || version.SyncUser.Length <= 0 || version.SyncToken.Length <= 0)
                 {
-                    MessageBox.Show("URL、账号、密钥不能为空");
+                    MessageBox.Show("同步URL、账号、密钥不能为空");
                     return;
                 }
             }
@@ -77,6 +77,12 @@ namespace RemindClock
             version.SmsConfig.SignName = txtAliSign.Text.Trim();
             version.SmsConfig.TemplateCode = txtAliTemplateCode.Text.Trim();
             version.SmsConfig.TemplateParamJson = txtAliTempParam.Text.Trim();
+            if (version.SmsConfig.TemplateParamJson.Length > 0 &&
+                !version.SmsConfig.ValidParaFormat)
+            {
+                MessageBox.Show("短信配置的模板参数，必须包含 {title} ");
+                return;
+            }
 
             notesService.SaveVersion(version);
             this.Close();

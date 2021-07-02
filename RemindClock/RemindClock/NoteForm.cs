@@ -174,6 +174,12 @@ namespace RemindClock
 
         private void ChkPhone_CheckedChanged(object sender, EventArgs e)
         {
+            var version = notesService.GetVersion();
+            if (version.SmsConfig == null || version.SmsConfig.IsInvalid)
+            {
+                MessageBox.Show("短信配置不完整，将无法进行短信提醒");
+            }
+
             txtPhone.Visible = chkPhone.Checked;
         }
 
