@@ -10,7 +10,7 @@ import java.util.Map;
 @Slf4j
 public final class CityHelper {
     private static final String cityFile = "/data/app/area.txt";
-    private static final Map<String, String[]> citys = loadFile(cityFile);
+    private static Map<String, String[]> citys = loadFile(cityFile);
 
     private CityHelper() {
     }
@@ -42,6 +42,13 @@ public final class CityHelper {
             return null;
         }
         return citys.getOrDefault(code, null);
+    }
+
+    /**
+     * 重新加载城市文件
+     */
+    public static void reloadCitys() {
+        citys = loadFile(cityFile);
     }
 
     private static Map<String, String[]> loadFile(String file) {
