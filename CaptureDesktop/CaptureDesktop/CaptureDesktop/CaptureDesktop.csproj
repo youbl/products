@@ -40,11 +40,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CaptureUtil.cs" />
+    <Compile Include="Controllers\IController.cs" />
+    <Compile Include="Controllers\CaptureController.cs" />
+    <Compile Include="Controllers\IndexController.cs" />
+    <Compile Include="HttpHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

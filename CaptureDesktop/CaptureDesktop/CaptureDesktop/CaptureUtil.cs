@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace CaptureDesktop
@@ -18,6 +19,23 @@ namespace CaptureDesktop
         private CaptureUtil()
         {
         }
+
+        public byte[] GetByteImage(Image img, ImageFormat format)
+        {
+            byte[] bt = null;
+            using (var stream = new MemoryStream())
+            using (Bitmap bmp = new Bitmap(img))
+            {
+                bmp.Save(stream, format); //将图像以指定的格式存入缓存内存流
+
+                bt = new byte[stream.Length];
+                stream.Position = 0; //设置留的初始位置
+                stream.Read(bt, 0, Convert.ToInt32(bt.Length));
+            }
+
+            return bt;
+        }
+
         // public Bitmap GetScreen()
         // {
         //     //获取整个屏幕图像,不包括任务栏

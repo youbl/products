@@ -7,9 +7,11 @@ namespace CaptureDesktop
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(DateTime.Now + " 开始...");
-            CaptureUtil.Default.CaptureScreenToFile("D:\\a.jpg", ImageFormat.Jpeg);
-            Console.WriteLine(DateTime.Now + " 完成.");
+            Console.WriteLine(DateTime.Now + " 开始监听...");
+            HttpHandler.Default.StartListen();
+
+            // CaptureUtil.Default.CaptureScreenToFile("D:\\a.jpg", ImageFormat.Jpeg);
+            Console.WriteLine(DateTime.Now + " 程序退出.");
         }
     }
 }
