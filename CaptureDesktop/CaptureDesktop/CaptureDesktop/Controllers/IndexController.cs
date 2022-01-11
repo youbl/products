@@ -16,6 +16,7 @@ namespace CaptureDesktop.Controllers
             using (response)
             using (var output = response.OutputStream)
             {
+                response.ContentType = "text/html;charset=utf-8";
                 response.ContentLength64 = buffer.Length;
                 output.Write(buffer, 0, buffer.Length);
             }
