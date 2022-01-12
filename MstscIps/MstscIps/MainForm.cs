@@ -11,11 +11,14 @@ namespace MstscIps
 {
     public partial class MainForm : Form
     {
-        private IFeignIP ipFeign = ProxyLoader.GetProxy<IFeignIP>();
+        private readonly IFeignIP _ipFeign = ProxyLoader.GetProxy<IFeignIP>();
 
-        private List<VpsMachineDto> ipList;
-        private bool isAsc = true;
-        private string _pwd;
+        private List<VpsMachineDto> _ipList;
+
+        // ListView排序标识，true为顺序，false为倒序
+        private bool _isAsc = true;
+
+        // 配置里的IP获取地址
         private string _url;
 
         public MainForm()
@@ -42,16 +45,18 @@ namespace MstscIps
 
         private void button1_Click(object sender, EventArgs e)
         {
-            StartMstsc(txtIp.Text, _pwd);
+            StartMstsc(txtIp.Text, txtPwd.Text);
         }
 
         private static void StartMstsc(string ip, string pwd)
         {
             try
             {
-                if (string.IsNullOrEmpty(ip))
+                ip = (ip ?? "").Trim();
+                pwd = (pwd ?? "").Trim();
+                if (ip.Length == 0 || pwd.Length == 0)
                 {
-                    MessageBox.Show("IP不能为空");
+                    MessageBox.Show("IP或远程密码不能为空");
                     return;
                 }
 
@@ -80,7 +85,7 @@ namespace MstscIps
                     return;
 
                 var ip = listView1.SelectedItems[0].SubItems[1].Text;
-                StartMstsc(ip, _pwd);
+                StartMstsc(ip, txtPwd.Text);
             }
             catch (Exception exp)
             {
@@ -93,8 +98,8 @@ namespace MstscIps
             if (e.Column < 1 || e.Column > 3)
                 return;
 
-            BindListView(ipList, e.Column, isAsc);
-            isAsc = !isAsc;
+            BindListView(_ipList, e.Column, _isAsc);
+            _isAsc = !_isAsc;
         }
 
         private void BindListView(List<VpsMachineDto> ips, int sortCol, bool asc)
@@ -135,7 +140,7 @@ namespace MstscIps
 
         private void txtIp_KeyUp(object sender, KeyEventArgs e)
         {
-            StartMstsc(txtIp.Text, _pwd);
+            StartMstsc(txtIp.Text, txtPwd.Text);
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -168,7 +173,7 @@ namespace MstscIps
                 return;
             }
 
-            _pwd = urlAndPwd[2];
+            txtPwd.Text = urlAndPwd[2];
             _url = urlAndPwd[1];
         }
 
@@ -184,8 +189,8 @@ namespace MstscIps
                     return;
                 }
 
-                ipList = ipFeign.GetIP(new Uri(url));
-                BindListView(ipList, 1, true);
+                _ipList = _ipFeign.GetIP(new Uri(url));
+                BindListView(_ipList, 1, true);
             }
             catch (Exception exp)
             {

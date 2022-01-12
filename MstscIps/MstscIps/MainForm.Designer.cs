@@ -30,6 +30,9 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.button2 = new System.Windows.Forms.Button();
+            this.lstUrls = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.txtIp = new System.Windows.Forms.TextBox();
@@ -39,9 +42,8 @@
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.lstUrls = new System.Windows.Forms.ComboBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.txtPwd = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -59,6 +61,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.txtPwd);
+            this.splitContainer1.Panel1.Controls.Add(this.label3);
             this.splitContainer1.Panel1.Controls.Add(this.linkLabel1);
             this.splitContainer1.Panel1.Controls.Add(this.button2);
             this.splitContainer1.Panel1.Controls.Add(this.lstUrls);
@@ -70,49 +74,79 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.listView1);
-            this.splitContainer1.Size = new System.Drawing.Size(800, 450);
-            this.splitContainer1.SplitterDistance = 40;
+            this.splitContainer1.Size = new System.Drawing.Size(600, 497);
+            this.splitContainer1.SplitterDistance = 71;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 0;
             this.splitContainer1.TabStop = false;
+            // 
+            // linkLabel1
+            // 
+            this.linkLabel1.AutoSize = true;
+            this.linkLabel1.Location = new System.Drawing.Point(526, 46);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(53, 12);
+            this.linkLabel1.TabIndex = 5;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "编辑配置";
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(294, 41);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 4;
+            this.button2.Text = "刷新IP列表";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // lstUrls
+            // 
+            this.lstUrls.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.lstUrls.FormattingEnabled = true;
+            this.lstUrls.Location = new System.Drawing.Point(9, 43);
+            this.lstUrls.Name = "lstUrls";
+            this.lstUrls.Size = new System.Drawing.Size(279, 20);
+            this.lstUrls.TabIndex = 3;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label2.ForeColor = System.Drawing.Color.Red;
-            this.label2.Location = new System.Drawing.Point(648, 13);
+            this.label2.Location = new System.Drawing.Point(375, 46);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(149, 12);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "双击下方列表IP进入远程";
+            this.label2.Size = new System.Drawing.Size(123, 12);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "双击列表IP进入远程";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(567, 8);
+            this.button1.Location = new System.Drawing.Point(294, 8);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 4;
+            this.button1.TabIndex = 2;
             this.button1.Text = "开启远程";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // txtIp
             // 
-            this.txtIp.Location = new System.Drawing.Point(445, 10);
+            this.txtIp.Location = new System.Drawing.Point(56, 10);
             this.txtIp.Name = "txtIp";
-            this.txtIp.Size = new System.Drawing.Size(116, 21);
-            this.txtIp.TabIndex = 3;
+            this.txtIp.Size = new System.Drawing.Size(99, 21);
+            this.txtIp.TabIndex = 0;
             this.txtIp.Text = "123.123.123.123";
             this.txtIp.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtIp_KeyUp);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(400, 13);
+            this.label1.Location = new System.Drawing.Point(12, 13);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(47, 12);
-            this.label1.TabIndex = 2;
+            this.label1.TabIndex = 0;
             this.label1.Text = "远程IP:";
             // 
             // listView1
@@ -128,7 +162,7 @@
             this.listView1.Location = new System.Drawing.Point(0, 0);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(800, 409);
+            this.listView1.Size = new System.Drawing.Size(600, 425);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -155,41 +189,27 @@
             this.columnHeader4.Text = "创建时间";
             this.columnHeader4.Width = 160;
             // 
-            // lstUrls
+            // txtPwd
             // 
-            this.lstUrls.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.lstUrls.FormattingEnabled = true;
-            this.lstUrls.Location = new System.Drawing.Point(9, 10);
-            this.lstUrls.Name = "lstUrls";
-            this.lstUrls.Size = new System.Drawing.Size(235, 20);
-            this.lstUrls.TabIndex = 0;
+            this.txtPwd.Location = new System.Drawing.Point(187, 10);
+            this.txtPwd.Name = "txtPwd";
+            this.txtPwd.Size = new System.Drawing.Size(101, 21);
+            this.txtPwd.TabIndex = 1;
             // 
-            // button2
+            // label3
             // 
-            this.button2.Location = new System.Drawing.Point(250, 8);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "刷新IP列表";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // linkLabel1
-            // 
-            this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(331, 13);
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(53, 12);
-            this.linkLabel1.TabIndex = 5;
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "编辑列表";
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(156, 13);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(35, 12);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "密码:";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(600, 497);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
@@ -218,6 +238,8 @@
         private System.Windows.Forms.ComboBox lstUrls;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.TextBox txtPwd;
+        private System.Windows.Forms.Label label3;
     }
 }
 
