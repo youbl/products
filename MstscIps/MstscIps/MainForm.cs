@@ -140,7 +140,8 @@ namespace MstscIps
 
         private void txtIp_KeyUp(object sender, KeyEventArgs e)
         {
-            StartMstsc(txtIp.Text, txtPwd.Text);
+            if (e.KeyCode == Keys.Enter && !e.Control && !e.Alt)
+                StartMstsc(txtIp.Text, txtPwd.Text);
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
