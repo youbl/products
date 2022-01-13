@@ -104,6 +104,9 @@ namespace MstscIps
 
         private void BindListView(List<VpsMachineDto> ips, int sortCol, bool asc)
         {
+            if (ips == null || ips.Count == 0)
+                return;
+
             ips.Sort((item1, item2) =>
                 asc
                     ? string.Compare(GetDtoCol(item1, sortCol), GetDtoCol(item2, sortCol), StringComparison.Ordinal)

@@ -193,8 +193,10 @@
             // 
             this.txtPwd.Location = new System.Drawing.Point(187, 10);
             this.txtPwd.Name = "txtPwd";
+            this.txtPwd.PasswordChar = '*';
             this.txtPwd.Size = new System.Drawing.Size(101, 21);
             this.txtPwd.TabIndex = 1;
+            this.txtPwd.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtIp_KeyUp);
             // 
             // label3
             // 
