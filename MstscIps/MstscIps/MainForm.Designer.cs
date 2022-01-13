@@ -33,7 +33,7 @@
             this.txtPwd = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnResreshIpList = new System.Windows.Forms.Button();
             this.lstUrls = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -68,7 +68,7 @@
             this.splitContainer1.Panel1.Controls.Add(this.txtPwd);
             this.splitContainer1.Panel1.Controls.Add(this.label3);
             this.splitContainer1.Panel1.Controls.Add(this.linkLabel1);
-            this.splitContainer1.Panel1.Controls.Add(this.button2);
+            this.splitContainer1.Panel1.Controls.Add(this.btnResreshIpList);
             this.splitContainer1.Panel1.Controls.Add(this.lstUrls);
             this.splitContainer1.Panel1.Controls.Add(this.label2);
             this.splitContainer1.Panel1.Controls.Add(this.button1);
@@ -114,15 +114,15 @@
             this.linkLabel1.Text = "编辑配置";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
-            // button2
+            // btnResreshIpList
             // 
-            this.button2.Location = new System.Drawing.Point(294, 41);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 4;
-            this.button2.Text = "刷新IP列表";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnResreshIpList.Location = new System.Drawing.Point(294, 41);
+            this.btnResreshIpList.Name = "btnResreshIpList";
+            this.btnResreshIpList.Size = new System.Drawing.Size(75, 23);
+            this.btnResreshIpList.TabIndex = 4;
+            this.btnResreshIpList.Text = "刷新IP列表";
+            this.btnResreshIpList.UseVisualStyleBackColor = true;
+            this.btnResreshIpList.Click += new System.EventHandler(this.btnResreshIpList_Click);
             // 
             // lstUrls
             // 
@@ -271,7 +271,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox lstUrls;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnResreshIpList;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.TextBox txtPwd;
         private System.Windows.Forms.Label label3;

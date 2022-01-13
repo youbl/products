@@ -4,8 +4,8 @@ using Beinet.Feign;
 using System.Windows.Forms;
 using MstscIps.Feign;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 using MstscIps.Feign.Dto;
+using MstscIps.Utils;
 
 namespace MstscIps
 {
@@ -18,8 +18,8 @@ namespace MstscIps
         // ListView排序标识，true为顺序，false为倒序
         private bool _isAsc = true;
 
-        // 配置里的IP获取地址
-        private string _url;
+        // 选中的配置项
+        private ConfigItem _configItem;
 
         public MainForm()
         {
@@ -50,23 +50,31 @@ namespace MstscIps
             StartMstsc(txtIp.Text);
         }
 
-        private string FindPwd(string ip)
+        private VpsMachineDto FindPwd(string ip)
         {
             if (string.IsNullOrEmpty(ip) || _ipList == null || _ipList.Count == 0)
-                return txtPwd.Text;
+                return GetDefault();
 
-            string ret = null;
             foreach (var machineDto in _ipList)
             {
                 if (ip == machineDto.VpsIp)
                 {
-                    ret = machineDto.VpsPwd;
-                    break;
+                    if (string.IsNullOrEmpty(machineDto.VpsPwd))
+                    {
+                        machineDto.VpsPwd = txtPwd.Text;
+                    }
+
+                    return machineDto;
                 }
             }
 
-            if (string.IsNullOrEmpty(ret))
-                return txtPwd.Text;
+            return GetDefault();
+        }
+
+        private VpsMachineDto GetDefault()
+        {
+            var ret = new VpsMachineDto();
+            ret.VpsPwd = txtPwd.Text;
             return ret;
         }
 
@@ -74,14 +82,16 @@ namespace MstscIps
         private void StartMstsc(string ip)
         {
             var pwd = FindPwd(ip);
-            StartMstscReal(ip, pwd);
+            StartMstscReal(ip, pwd.User, pwd.VpsPwd);
         }
 
 
-        private static void StartMstscReal(string ip, string pwd)
+        private static void StartMstscReal(string ip, string user, string pwd)
         {
             try
             {
+                if (string.IsNullOrEmpty(user))
+                    user = "administrator";
                 ip = (ip ?? "").Trim();
                 pwd = (pwd ?? "").Trim();
                 if (ip.Length == 0 || pwd.Length == 0)
@@ -90,15 +100,19 @@ namespace MstscIps
                     return;
                 }
 
-                if (!Regex.IsMatch(ip, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"))
+                if (!StrHelper.IsIp(ip))
                 {
                     MessageBox.Show("无效的IP格式");
                     return;
                 }
 
-                var savePwd = "/generic:" + ip + " /user:administrator /pass:\"" + pwd + "\" ";
-                Process.Start("cmdkey", savePwd);
-                System.Threading.Thread.Sleep(1000);
+                if (!string.IsNullOrEmpty(pwd))
+                {
+                    var savePwd = "/generic:" + ip + " /user:" + user + " /pass:\"" + pwd + "\" ";
+                    Process.Start("cmdkey", savePwd);
+                    System.Threading.Thread.Sleep(100);
+                }
+
                 Process.Start("mstsc", "/f /v:" + ip); // 全屏
             }
             catch (Exception exp)
@@ -134,6 +148,7 @@ namespace MstscIps
 
         private void BindListView(List<VpsMachineDto> ips, int sortCol, bool asc)
         {
+            listView1.Items.Clear();
             if (ips == null || ips.Count == 0)
                 return;
 
@@ -142,7 +157,6 @@ namespace MstscIps
                     ? string.Compare(GetDtoCol(item1, sortCol), GetDtoCol(item2, sortCol), StringComparison.Ordinal)
                     : string.Compare(GetDtoCol(item2, sortCol), GetDtoCol(item1, sortCol), StringComparison.Ordinal));
 
-            listView1.Items.Clear();
             var idx = 0;
             foreach (var ip in ips)
             {
@@ -207,24 +221,32 @@ namespace MstscIps
                 return;
             }
 
-            txtPwd.Text = urlAndPwd[2];
-            _url = urlAndPwd[1];
+            txtPwd.Text = urlAndPwd.Pwd;
+            _configItem = urlAndPwd;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void btnResreshIpList_Click(object sender, EventArgs e)
         {
             var begin = DateTime.Now;
             try
             {
                 ParseUrlAndPwd();
-                var url = _url;
+                var url = _configItem.Url;
                 if (string.IsNullOrEmpty(url))
                 {
                     MessageBox.Show("配置有误，请检查并重新保存配置");
                     return;
                 }
 
-                _ipList = _ipFeign.GetIP(new Uri(url));
+                if (_configItem.Type == ConfigType.Url)
+                {
+                    _ipList = _ipFeign.GetIP(new Uri(url));
+                }
+                else if (_configItem.Type == ConfigType.File)
+                {
+                    _ipList = ConfigUtil.Default.ReadIpFile(url);
+                }
+
                 BindListView(_ipList, 1, true);
             }
             catch (Exception exp)
@@ -234,7 +256,8 @@ namespace MstscIps
             finally
             {
                 var costTime = (int) (DateTime.Now - begin).TotalMilliseconds;
-                toolStripLabel2.Text = "刷新耗时:" + costTime.ToString() + "ms";
+                toolStripLabel2.Text =
+                    "刷新耗时:" + costTime.ToString() + "ms, 行数:" + (_ipList?.Count ?? 0);
             }
         }
     }

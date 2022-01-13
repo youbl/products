@@ -58,11 +58,12 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(88, 290);
+            this.label1.Location = new System.Drawing.Point(89, 286);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(401, 12);
+            this.label1.Size = new System.Drawing.Size(449, 24);
             this.label1.TabIndex = 2;
-            this.label1.Text = "说明：每行为一个配置，说明,URL,VPS密码,以半角逗号分隔；3项均为必填";
+            this.label1.Text = "说明：每行为一个配置，说明,URL,VPS密码,以半角逗号分隔；3项均为必填\r\n注：URL可以是本地文件，本地文件的行格式：说明:IP:用户:密码，以半角分号分隔" +
+    "";
             // 
             // EditForm
             // 
