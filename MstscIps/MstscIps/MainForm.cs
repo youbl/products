@@ -25,6 +25,8 @@ namespace MstscIps
         {
             InitializeComponent();
             LoadConfig();
+
+            toolStripLabel1.Text = "启动时间:" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss 有问题请联系北亮");
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -211,6 +213,7 @@ namespace MstscIps
 
         private void button2_Click(object sender, EventArgs e)
         {
+            var begin = DateTime.Now;
             try
             {
                 ParseUrlAndPwd();
@@ -227,6 +230,11 @@ namespace MstscIps
             catch (Exception exp)
             {
                 MessageBox.Show(exp + "");
+            }
+            finally
+            {
+                var costTime = (int) (DateTime.Now - begin).TotalMilliseconds;
+                toolStripLabel2.Text = "刷新耗时:" + costTime.ToString() + "ms";
             }
         }
     }
