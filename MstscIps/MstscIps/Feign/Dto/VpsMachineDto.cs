@@ -14,6 +14,12 @@
         public string VpsIp { get; set; }
 
         /// <summary>
+        /// VPS 密码
+        /// </summary>
+
+        public string VpsPwd { get; set; }
+
+        /// <summary>
         /// 所属分组
         /// </summary>
         public string GroupCode { get; set; }

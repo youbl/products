@@ -45,10 +45,38 @@ namespace MstscIps
 
         private void button1_Click(object sender, EventArgs e)
         {
-            StartMstsc(txtIp.Text, txtPwd.Text);
+            StartMstsc(txtIp.Text);
         }
 
-        private static void StartMstsc(string ip, string pwd)
+        private string FindPwd(string ip)
+        {
+            if (string.IsNullOrEmpty(ip) || _ipList == null || _ipList.Count == 0)
+                return txtPwd.Text;
+
+            string ret = null;
+            foreach (var machineDto in _ipList)
+            {
+                if (ip == machineDto.VpsIp)
+                {
+                    ret = machineDto.VpsPwd;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(ret))
+                return txtPwd.Text;
+            return ret;
+        }
+
+
+        private void StartMstsc(string ip)
+        {
+            var pwd = FindPwd(ip);
+            StartMstscReal(ip, pwd);
+        }
+
+
+        private static void StartMstscReal(string ip, string pwd)
         {
             try
             {
@@ -85,7 +113,7 @@ namespace MstscIps
                     return;
 
                 var ip = listView1.SelectedItems[0].SubItems[1].Text;
-                StartMstsc(ip, txtPwd.Text);
+                StartMstsc(ip);
             }
             catch (Exception exp)
             {
@@ -144,7 +172,7 @@ namespace MstscIps
         private void txtIp_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter && !e.Control && !e.Alt)
-                StartMstsc(txtIp.Text, txtPwd.Text);
+                StartMstsc(txtIp.Text);
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
