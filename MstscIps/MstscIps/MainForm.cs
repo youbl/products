@@ -4,6 +4,7 @@ using Beinet.Feign;
 using System.Windows.Forms;
 using MstscIps.Feign;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using MstscIps.Feign.Dto;
 using MstscIps.Utils;
 
@@ -17,6 +18,8 @@ namespace MstscIps
 
         // ListView排序标识，true为顺序，false为倒序
         private bool _isAsc = true;
+        private int _sortCol = 1;
+        private string _oldSearchTxt = "";
 
         // 选中的配置项
         private ConfigItem _configItem;
@@ -152,6 +155,7 @@ namespace MstscIps
             if (ips == null || ips.Count == 0)
                 return;
 
+            this._sortCol = sortCol;
             ips.Sort((item1, item2) =>
                 asc
                     ? string.Compare(GetDtoCol(item1, sortCol), GetDtoCol(item2, sortCol), StringComparison.Ordinal)
@@ -247,7 +251,7 @@ namespace MstscIps
                     _ipList = ConfigUtil.Default.ReadIpFile(url);
                 }
 
-                BindListView(_ipList, 1, true);
+                txtIpFilter_KeyUp(null, null);
             }
             catch (Exception exp)
             {
@@ -259,6 +263,65 @@ namespace MstscIps
                 toolStripLabel2.Text =
                     "刷新耗时:" + costTime.ToString() + "ms, 行数:" + (_ipList?.Count ?? 0);
             }
+        }
+
+        private void txtIpFilter_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e != null)
+            {
+                if (e.KeyCode == Keys.Escape)
+                {
+                    txtIpFilter.Text = "";
+                }
+                else
+                {
+                    // 只允许数字和小数点
+                    var newTxt = Regex.Replace(txtIpFilter.Text, @"[^\d\.]", "");
+                    if (txtIpFilter.Text != newTxt)
+                    {
+                        txtIpFilter.Text = newTxt;
+                        txtIpFilter.SelectionStart = newTxt.Length;
+                        // txtIpFilter.Select(newTxt.Length, 0);
+                    }
+                }
+            }
+
+            if (_ipList == null || _ipList.Count <= 0)
+                return;
+
+            List<VpsMachineDto> showIpList;
+            var filter = txtIpFilter.Text.Trim();
+            if (filter.Length > 0 && filter == _oldSearchTxt)
+            {
+                return;
+            }
+
+            _oldSearchTxt = filter;
+            if (filter.Length <= 0)
+            {
+                showIpList = _ipList;
+            }
+            else
+            {
+                showIpList = new List<VpsMachineDto>();
+                foreach (var dto in _ipList)
+                {
+                    if (dto.VpsIp.Contains(filter))
+                    {
+                        showIpList.Add(dto);
+                    }
+                }
+            }
+
+            if (showIpList.Count == 0)
+            {
+                MessageBox.Show("无结果，请修改IP检索内容");
+                txtIpFilter.SelectAll();
+                txtIpFilter.Focus();
+                return;
+            }
+
+            BindListView(showIpList, _sortCol, _isAsc);
         }
     }
 }
