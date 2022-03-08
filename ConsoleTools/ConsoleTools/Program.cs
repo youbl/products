@@ -13,7 +13,7 @@ namespace ConsoleTools
             //DoScan(@"d:\tmp\aaa");
             if (args == null || args.Length <= 0)
             {
-                Console.WriteLine("请输入参数： 1截图 2开机时间 3分辨率，第2个参数为输出文件路径(可空)");
+                LoopChoose();
                 return;
             }
 
@@ -44,6 +44,23 @@ namespace ConsoleTools
             //         Console.WriteLine("写文件错:" + exp);
             //     }
             // }
+        }
+
+        static void LoopChoose()
+        {
+            var line = "";
+            while (!line.Equals("exit", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("请输入参数： 1截图 2开机时间 3分辨率 4配置，第2个参数为输出文件路径(可空)");
+                line = (Console.ReadLine() ?? "").Trim();
+                if (line.Length > 0)
+                {
+                    var arrArgs = line.Split(' ');
+                    Console.WriteLine(MainService.CallService(arrArgs[0], arrArgs.Length > 1 ? arrArgs[1] : ""));
+                }
+
+                Console.WriteLine();
+            }
         }
     }
 }
