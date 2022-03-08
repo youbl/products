@@ -65,6 +65,14 @@ namespace MstscIps
                     if (string.IsNullOrEmpty(machineDto.VpsPwd))
                     {
                         machineDto.VpsPwd = txtPwd.Text;
+
+                        if (machineDto.ImageName != null &&
+                            machineDto.ImageName.IndexOf("tencent", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                            machineDto.VpsPwd.Length > 30
+                           )
+                        {
+                            machineDto.VpsPwd = machineDto.VpsPwd.Substring(0, 30); // 腾讯云只支持30位密码
+                        }
                     }
 
                     return machineDto;
@@ -170,7 +178,9 @@ namespace MstscIps
                     idx.ToString(),
                     ip.VpsIp,
                     ip.GroupCode,
-                    ip.CreateDate
+                    ip.CreateDate,
+                    ip.InstanceId,
+                    ip.ImageName
                 });
                 listView1.Items.Add(item);
             }
@@ -186,6 +196,10 @@ namespace MstscIps
                     return dto.GroupCode;
                 case 3:
                     return dto.CreateDate;
+                case 4:
+                    return dto.InstanceId;
+                case 5:
+                    return dto.ImageName;
             }
         }
 

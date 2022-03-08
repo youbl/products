@@ -28,5 +28,15 @@
         /// VPS登录用户名
         /// </summary>
         public string User { get; set; } = "administrator";
+
+        /// <summary>
+        /// VPS实例ID
+        /// </summary>
+        public string InstanceId { get; set; }
+
+        /// <summary>
+        /// 使用的镜像
+        /// </summary>
+        public string ImageName { get; set; }
     }
 }

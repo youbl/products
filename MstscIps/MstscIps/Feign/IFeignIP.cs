@@ -14,6 +14,25 @@ namespace MstscIps.Feign
         /// </summary>
         [GetMapping("")]
         List<VpsMachineDto> GetIP(Uri uri);
+
+        /*
+         返回数据格式：
+[
+    {
+        "id": "123",
+        "createDate": "2022-03-08T16:32:15",
+        "updateDate": "2022-03-08T16:32:15",
+        "statusCd": "1000",
+        "vpsIp": "1.2.3.7",
+        "vpsStatus": "running",
+        "openDateTime": "2022-03-08T16:32:15",
+        "groupCode": "NORMAL_GROUP",
+        "vpsOpenDuration": "0",
+        "imageName": "aws-java-pro",
+        "instanceId": "i-abcd"
+    }
+]
+         */
     }
 
 
