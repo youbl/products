@@ -1,4 +1,5 @@
 ﻿using System;
+using ConsoleTools.Utilities;
 
 namespace ConsoleTools
 {
@@ -10,7 +11,6 @@ namespace ConsoleTools
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            //DoScan(@"d:\tmp\aaa");
             if (args == null || args.Length <= 0)
             {
                 LoopChoose();
@@ -31,19 +31,6 @@ namespace ConsoleTools
             {
                 Console.WriteLine("CallService出错:" + exp);
             }
-
-            // Console.WriteLine(result);
-            // if (args.Length >= 2)
-            // {
-            //     try
-            //     {
-            //         FileHelper.WriteToFile(args[1], result);
-            //     }
-            //     catch (Exception exp)
-            //     {
-            //         Console.WriteLine("写文件错:" + exp);
-            //     }
-            // }
         }
 
         static void LoopChoose()
@@ -51,7 +38,7 @@ namespace ConsoleTools
             var line = "";
             while (!line.Equals("exit", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine("请输入参数： 1截图 2开机时间 3分辨率 4配置，第2个参数为输出文件路径(可空)");
+                Console.WriteLine("请输入参数： 1截图 2开机时间 3当前分辨率 4支持的分辨率 5设置分辨率 6系统配置，第2个参数为输出文件路径(可空)");
                 line = (Console.ReadLine() ?? "").Trim();
                 if (line.Length > 0)
                 {

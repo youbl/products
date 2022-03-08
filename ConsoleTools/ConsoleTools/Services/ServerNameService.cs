@@ -10,7 +10,7 @@ namespace ConsoleTools.Services
     {
         public string Operate(string saveFile)
         {
-            var ret = string.Format("{0}\\{1} ({2} {3}位 CPU:{4}核 内存:{5})",
+            var ret = string.Format("机器名:{0} 用户:{1} ({2} {3}位 CPU:{4}核 内存:{5})",
                 Environment.MachineName,
                 Environment.UserName,
                 Environment.OSVersion,

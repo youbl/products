@@ -13,7 +13,9 @@ namespace ConsoleTools
             dictServices.Add("1", new CaptureService());
             dictServices.Add("2", new RuntimeService());
             dictServices.Add("3", new ResolutionService());
-            dictServices.Add("4", new ServerNameService());
+            dictServices.Add("4", new SupportResolutionService());
+            dictServices.Add("5", new ChangeResolutionService());
+            dictServices.Add("6", new ServerNameService());
         }
 
         /// <summary>
