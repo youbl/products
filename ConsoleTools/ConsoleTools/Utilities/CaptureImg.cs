@@ -8,6 +8,7 @@ namespace ConsoleTools.Utilities
 {
     /// <summary>
     /// 屏幕截图工具，代码拷贝自 https://stackoverflow.com/questions/39760371/
+    /// 不支持多显示器
     /// </summary>
     public class CaptureImg
     {

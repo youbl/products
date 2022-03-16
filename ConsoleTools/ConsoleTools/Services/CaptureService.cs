@@ -24,7 +24,7 @@ namespace ConsoleTools.Services
                 file = Path.Combine(path, DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg");
             }
 
-            CaptureImg.Default.CaptureScreenToFile(file, ImageFormat.Jpeg);
+            CaptureImg2.Default.CaptureScreenToFile(file, ImageFormat.Jpeg);
             return file;
         }
     }
