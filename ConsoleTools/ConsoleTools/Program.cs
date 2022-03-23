@@ -1,5 +1,4 @@
 ﻿using System;
-using ConsoleTools.Utilities;
 
 namespace ConsoleTools
 {
@@ -36,9 +35,19 @@ namespace ConsoleTools
         static void LoopChoose()
         {
             var line = "";
-            while (!line.Equals("exit", StringComparison.OrdinalIgnoreCase))
+            Console.WriteLine("请输入参数1： " +
+                              "\n  无参数时，显示本菜单，有参数时，执行完自动退出 " +
+                              "\n  1 全屏截图，参数2为截图文件路径(可空) " +
+                              "\n  2 获取开机时间，参数2为写入文件路径(可空) " +
+                              "\n  3 获取当前分辨率，参数2为写入文件路径(可空) " +
+                              "\n  4 获取当前支持的分辨率，参数2为写入文件路径(可空) " +
+                              "\n  5 设置分辨率，参数2为分辨率，如1920*1080 " +
+                              "\n  6 获取系统配置，参数2为写入文件路径(可空)");
+            while (!line.Equals("exit", StringComparison.OrdinalIgnoreCase) &&
+                   !line.Equals("quit", StringComparison.OrdinalIgnoreCase) &&
+                   !line.Equals("q", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine("请输入参数： 1截图 2开机时间 3当前分辨率 4支持的分辨率 5设置分辨率 6系统配置，第2个参数为输出文件路径(可空)");
+                Console.WriteLine();
                 line = (Console.ReadLine() ?? "").Trim();
                 if (line.Length > 0)
                 {
@@ -46,7 +55,6 @@ namespace ConsoleTools
                     Console.WriteLine(MainService.CallService(arrArgs[0], arrArgs.Length > 1 ? arrArgs[1] : ""));
                 }
 
-                Console.WriteLine();
             }
         }
     }
