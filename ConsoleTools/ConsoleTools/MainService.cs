@@ -22,9 +22,9 @@ namespace ConsoleTools
         /// 呼叫服务，并把结果存入指定文件
         /// </summary>
         /// <param name="type">服务类型</param>
-        /// <param name="saveFile">结果文件，为空表示不写入文件，或使用默认文件</param>
+        /// <param name="args">结果文件，为空表示不写入文件，或使用默认文件</param>
         /// <returns>服务返回的结果</returns>
-        public static string CallService(string type, string saveFile)
+        public static string CallService(string type, string[] args)
         {
             if (string.IsNullOrEmpty(type) ||
                 !dictServices.TryGetValue(type, out var service))
@@ -32,7 +32,7 @@ namespace ConsoleTools
                 return ("未找到服务类，参数: " + type);
             }
 
-            return service.Operate(saveFile);
+            return service.Operate(args);
         }
     }
 }

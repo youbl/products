@@ -10,8 +10,9 @@ namespace ConsoleTools.Services
     /// </summary>
     internal class ResolutionService : ServicesBase
     {
-        public string Operate(string saveFile)
+        public string Operate(string[] args)
         {
+            var saveFile = args.Length > 0 ? args[0] : "";
             var ret = SystemHelper.GetResolution();
             if (!string.IsNullOrWhiteSpace(saveFile))
             {

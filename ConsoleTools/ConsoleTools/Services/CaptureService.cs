@@ -12,20 +12,36 @@ namespace ConsoleTools.Services
     {
         private static string path = AppDomain.CurrentDomain.BaseDirectory;
 
-        public string Operate(string saveFile)
+        public string Operate(string[] args)
         {
             string file;
-            if (!string.IsNullOrWhiteSpace(saveFile))
+            if (args.Length > 0 && args[0] != "-")
             {
-                file = saveFile;
+                file = args[0];
             }
             else
             {
                 file = Path.Combine(path, DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg");
             }
 
-            CaptureImg2.Default.CaptureScreenToFile(file, ImageFormat.Jpeg);
+            var format = args.Length > 1 ? args[1] : "jpeg";
+
+            CaptureImg2.Default.CaptureScreenToFile(file, GetFormat(format));
             return file;
+        }
+
+        ImageFormat GetFormat(string format)
+        {
+            format = (format ?? "jpeg").ToLower();
+            switch (format)
+            {
+                default:
+                    return ImageFormat.Jpeg;
+                case "png":
+                    return ImageFormat.Png;
+                case "bmp":
+                    return ImageFormat.Bmp;
+            }
         }
     }
 }

@@ -8,8 +8,9 @@ namespace ConsoleTools.Services
     /// </summary>
     internal class ServerNameService : ServicesBase
     {
-        public string Operate(string saveFile)
+        public string Operate(string[] args)
         {
+            var saveFile = args.Length > 0 ? args[0] : "";
             var ret = string.Format("机器名:{0} 用户:{1} ({2} {3}位 CPU:{4}核 内存:{5})",
                 Environment.MachineName,
                 Environment.UserName,

@@ -2,6 +2,6 @@
 {
     internal interface ServicesBase
     {
-        string Operate(string saveFile);
+        string Operate(string[] args);
     }
 }

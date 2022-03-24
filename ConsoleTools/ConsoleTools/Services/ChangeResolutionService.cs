@@ -7,8 +7,9 @@ namespace ConsoleTools.Services
     /// </summary>
     internal class ChangeResolutionService : ServicesBase
     {
-        public string Operate(string resolution)
+        public string Operate(string[] args)
         {
+            string resolution = args.Length > 0 ? args[0] : "";
             if (string.IsNullOrEmpty(resolution))
             {
                 return "分辨率参数不能为空, 举例 1280*800";

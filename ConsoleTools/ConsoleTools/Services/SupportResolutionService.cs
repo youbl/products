@@ -10,8 +10,10 @@ namespace ConsoleTools.Services
     /// </summary>
     internal class SupportResolutionService : ServicesBase
     {
-        public string Operate(string saveFile)
+        public string Operate(string[] args)
         {
+            var saveFile = args.Length > 0 ? args[0] : "";
+
             var sb = new StringBuilder();
             sb.AppendLine("当前分辨率:" + DisplayHelper.GetCurrentSettings());
             var allModes = DisplayHelper.EnumerateSupportedModes();
