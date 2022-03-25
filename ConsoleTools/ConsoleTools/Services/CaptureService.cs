@@ -14,6 +14,8 @@ namespace ConsoleTools.Services
 
         public string Operate(string[] args)
         {
+            var format = GetFormat(args.Length > 1 ? args[1] : "jpg");
+
             string file;
             if (args.Length > 0 && args[0] != "-")
             {
@@ -21,12 +23,18 @@ namespace ConsoleTools.Services
             }
             else
             {
-                file = Path.Combine(path, DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg");
+                file = Path.Combine(path, DateTime.Now.ToString("yyyyMMddHHmmss") + "." + format.ToString().ToLower());
             }
 
-            var format = args.Length > 1 ? args[1] : "jpeg";
+            if (args.Length > 2 && args[2] == "main")
+            {
+                CaptureImg.Default.CaptureScreenToFile(file, format);
+            }
+            else
+            {
+                CaptureImg2.Default.CaptureScreenToFile(file, format);
+            }
 
-            CaptureImg2.Default.CaptureScreenToFile(file, GetFormat(format));
             return file;
         }
 

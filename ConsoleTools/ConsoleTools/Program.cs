@@ -26,7 +26,7 @@ namespace ConsoleTools
                 LoopChoose();
                 return;
             }
-            
+
             try
             {
                 Console.WriteLine(MainService.CallService(args[0], GetLeftArr(args)));
@@ -42,7 +42,9 @@ namespace ConsoleTools
             var line = "";
             Console.WriteLine("请输入参数1： " +
                               "\n  无参数时，显示本菜单，有参数时，执行完自动退出 " +
-                              "\n  1 全屏截图，参数2为截图文件路径(可空)，参数3为截图格式(默认jpg) " +
+                              "\n  1 全屏截图，参数2为截图文件路径(可空或传-)，" +
+                              "\n              参数3为截图格式(默认jpg，支持jpg/png/bmp)，" +
+                              "\n              参数3为main表示截主屏，默认多屏 " +
                               "\n  2 获取开机时间，参数2为写入文件路径(可空) " +
                               "\n  3 获取当前分辨率，参数2为写入文件路径(可空) " +
                               "\n  4 获取当前支持的分辨率，参数2为写入文件路径(可空) " +
