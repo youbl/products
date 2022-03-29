@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.txtIpFilter = new System.Windows.Forms.TextBox();
@@ -48,6 +49,9 @@
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.lvContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.立即远程ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.复制ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
@@ -55,6 +59,7 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.lvContextMenu.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -139,7 +144,7 @@
             // 
             // btnResreshIpList
             // 
-            this.btnResreshIpList.Location = new System.Drawing.Point(522, 38);
+            this.btnResreshIpList.Location = new System.Drawing.Point(544, 38);
             this.btnResreshIpList.Name = "btnResreshIpList";
             this.btnResreshIpList.Size = new System.Drawing.Size(75, 23);
             this.btnResreshIpList.TabIndex = 6;
@@ -153,7 +158,7 @@
             this.lstUrls.FormattingEnabled = true;
             this.lstUrls.Location = new System.Drawing.Point(158, 40);
             this.lstUrls.Name = "lstUrls";
-            this.lstUrls.Size = new System.Drawing.Size(361, 20);
+            this.lstUrls.Size = new System.Drawing.Size(380, 20);
             this.lstUrls.TabIndex = 5;
             // 
             // label2
@@ -172,9 +177,9 @@
             this.button1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button1.Location = new System.Drawing.Point(444, 8);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(94, 23);
             this.button1.TabIndex = 2;
-            this.button1.Text = "远    程";
+            this.button1.Text = "立即开始远程";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -205,11 +210,11 @@
             this.columnHeader4,
             this.columnHeader5,
             this.columnHeader6});
+            this.listView1.ContextMenuStrip = this.lvContextMenu;
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView1.FullRowSelect = true;
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(0, 0);
-            this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(712, 400);
             this.listView1.TabIndex = 0;
@@ -248,6 +253,29 @@
             // 
             this.columnHeader6.Text = "使用镜像";
             this.columnHeader6.Width = 160;
+            // 
+            // lvContextMenu
+            // 
+            this.lvContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.立即远程ToolStripMenuItem,
+            this.复制ToolStripMenuItem});
+            this.lvContextMenu.Name = "lvContextMenu";
+            this.lvContextMenu.Size = new System.Drawing.Size(181, 70);
+            this.lvContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.lvContextMenu_Opening);
+            // 
+            // 立即远程ToolStripMenuItem
+            // 
+            this.立即远程ToolStripMenuItem.Name = "立即远程ToolStripMenuItem";
+            this.立即远程ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.立即远程ToolStripMenuItem.Text = "立即远程";
+            this.立即远程ToolStripMenuItem.Click += new System.EventHandler(this.立即远程ToolStripMenuItem_Click);
+            // 
+            // 复制ToolStripMenuItem
+            // 
+            this.复制ToolStripMenuItem.Name = "复制ToolStripMenuItem";
+            this.复制ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.复制ToolStripMenuItem.Text = "复制";
+            this.复制ToolStripMenuItem.Click += new System.EventHandler(this.复制ToolStripMenuItem_Click);
             // 
             // toolStrip1
             // 
@@ -289,6 +317,7 @@
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.lvContextMenu.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -319,6 +348,9 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.ContextMenuStrip lvContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem 复制ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 立即远程ToolStripMenuItem;
     }
 }
 

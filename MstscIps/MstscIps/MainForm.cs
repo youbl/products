@@ -4,6 +4,7 @@ using Beinet.Feign;
 using System.Windows.Forms;
 using MstscIps.Feign;
 using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 using MstscIps.Feign.Dto;
 using MstscIps.Utils;
@@ -150,7 +151,7 @@ namespace MstscIps
 
         private void listView1_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            if (e.Column < 1 || e.Column > 3)
+            if (e.Column < 1)
                 return;
 
             BindListView(_ipList, e.Column, _isAsc);
@@ -245,6 +246,7 @@ namespace MstscIps
 
         private void btnResreshIpList_Click(object sender, EventArgs e)
         {
+            BindListView(null, 0, false); // 清空
             var begin = DateTime.Now;
             try
             {
@@ -336,6 +338,42 @@ namespace MstscIps
             }
 
             BindListView(showIpList, _sortCol, _isAsc);
+        }
+
+        private void 立即远程ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            listView1_DoubleClick(sender, e);
+        }
+
+        private void 复制ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count < 1)
+            {
+                MessageBox.Show("请先选中行");
+                return;
+            }
+
+            var sb = new StringBuilder();
+            foreach (ListViewItem item in listView1.SelectedItems)
+            {
+                foreach (ListViewItem.ListViewSubItem subItem in item.SubItems)
+                {
+                    sb.Append(subItem.Text).Append(", ");
+                }
+
+                sb.AppendLine();
+            }
+
+            Clipboard.SetText(sb.ToString());
+        }
+
+        private void lvContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var enabled = listView1.SelectedItems.Count >= 1;
+            foreach (ToolStripItem item in lvContextMenu.Items)
+            {
+                item.Enabled = enabled;
+            }
         }
     }
 }
