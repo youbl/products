@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Text.RegularExpressions;
 using ConsoleTools.Utilities;
 
 namespace ConsoleTools.Services
@@ -7,6 +8,8 @@ namespace ConsoleTools.Services
     internal class MachineCodeService : ServicesBase
     {
         public const int CODE_LEN = 32;
+        private static Regex regInvalidChars = new Regex("[_.-]", RegexOptions.Compiled);
+
 
         public string Operate(string[] args)
         {
@@ -34,6 +37,7 @@ namespace ConsoleTools.Services
             var len = args.Length;
             for (int i = 0, j = len; i < j; i++)
             {
+                args[i] = regInvalidChars.Replace(args[i], "");
                 sb.Append(args[i]);
             }
 
@@ -47,9 +51,14 @@ namespace ConsoleTools.Services
             var eachSub = (int) Math.Ceiling(diff * 1D / len);
             for (int i = 0, j = len; i < j; i++)
             {
-                sb.Append(args[i].Substring(eachSub));
+                if (args[i].Length > eachSub)
+                    sb.Append(args[i].Substring(eachSub));
+                else
+                    sb.Append(args[i]);
             }
 
+            if (sb.Length > CODE_LEN)
+                sb.Remove(0, sb.Length - CODE_LEN);
             return sb.ToString();
         }
     }
