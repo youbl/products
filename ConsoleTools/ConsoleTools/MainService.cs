@@ -16,6 +16,7 @@ namespace ConsoleTools
             dictServices.Add("4", new SupportResolutionService());
             dictServices.Add("5", new ChangeResolutionService());
             dictServices.Add("6", new ServerNameService());
+            dictServices.Add("7", new MachineCodeService());
         }
 
         /// <summary>

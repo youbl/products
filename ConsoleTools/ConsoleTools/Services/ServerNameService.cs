@@ -17,7 +17,7 @@ namespace ConsoleTools.Services
                 Environment.OSVersion,
                 Environment.Is64BitOperatingSystem ? "64" : "32",
                 Environment.ProcessorCount,
-                SystemHelper.GetPhysicalMemort());
+                SystemHelper.GetPhysicalMemory());
 
             if (!string.IsNullOrWhiteSpace(saveFile))
             {
