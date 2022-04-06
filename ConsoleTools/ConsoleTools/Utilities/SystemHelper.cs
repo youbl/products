@@ -63,6 +63,7 @@ namespace ConsoleTools.Utilities
                     // {
                     //     sb.AppendFormat("{0} : {1}\n", property.Name, property.Value);
                     // }
+                    // Console.WriteLine(sb + "\n");
 
                     action(record);
                 }
@@ -156,6 +157,28 @@ namespace ConsoleTools.Utilities
             }, 1);
 
             return result.ToString();
+        }
+
+        /// <summary>
+        /// 返回网卡MAC
+        /// </summary>
+        /// <returns></returns>
+        public static string GetMac()
+        {
+            var mos = "SELECT IPEnabled,MacAddress FROM Win32_NetworkAdapterConfiguration";
+            var result = new StringBuilder();
+            ManagementObjectQuery(mos, record =>
+            {
+                if (result.Length > 0)
+                {
+                    result.AppendLine();
+                }
+
+                if ((bool) record["IPEnabled"])
+                    result.AppendFormat("{0}", (record["MacAddress"] ?? "").ToString().Trim());
+            });
+
+            return result.ToString().Trim();
         }
     }
 }

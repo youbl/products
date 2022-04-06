@@ -8,7 +8,7 @@ namespace ConsoleTools.Services
     internal class MachineCodeService : ServicesBase
     {
         public const int CODE_LEN = 32;
-        private static Regex regInvalidChars = new Regex("[_.-]", RegexOptions.Compiled);
+        private static Regex regInvalidChars = new Regex("[_\\.\\-:\\r\\n]", RegexOptions.Compiled);
 
 
         public string Operate(string[] args)
@@ -16,11 +16,14 @@ namespace ConsoleTools.Services
             var cpuId = SystemHelper.GetCpuId();
             var diskId = SystemHelper.GetDiskId();
             var boardId = SystemHelper.GetBoardId();
-            var ret = string.Format("CPUID:{0} 硬盘ID:{1} 主板ID:{2} 机器码:{3}",
+            var mac = SystemHelper.GetMac();
+
+            var ret = string.Format("CPUID:{0} 硬盘ID:{1} 主板ID:{2} mac:{3} 机器码:{4}",
                 cpuId,
                 diskId,
                 boardId,
-                MakeMachineCode(cpuId, diskId, boardId));
+                mac,
+                MakeMachineCode(cpuId, diskId, boardId, mac));
 
             var saveFile = args.Length > 0 ? args[0] : "";
             if (!string.IsNullOrWhiteSpace(saveFile))
