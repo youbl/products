@@ -11,6 +11,8 @@ namespace ConsoleTools
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             // var filename = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
             //     DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg");
             // using (Image img = CaptureImg3.GetWindow("钉钉"))
@@ -50,7 +52,8 @@ namespace ConsoleTools
                               "\n  4 获取当前支持的分辨率，参数2为写入文件路径(可空) " +
                               "\n  5 设置分辨率，参数2为分辨率，如1920*1080 " +
                               "\n  6 获取系统配置，参数2为写入文件路径(可空)" +
-                              "\n  7 获取机器码，参数2为写入文件路径(可空)");
+                              "\n  7 获取机器码，参数2为写入文件路径(可空)" +
+                              "\n  8 获取磁盘信息，参数2为写入文件路径(可空)");
             while (!line.Equals("exit", StringComparison.OrdinalIgnoreCase) &&
                    !line.Equals("quit", StringComparison.OrdinalIgnoreCase) &&
                    !line.Equals("q", StringComparison.OrdinalIgnoreCase))
@@ -74,6 +77,12 @@ namespace ConsoleTools
             }
 
             return ret.ToArray();
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            // object exp = e == null ? "" : e.ExceptionObject;
+            // MessageBox.Show("CurrentDomain_UnhandledExp:" + exp);
         }
     }
 }
