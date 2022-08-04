@@ -322,7 +322,7 @@ namespace MstscIps
                 showIpList = new List<VpsMachineDto>();
                 foreach (var dto in _ipList)
                 {
-                    if (dto.VpsIp.Contains(filter))
+                    if (!string.IsNullOrEmpty(dto.VpsIp) && dto.VpsIp.Contains(filter))
                     {
                         showIpList.Add(dto);
                     }
