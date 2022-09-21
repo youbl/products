@@ -31,6 +31,11 @@ namespace MstscIps
             LoadConfig();
 
             toolStripLabel1.Text = "启动时间:" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss 有问题请联系北亮");
+
+            // 按钮添加提示信息
+            var toolTip = new ToolTip();
+            toolTip.ReshowDelay = 1;
+            toolTip.SetToolTip(btnClearPwdCache, "远程出错时，可以点此按钮清理密码缓存（缓存太多会有问题）");
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -275,7 +280,7 @@ namespace MstscIps
             }
             finally
             {
-                var costTime = (int) (DateTime.Now - begin).TotalMilliseconds;
+                var costTime = (int)(DateTime.Now - begin).TotalMilliseconds;
                 toolStripLabel2.Text =
                     "刷新耗时:" + costTime.ToString() + "ms, 行数:" + (_ipList?.Count ?? 0);
             }
@@ -373,6 +378,34 @@ namespace MstscIps
             foreach (ToolStripItem item in lvContextMenu.Items)
             {
                 item.Enabled = enabled;
+            }
+        }
+
+        private void btnClearPwdCache_Click(object sender, EventArgs e)
+        {
+            var startInfo = new ProcessStartInfo();
+            startInfo.FileName = @"powershell.exe";
+            // startInfo.Arguments = @"& 'c:\Scripts\test.ps1'";
+            var cmd = "cmdkey /list | ForEach-Object{if($_ -like \"*目标:*\"){cmdkey /delete:($_ -replace \" \",\"\" -replace \"目标:\",\"\")}}";
+
+            //startInfo.RedirectStandardOutput = true;
+            //startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardInput = true;
+            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = false;
+
+            using (var process = new Process())
+            {
+                process.StartInfo = startInfo;
+                process.Start();
+                process.StandardInput.WriteLine(cmd);
+
+                process.StandardInput.WriteLine("exit");
+                process.WaitForExit();
+                // string output = process.StandardOutput.ReadToEnd();
+                // Assert.IsTrue(output.Contains("123"));
+                // string errors = process.StandardError.ReadToEnd();
+                // Assert.IsTrue(string.IsNullOrEmpty(errors));
             }
         }
     }

@@ -55,6 +55,7 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            this.btnClearPwdCache = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -74,6 +75,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnClearPwdCache);
             this.splitContainer1.Panel1.Controls.Add(this.txtIpFilter);
             this.splitContainer1.Panel1.Controls.Add(this.label4);
             this.splitContainer1.Panel1.Controls.Add(this.txtPwd);
@@ -90,7 +92,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.listView1);
             this.splitContainer1.Panel2.Controls.Add(this.toolStrip1);
-            this.splitContainer1.Size = new System.Drawing.Size(712, 497);
+            this.splitContainer1.Size = new System.Drawing.Size(949, 621);
             this.splitContainer1.SplitterDistance = 71;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 0;
@@ -98,55 +100,61 @@
             // 
             // txtIpFilter
             // 
-            this.txtIpFilter.Location = new System.Drawing.Point(49, 40);
+            this.txtIpFilter.Location = new System.Drawing.Point(65, 50);
+            this.txtIpFilter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtIpFilter.Name = "txtIpFilter";
-            this.txtIpFilter.Size = new System.Drawing.Size(103, 21);
+            this.txtIpFilter.Size = new System.Drawing.Size(136, 25);
             this.txtIpFilter.TabIndex = 4;
             this.txtIpFilter.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtIpFilter_KeyUp);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(5, 43);
+            this.label4.Location = new System.Drawing.Point(7, 54);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(47, 12);
+            this.label4.Size = new System.Drawing.Size(61, 15);
             this.label4.TabIndex = 0;
             this.label4.Text = "IP检索:";
             // 
             // txtPwd
             // 
-            this.txtPwd.Location = new System.Drawing.Point(349, 10);
+            this.txtPwd.Location = new System.Drawing.Point(465, 12);
+            this.txtPwd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtPwd.Name = "txtPwd";
             this.txtPwd.PasswordChar = '*';
-            this.txtPwd.Size = new System.Drawing.Size(92, 21);
+            this.txtPwd.Size = new System.Drawing.Size(121, 25);
             this.txtPwd.TabIndex = 1;
             this.txtPwd.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtIp_KeyUp);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(318, 13);
+            this.label3.Location = new System.Drawing.Point(424, 16);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(35, 12);
+            this.label3.Size = new System.Drawing.Size(45, 15);
             this.label3.TabIndex = 0;
             this.label3.Text = "密码:";
             // 
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(544, 13);
+            this.linkLabel1.Location = new System.Drawing.Point(851, 53);
+            this.linkLabel1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(53, 12);
+            this.linkLabel1.Size = new System.Drawing.Size(83, 15);
             this.linkLabel1.TabIndex = 3;
             this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "编辑配置";
+            this.linkLabel1.Text = "IP列表配置";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
             // btnResreshIpList
             // 
-            this.btnResreshIpList.Location = new System.Drawing.Point(544, 38);
+            this.btnResreshIpList.Location = new System.Drawing.Point(725, 48);
+            this.btnResreshIpList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnResreshIpList.Name = "btnResreshIpList";
-            this.btnResreshIpList.Size = new System.Drawing.Size(75, 23);
+            this.btnResreshIpList.Size = new System.Drawing.Size(100, 29);
             this.btnResreshIpList.TabIndex = 6;
             this.btnResreshIpList.Text = "刷新IP列表";
             this.btnResreshIpList.UseVisualStyleBackColor = true;
@@ -156,9 +164,10 @@
             // 
             this.lstUrls.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.lstUrls.FormattingEnabled = true;
-            this.lstUrls.Location = new System.Drawing.Point(158, 40);
+            this.lstUrls.Location = new System.Drawing.Point(211, 50);
+            this.lstUrls.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.lstUrls.Name = "lstUrls";
-            this.lstUrls.Size = new System.Drawing.Size(380, 20);
+            this.lstUrls.Size = new System.Drawing.Size(505, 23);
             this.lstUrls.TabIndex = 5;
             // 
             // label2
@@ -166,18 +175,20 @@
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label2.ForeColor = System.Drawing.Color.Red;
-            this.label2.Location = new System.Drawing.Point(5, 13);
+            this.label2.Location = new System.Drawing.Point(7, 16);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(123, 12);
+            this.label2.Size = new System.Drawing.Size(153, 15);
             this.label2.TabIndex = 0;
             this.label2.Text = "双击列表IP进入远程";
             // 
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button1.Location = new System.Drawing.Point(444, 8);
+            this.button1.Location = new System.Drawing.Point(592, 10);
+            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(94, 23);
+            this.button1.Size = new System.Drawing.Size(125, 29);
             this.button1.TabIndex = 2;
             this.button1.Text = "立即开始远程";
             this.button1.UseVisualStyleBackColor = true;
@@ -185,9 +196,10 @@
             // 
             // txtIp
             // 
-            this.txtIp.Location = new System.Drawing.Point(190, 10);
+            this.txtIp.Location = new System.Drawing.Point(253, 12);
+            this.txtIp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtIp.Name = "txtIp";
-            this.txtIp.Size = new System.Drawing.Size(122, 21);
+            this.txtIp.Size = new System.Drawing.Size(161, 25);
             this.txtIp.TabIndex = 0;
             this.txtIp.Text = "123.123.123.123";
             this.txtIp.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtIp_KeyUp);
@@ -195,9 +207,10 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(148, 13);
+            this.label1.Location = new System.Drawing.Point(197, 16);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(47, 12);
+            this.label1.Size = new System.Drawing.Size(61, 15);
             this.label1.TabIndex = 0;
             this.label1.Text = "远程IP:";
             // 
@@ -215,8 +228,9 @@
             this.listView1.FullRowSelect = true;
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(0, 0);
+            this.listView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(712, 400);
+            this.listView1.Size = new System.Drawing.Size(949, 524);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -256,37 +270,39 @@
             // 
             // lvContextMenu
             // 
+            this.lvContextMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.lvContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.立即远程ToolStripMenuItem,
             this.复制ToolStripMenuItem});
             this.lvContextMenu.Name = "lvContextMenu";
-            this.lvContextMenu.Size = new System.Drawing.Size(181, 70);
+            this.lvContextMenu.Size = new System.Drawing.Size(139, 52);
             this.lvContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.lvContextMenu_Opening);
             // 
             // 立即远程ToolStripMenuItem
             // 
             this.立即远程ToolStripMenuItem.Name = "立即远程ToolStripMenuItem";
-            this.立即远程ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.立即远程ToolStripMenuItem.Size = new System.Drawing.Size(138, 24);
             this.立即远程ToolStripMenuItem.Text = "立即远程";
             this.立即远程ToolStripMenuItem.Click += new System.EventHandler(this.立即远程ToolStripMenuItem_Click);
             // 
             // 复制ToolStripMenuItem
             // 
             this.复制ToolStripMenuItem.Name = "复制ToolStripMenuItem";
-            this.复制ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.复制ToolStripMenuItem.Size = new System.Drawing.Size(138, 24);
             this.复制ToolStripMenuItem.Text = "复制";
             this.复制ToolStripMenuItem.Click += new System.EventHandler(this.复制ToolStripMenuItem_Click);
             // 
             // toolStrip1
             // 
             this.toolStrip1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel1,
             this.toolStripLabel2});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 400);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 524);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.toolStrip1.Size = new System.Drawing.Size(712, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(949, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -294,7 +310,7 @@
             // 
             this.toolStripLabel1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(96, 22);
+            this.toolStripLabel1.Size = new System.Drawing.Size(122, 22);
             this.toolStripLabel1.Text = "toolStripLabel1";
             // 
             // toolStripLabel2
@@ -302,13 +318,25 @@
             this.toolStripLabel2.Name = "toolStripLabel2";
             this.toolStripLabel2.Size = new System.Drawing.Size(0, 22);
             // 
+            // btnClearPwdCache
+            // 
+            this.btnClearPwdCache.Location = new System.Drawing.Point(736, 10);
+            this.btnClearPwdCache.Margin = new System.Windows.Forms.Padding(4);
+            this.btnClearPwdCache.Name = "btnClearPwdCache";
+            this.btnClearPwdCache.Size = new System.Drawing.Size(139, 29);
+            this.btnClearPwdCache.TabIndex = 7;
+            this.btnClearPwdCache.Text = "清理密码缓存";
+            this.btnClearPwdCache.UseVisualStyleBackColor = true;
+            this.btnClearPwdCache.Click += new System.EventHandler(this.btnClearPwdCache_Click);
+            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(712, 497);
+            this.ClientSize = new System.Drawing.Size(949, 621);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "MainForm";
             this.Text = "远程辅助工具";
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -351,6 +379,7 @@
         private System.Windows.Forms.ContextMenuStrip lvContextMenu;
         private System.Windows.Forms.ToolStripMenuItem 复制ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 立即远程ToolStripMenuItem;
+        private System.Windows.Forms.Button btnClearPwdCache;
     }
 }
 
