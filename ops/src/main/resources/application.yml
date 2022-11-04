@@ -1,0 +1,31 @@
+logging.level:
+  beinet.cn.ops.beans.ref.MyFeignClient: DEBUG
+
+server:
+  port: 8881
+  servlet:
+    context-path: /ops-ci
+    session:
+      timeout: 86400
+  max-http-header-size: 64000
+
+spring:
+  application:
+    name: ops-ci
+  #  profiles:
+  #    active: test
+  datasource:
+    username: "ENC(O4/5+5/k7KI8BjCpouLrcroHzHX13rrZ)"
+    password: "ENC(kUGFVlObJGzwbvype/V4JwlOo2XqVx/0HUwTruri0nU=)"
+    url: jdbc:mysql://rpa-mysql-scheduler-test.ziniao.com:3306/rpa-schd-python-test?allowMultiQueries=true&useUnicode=true&characterEncoding=utf8&socketTimeout=3000&connectTimeout=3000&rewriteBatchedStatements=true
+
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 输出SQL日志
+    map-underscore-to-camel-case: false # 数据库下划线自动转驼峰标示关闭
+
+# 加密解密配置里的密码信息，使用的密钥
+jasypt:
+  encryptor:
+    password: zixun.com

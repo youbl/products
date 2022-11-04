@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <title>小助手发布</title>
+    <script src="../res/unpkg/vue.min.js" type="text/javascript"></script>
+    <script src="../res/unpkg/axios.min.js" type="text/javascript"></script>
+    <script src="../res/unpkg/elemeIndex.js" type="text/javascript"></script>
+    <script src="../res/qs.min.js" type="text/javascript"></script>
+    <script src="../res/common.js" type="text/javascript"></script>
+
+    <link href="../res/unpkg/elemeIndex.css" rel="stylesheet">
+</head>
+<body>
+<div id="divApp" style="text-align: center;width: 98%;">
+    <el-form :inline="true" ref="searchForm" style="text-align: left">
+        <el-form-item label="环境选择" prop="riskId">
+            <el-radio-group v-model="env" @change="envChanged">
+                <el-radio :label="'test'">测试环境</el-radio>
+                <el-radio :label="'prev'">预上环境</el-radio>
+                <el-radio :label="'prod'">生产环境</el-radio>
+            </el-radio-group>
+        </el-form-item>
+        <el-form-item>
+            <el-button @click="openBuildDialog" icon="el-icon-search" type="primary">启动构建</el-button>
+            <el-button @click="location.reload()" icon="el-icon-refresh">刷 新</el-button>
+        </el-form-item>
+        <br>
+        <span style="color:red;">注：当店铺ID与店铺名称同时填写时，查询条件以店铺ID为准</span>
+    </el-form>
+
+    <el-table
+            v-loading="loading"
+            element-loading-text="拼命加载中"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.8)"
+            :data="dataList"
+            border
+            stripe
+            @selection-change="handleSelectionChange">
+        <el-table-column
+                type="selection"
+                width="55">
+        </el-table-column>
+        <el-table-column label="项目名" width="160">
+            <template slot-scope="scope">
+                {{scope.row.name}}
+            </template>
+        </el-table-column>
+        <el-table-column label="包名" width="180">
+            <template slot-scope="scope">
+                {{scope.row.identify}}
+            </template>
+        </el-table-column>
+        <el-table-column label="Jenkins" width="100">
+            <template slot-scope="scope">
+                <a :href="'http://10.100.72.165:8080/job/' + scope.row.jenkins_id + '/'" target="_blank">Jenkins</a>
+            </template>
+        </el-table-column>
+        <el-table-column label="当前版本" width="600">
+            <template slot-scope="scope">
+                    <span v-if="scope.row.versionObj">
+                        {{scope.row.versionObj.updateDate}}
+                        <a :href="scope.row.versionObj.url">下载</a>
+                    </span>
+                <div>
+                    {{scope.row.version}}
+                    <span v-if="scope.row.versionObj">
+                        ({{sizeToStr(scope.row.versionObj.fileSize)}})
+                        </span>
+                </div>
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <el-dialog :visible.sync="showBuildDialog" title="启动构建" center width="30%">
+        <el-form :model="buildData" ref="buildForm" style="width:500px">
+            <el-form-item label-width="150px" label="打包环境" prop="type">
+                {{env}}
+            </el-form-item>
+            <el-form-item label="打包分支" label-width="150px" prop="branch">
+                <el-input placeholder="请输入打包分支" v-model.trim="buildData.branch"></el-input>
+            </el-form-item>
+            <el-form-item label="是否发布" label-width="150px" prop="isPublish">
+                <el-checkbox v-model="buildData.isPublish"></el-checkbox>
+            </el-form-item>
+            <el-form-item label="新版本说明" label-width="150px" prop="versionDesc">
+                <el-input type="textarea"
+                          :rows="3"
+                          placeholder="请输入升级说明" v-model.trim="buildData.versionDesc"></el-input>
+            </el-form-item>
+        </el-form>
+        <div class="dialog-footer" slot="footer">
+            <el-button @click="startBuild('buildForm')" icon="el-icon-success" type="primary">提 交</el-button>
+            <el-button @click="showBuildDialog=false">取 消</el-button>
+        </div>
+    </el-dialog>
+</div>
+
+<script type="text/javascript">
+    const BASE_URL = '/' + location.pathname.split('/')[1] + '/';
+
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            let defaultVerTxt = '请先选择环境';
+
+            return {
+                env: '',
+
+                loading: false,
+                selectedRows: [],
+                dataList: [
+                    {
+                        name: '守护项目',
+                        identify: 'hubu-daemon-new',
+                        jenkins_id: 'NetHubuDaemon',
+                        version: defaultVerTxt,
+                    },
+                    {
+                        name: '升级器项目',
+                        identify: 'hubu-updater',
+                        jenkins_id: 'NetHubuUpdater',
+                        version: defaultVerTxt,
+                    },
+                    {
+                        name: '小助手项目',
+                        identify: 'hubu-worker-new',
+                        jenkins_id: 'NetHubuWorker',
+                        version: defaultVerTxt,
+                    },
+                    {
+                        name: '完整包项目',
+                        identify: 'rpa-worker-daemon',
+                        jenkins_id: 'AssistanctSetupPackage',
+                        version: defaultVerTxt,
+                    },
+                ],
+
+                showBuildDialog: false,
+                buildData: {
+                    env: '',
+                    branch: '',
+                    isPublish: false,
+                    versionDesc: '',
+                    jenkinsIdList: [],
+                },
+            };
+        },
+        mounted: function () {
+        },
+        computed: {},
+        methods: {
+            // 环境选择变更
+            envChanged: function () {
+                this.loadVersion();
+
+                this.buildData.env = this.env;
+                this.buildData.branch = this.env;
+                if (this.env === 'prod')
+                    this.buildData.branch = 'master';
+            },
+            // 加载当前环境的每个组件版本
+            loadVersion: function () {
+                for (let i = 0, j = this.dataList.length; i < j; i++) {
+                    this.getLatestVersion(this.dataList[i], this.env);
+                }
+            },
+            getLatestVersion: function (app, env) {
+                let url = BASE_URL + 'version?identify=' + encodeURIComponent(app.identify) + '&env=' + env;
+                axios.get(url).then(response => {
+                    if (!response || response.data == null || response.data.url == null) {
+                        return;
+                    }
+
+                    Vue.set(app, 'version', response.data.version);
+                    Vue.set(app, 'versionObj', response.data);
+                }).catch(error => this.ajaxError(error));
+            },
+            handleSelectionChange(val) {
+                this.selectedRows = val;
+            },
+            openBuildDialog: function () {
+                if (!this.env) {
+                    return alert('请先选择环境');
+                }
+                if (!this.selectedRows || this.selectedRows.length <= 0) {
+                    return alert('请选择要构建的项目');
+                }
+                this.showBuildDialog = true;
+            },
+            startBuild: function () {
+                if (!this.buildData.env) {
+                    return alert('打包环境不能为空');
+                }
+                if (!this.buildData.branch) {
+                    return alert('请输入构建分支');
+                }
+                if (!this.buildData.versionDesc) {
+                    return alert('请输入新版本说明');
+                }
+                this.buildData.jenkinsIdList = [];
+                for (let i = 0, j = this.selectedRows.length; i < j; i++) {
+                    let item = this.selectedRows[i];
+                    this.buildData.jenkinsIdList.push(item.identify);
+                }
+                let url = BASE_URL + 'version?identify=' + encodeURIComponent(app.identify) + '&env=' + env;
+                axios.get(url).then(response => {
+                    if (!response || response.data == null || response.data.url == null) {
+                        return;
+                    }
+
+                    Vue.set(app, 'version', response.data.version);
+                    Vue.set(app, 'versionObj', response.data);
+                }).catch(error => this.ajaxError(error));
+            },
+            goLogin: function () {
+                top.location.href = BASE_URL + 'login/index.html?returnUrl=' + encodeURIComponent(location.href);
+            },
+            ajaxError: function (error) {
+                if (error.response && error.response.data) {
+                    console.log(JSON.stringify(error.response.data));
+                    let msg = error.response.data['msg'];
+                    if (msg && msg === 'Unauthorized') {
+                        this.goLogin();
+                    } else {
+                        alert(msg ? msg : '出错了');
+                    }
+                } else {
+                    console.log(JSON.stringify(error));
+                    alert('未知错误');
+                }
+            },
+        },
+    });
+</script>
+</body>
+</html>

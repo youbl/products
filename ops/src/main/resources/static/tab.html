@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>tab标签</title>
+    <script src="./res/unpkg/vue.min.js"></script>
+    <script src="./res/unpkg/elemeIndex.js"></script>
+    <link rel="stylesheet" href="./res/unpkg/elemeIndex.css">
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+
+        .el-aside {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div id="divApp">
+    <el-container style="height: 900px; border: 1px solid #eee">
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+            <el-menu :default-openeds="['1', '2']">
+                <el-submenu index="1">
+                    <template slot="title"><i class="el-icon-menu"></i>项目相关</template>
+                    <el-menu-item-group>
+                        <!--                        <template slot="title">分组一</template>-->
+                        <el-menu-item index="1-1" @click="openUrl('http://rpaops.ziniao.com/')">运维后台</el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+                <el-submenu index="2">
+                    <template slot="title"><i class="el-icon-menu"></i>构建相关</template>
+                    <el-menu-item index="2-1" @click="openUrl('./builds/worker.html')">小助手发版本</el-menu-item>
+                    <el-menu-item index="2-2">选项2</el-menu-item>
+                </el-submenu>
+            </el-menu>
+        </el-aside>
+
+        <el-container>
+            <el-header style="text-align: right; font-size: 12px">
+                <el-dropdown>
+                    <i class="el-icon-setting" style="margin-right: 15px"></i>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>个人信息</el-dropdown-item>
+                        <el-dropdown-item>退出</el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+                <span>王小虎</span>
+            </el-header>
+
+            <el-main style="">
+                <iframe frameborder="0" style="width:100%; display: block; border: 0; margin: 0 0 0 0;"
+                        :src="iframeUrl">
+                </iframe>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+<script>
+    const vueApp = new Vue({
+        el: '#divApp',
+        data: function () {
+            return {
+                //tableData: Array(20).fill({a:123})
+                iframeUrl: 'http://rpaops.ziniao.com',
+            }
+        },
+        created: function () {
+            this.adjustAllIframe();
+        },
+        methods: {
+            openUrl: function (url) {
+                if (url.indexOf('?') >= 0)
+                    url += '&_v=' + new Date().getTime();
+                else
+                    url += '?_v=' + new Date().getTime();
+                this.iframeUrl = url;
+            },
+            adjustAllIframe: function () {
+                let iframes = document.getElementsByTagName('IFRAME');
+                for (let i = 0, j = iframes.length; i < j; i++) {
+                    let item = iframes[i];
+                    this.adjustIframe(item);
+                }
+            },
+            adjustIframe: function (ifrm) {
+                // let ifrm = document.getElementsByTagName('IFRAME')[0];
+
+                //const deviceWidth = document.documentElement.clientWidth;
+                const deviceHeight = document.documentElement.clientHeight;
+                //ifrm.style.width = (Number(deviceWidth) - 220) + 'px'; //数字是页面布局宽度差值
+                ifrm.style.height = (Number(deviceHeight) - 130) + 'px'; //数字是页面布局高度差
+            },
+        },
+    });
+
+
+    /**
+     * 获取url里的变量值
+     * @param {string} name 变量名
+     * @return {string} 变量值
+     */
+    function getQueryString(name) {
+        if (typeof (name) !== 'string') {
+            return '';
+        }
+        name = name.trim();
+        if (name.length === 0) {
+            return '';
+        }
+        let localSearch = location.search.toLocaleLowerCase();
+        name = name.toLowerCase() + '=';
+        let tmpName = '?' + name;
+        let idx = localSearch.indexOf(tmpName);
+        if (idx < 0) {
+            tmpName = '&' + name;
+            idx = localSearch.indexOf(tmpName);
+            if (idx < 0) {
+                return '';
+            }
+        }
+        name = tmpName;
+        let tmp = location.search.substr(idx + name.length);
+        idx = tmp.indexOf('&');
+        if (idx === 0)
+            return '';
+        let ret;
+        if (idx < 0) {
+            ret = tmp;
+        } else {
+            ret = tmp.substr(0, idx);
+        }
+        return decodeURIComponent(ret.trim());
+    }
+</script>
+</body>
+</html>
