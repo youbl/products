@@ -242,7 +242,7 @@ function downloadDataToCsv(data) {
     let uri = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(data);
     let downloadLink = document.createElement("a");
     downloadLink.href = uri;
-    downloadLink.download = "export-ziniao.csv";
+    downloadLink.download = "export-beinet.csv";
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);

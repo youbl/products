@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.net.URI;
 
-@FeignClient(value = "vpsManager", url = "https://test-rpascheduler.ziniao.com")
+@FeignClient(value = "vpsManager", url = "https://beinet.cn")
 public interface VpsManagerFeign {
     @PostMapping(value = "/vps-manage-service/worker/version/latest",
             headers = {"simple-auth=vps-executor:zx2021RpaScheduler"})

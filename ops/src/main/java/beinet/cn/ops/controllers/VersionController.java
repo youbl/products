@@ -21,13 +21,13 @@ public class VersionController {
         String domain;
         switch (env) {
             case "test":
-                domain = "https://test-rpascheduler.ziniao.com";
+                domain = "https://test-beinet.cn";
                 break;
             case "prev":
-                domain = "https://pre-rpascheduler.ziniao.com";
+                domain = "https://pre-beinet.cn";
                 break;
             case "prod":
-                domain = "https://rpascheduler.ziniao.com";
+                domain = "https://beinet.cn";
                 break;
             default:
                 throw new RuntimeException("不支持的环境:" + env);

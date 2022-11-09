@@ -17,7 +17,7 @@ spring:
   datasource:
     username: "ENC(O4/5+5/k7KI8BjCpouLrcroHzHX13rrZ)"
     password: "ENC(kUGFVlObJGzwbvype/V4JwlOo2XqVx/0HUwTruri0nU=)"
-    url: jdbc:mysql://rpa-mysql-scheduler-test.ziniao.com:3306/rpa-schd-python-test?allowMultiQueries=true&useUnicode=true&characterEncoding=utf8&socketTimeout=3000&connectTimeout=3000&rewriteBatchedStatements=true
+    url: jdbc:mysql://10.1.2.3:3306/testDb?allowMultiQueries=true&useUnicode=true&characterEncoding=utf8&socketTimeout=3000&connectTimeout=3000&rewriteBatchedStatements=true
 
 
 mybatis-plus:
@@ -28,4 +28,4 @@ mybatis-plus:
 # 加密解密配置里的密码信息，使用的密钥
 jasypt:
   encryptor:
-    password: zixun.com
+    password: beinet.cn
